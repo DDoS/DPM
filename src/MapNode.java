@@ -33,26 +33,26 @@ public class MapNode {
 	}
 
 	public MapPath getShortestPathTo(MapNode m){
-		Queue<MapNode> queue = new LinkedList<MapNode>();
+		Queue<MapNode> queue = new Queue<MapNode>();
 		this.parent = null;
-		queue.add(this);
+		queue.push(this);
 		MapNode currNode = this;
 		while(!queue.isEmpty()&&currNode!=m){
-			currNode = queue.poll();
+			currNode = (MapNode) queue.pop();
 			MapNode nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 		}
 		MapPath result = null;
