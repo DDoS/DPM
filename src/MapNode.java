@@ -37,7 +37,8 @@ public class MapNode {
 		this.parent = null;
 		queue.add(this);
 		MapNode currNode = this;
-		while(!queue.isEmpty()&&currNode!=m){
+		System.out.println("hi?");
+		while(!queue.isEmpty()&&!currNode.equals(m)){
 			currNode = queue.poll();
 			MapNode nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 			if(nextNode!=null&&nextNode.getParent()==null){
@@ -54,9 +55,11 @@ public class MapNode {
 				nextNode.setParent(currNode);
 				queue.add(nextNode);
 			}
+			System.out.println("iterated");
 		}
 		MapPath result = null;
-		if(currNode==m){
+		if(currNode.equals(m)){
+			System.out.println("got here");
 			while(currNode.getParent()!=null){
 				if(currNode.getParent().getNodeFromPath(new MapPath(MapPath.Direction.LEFT)) == currNode){
 					result = new MapPath(MapPath.Direction.LEFT, result);

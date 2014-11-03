@@ -59,4 +59,12 @@ public class Map {
 		return f.getShortestPathTo(t);
 	}
 	
+	public MapNode getNodeAtIndex(int i){
+		return nodes[i];
+	}
+	
+	public MapNode getNodeAtPosition(int x, int y, int t){
+		return nodes[x + y*(int)Math.sqrt((double)nodes.length/4) + t/90];
+	}
+	
 }
