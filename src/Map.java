@@ -7,7 +7,7 @@ public class Map {
 	public Map(int size){
 		nodes = new MapNode[size];
 	}
-	
+
 	public Map(int[][] map){
 		if(map.length>0){
 			nodes = new MapNode[map.length * map[0].length * 4];
@@ -25,23 +25,23 @@ public class Map {
 					if(j<map[0].length-1&&map[i][j+1]!=0){
 						nodes[i + j*map.length + 3].setChild(MapPath.Direction.FRONT, nodes[i + (j+1)*map.length + 3]);
 					}
-					
+
 					nodes[i + j*map.length + 0].setChild(MapPath.Direction.LEFT, nodes[i + j*map.length + 3]);
 					nodes[i + j*map.length + 0].setChild(MapPath.Direction.RIGHT, nodes[i + j*map.length + 1]);
-					
+
 					nodes[i + j*map.length + 1].setChild(MapPath.Direction.LEFT, nodes[i + j*map.length + 0]);
 					nodes[i + j*map.length + 1].setChild(MapPath.Direction.RIGHT, nodes[i + j*map.length + 2]);
-					
+
 					nodes[i + j*map.length + 2].setChild(MapPath.Direction.LEFT, nodes[i + j*map.length + 1]);
 					nodes[i + j*map.length + 2].setChild(MapPath.Direction.RIGHT, nodes[i + j*map.length + 3]);
-					
+
 					nodes[i + j*map.length + 3].setChild(MapPath.Direction.LEFT, nodes[i + j*map.length + 2]);
 					nodes[i + j*map.length + 3].setChild(MapPath.Direction.RIGHT, nodes[i + j*map.length + 0]);
 				}
 			}
 		}
 	}
-	
+
 	public ArrayList<MapNode> getRemaningNodes(){
 		ArrayList<MapNode> result = new ArrayList<MapNode>();
 		for(int i=0; i<nodes.length; i++){
@@ -51,12 +51,12 @@ public class Map {
 		}
 		return result;
 	}
-	
+
 	public MapPath getPathFromNodeToNode(MapNode f, MapNode t){
 		for(int i=0; i<nodes.length; i++){
 			nodes[i].setParent(null);
 		}
 		return f.getShortestPathTo(t);
 	}
-	
+
 }

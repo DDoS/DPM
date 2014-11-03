@@ -8,16 +8,16 @@ public class MapNode {
 	private MapNode left;
 	private MapNode right;
 	private MapNode front;
-	
+
 	private boolean isValidStart;
-	
+
 	private MapNode parent;
-	
+
 	public MapNode(){
 		isValidStart = false;
 		left = null;
 		right = null;
-		front = null;	
+		front = null;
 	}
 	public MapNode getNodeFromPath(MapPath path){
 		if(path!=null){
@@ -31,7 +31,7 @@ public class MapNode {
 		}
 		return this;
 	}
-	
+
 	public MapPath getShortestPathTo(MapNode m){
 		Queue<MapNode> queue = new LinkedList<MapNode>();
 		this.parent = null;
@@ -70,7 +70,7 @@ public class MapNode {
 		}
 		return result;
 	}
-	
+
 	public void setChild(MapPath.Direction d, MapNode m){
 		if(d == MapPath.Direction.LEFT){
 			left = m;
@@ -80,19 +80,19 @@ public class MapNode {
 			front = m;
 		}
 	}
-	
+
 	public boolean getIsValidStart(){
 		return isValidStart;
 	}
-	
+
 	public void setIsValidStart(boolean b){
 		isValidStart = b;
 	}
-	
+
 	public MapNode getParent(){
 		return parent;
 	}
-	
+
 	public void setParent(MapNode p){
 		parent = p;
 	}
