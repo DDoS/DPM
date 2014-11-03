@@ -8,16 +8,16 @@ public class MapNode {
 	private MapNode left;
 	private MapNode right;
 	private MapNode front;
-	
+
 	private boolean isValidStart;
-	
+
 	private MapNode parent;
-	
+
 	public MapNode(){
 		isValidStart = false;
 		left = null;
 		right = null;
-		front = null;	
+		front = null;
 	}
 	public MapNode getNodeFromPath(MapPath path){
 		if(path!=null){
@@ -31,29 +31,34 @@ public class MapNode {
 		}
 		return this;
 	}
-	
+
 	public MapPath getShortestPathTo(MapNode m){
-		Queue<MapNode> queue = new LinkedList<MapNode>();
+		Queue<MapNode> queue = new Queue<MapNode>();
 		this.parent = null;
-		queue.add(this);
+		queue.push(this);
 		MapNode currNode = this;
+<<<<<<< HEAD
 		System.out.println("hi?");
 		while(!queue.isEmpty()&&!currNode.equals(m)){
 			currNode = queue.poll();
+=======
+		while(!queue.isEmpty()&&currNode!=m){
+			currNode = (MapNode) queue.pop();
+>>>>>>> 23ec48eedb09167a00245b0b145867afe164fb2a
 			MapNode nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
 			if(nextNode!=null&&nextNode.getParent()==null){
 				nextNode.setParent(currNode);
-				queue.add(nextNode);
+				queue.push(nextNode);
 			}
 			System.out.println("iterated");
 		}
@@ -73,7 +78,7 @@ public class MapNode {
 		}
 		return result;
 	}
-	
+
 	public void setChild(MapPath.Direction d, MapNode m){
 		if(d == MapPath.Direction.LEFT){
 			left = m;
@@ -83,19 +88,19 @@ public class MapNode {
 			front = m;
 		}
 	}
-	
+
 	public boolean getIsValidStart(){
 		return isValidStart;
 	}
-	
+
 	public void setIsValidStart(boolean b){
 		isValidStart = b;
 	}
-	
+
 	public MapNode getParent(){
 		return parent;
 	}
-	
+
 	public void setParent(MapNode p){
 		parent = p;
 	}
