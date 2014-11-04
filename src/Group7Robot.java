@@ -9,7 +9,7 @@ public class Group7Robot {
 
 		// SENSORS
 		FilteredLightSensor lightSensor = new FilteredLightSensor(SensorPort.S1);
-		FilteredUltrasonicSensor ultrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S1);
+		FilteredUltrasonicSensor ultrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S2);
 
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, lightSensor);
