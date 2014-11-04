@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.Queue;
 
 
@@ -8,63 +7,70 @@ public class MapNode {
 	private MapNode left;
 	private MapNode right;
 	private MapNode front;
-
+	public int num;
+	
 	private boolean isValidStart;
-
+	private boolean visited;
 	private MapNode parent;
-
+	
 	public MapNode(){
 		isValidStart = false;
+		visited = false;
 		left = null;
 		right = null;
-		front = null;
+		front = null;	
 	}
 	public MapNode getNodeFromPath(MapPath path){
 		if(path!=null){
 			if(path.getDirection() == MapPath.Direction.LEFT){
-				return this.left.getNodeFromPath(path.getNextMapPath());
+				if(this.left!=null){
+					return this.left.getNodeFromPath(path.getNextMapPath());
+				}
+				return null;
 			}else if(path.getDirection() == MapPath.Direction.RIGHT){
-				return this.right.getNodeFromPath(path.getNextMapPath());
+				if(this.right!=null){
+					return this.right.getNodeFromPath(path.getNextMapPath());
+				}
+				return null;
 			}else if(path.getDirection() == MapPath.Direction.FRONT){
-				return this.front.getNodeFromPath(path.getNextMapPath());
+				if(this.front!=null){
+					return this.front.getNodeFromPath(path.getNextMapPath());
+				}
+				return null;
 			}
 		}
 		return this;
 	}
-
+	
 	public MapPath getShortestPathTo(MapNode m){
 		Queue<MapNode> queue = new Queue<MapNode>();
 		this.parent = null;
+		this.visited = true;
 		queue.push(this);
 		MapNode currNode = this;
-<<<<<<< HEAD
-		System.out.println("hi?");
-		while(!queue.isEmpty()&&!currNode.equals(m)){
-			currNode = queue.poll();
-=======
 		while(!queue.isEmpty()&&currNode!=m){
 			currNode = (MapNode) queue.pop();
->>>>>>> 23ec48eedb09167a00245b0b145867afe164fb2a
 			MapNode nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
-			if(nextNode!=null&&nextNode.getParent()==null){
+			if(nextNode!=null&&nextNode.getVisited()==false){
 				nextNode.setParent(currNode);
+				nextNode.setVisited(true);
 				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
-			if(nextNode!=null&&nextNode.getParent()==null){
+			if(nextNode!=null&&nextNode.getVisited()==false){
 				nextNode.setParent(currNode);
+				nextNode.setVisited(true);
 				queue.push(nextNode);
 			}
 			nextNode = currNode.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
-			if(nextNode!=null&&nextNode.getParent()==null){
+			if(nextNode!=null&&nextNode.getVisited()==false){
 				nextNode.setParent(currNode);
+				nextNode.setVisited(true);
 				queue.push(nextNode);
 			}
-			System.out.println("iterated");
 		}
 		MapPath result = null;
-		if(currNode.equals(m)){
-			System.out.println("got here");
+		if(currNode==m){	
 			while(currNode.getParent()!=null){
 				if(currNode.getParent().getNodeFromPath(new MapPath(MapPath.Direction.LEFT)) == currNode){
 					result = new MapPath(MapPath.Direction.LEFT, result);
@@ -78,7 +84,7 @@ public class MapNode {
 		}
 		return result;
 	}
-
+	
 	public void setChild(MapPath.Direction d, MapNode m){
 		if(d == MapPath.Direction.LEFT){
 			left = m;
@@ -88,20 +94,28 @@ public class MapNode {
 			front = m;
 		}
 	}
-
+	
 	public boolean getIsValidStart(){
 		return isValidStart;
 	}
-
+	
 	public void setIsValidStart(boolean b){
 		isValidStart = b;
 	}
-
+	
 	public MapNode getParent(){
 		return parent;
 	}
-
+	
 	public void setParent(MapNode p){
 		parent = p;
+	}
+	
+	public boolean getVisited(){
+		return visited;
+	}
+	
+	public void setVisited(boolean b){
+		visited = b;
 	}
 }
