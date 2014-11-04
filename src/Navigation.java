@@ -11,8 +11,8 @@ public class Navigation extends Thread {
     // Motor speed constants
     private static final int MOTOR_STRAIGHT = 200;
     // Motors (left and right)
-    private final NXTRegulatedMotor leftMotor = Motor.A;
-    private final NXTRegulatedMotor rightMotor = Motor.C;
+    private final NXTRegulatedMotor leftMotor;
+    private final NXTRegulatedMotor rightMotor;
     // Odometer instance
     private final Odometer odometer;
     // Properties for thread control and command execution
@@ -26,7 +26,9 @@ public class Navigation extends Thread {
      *
      * @param odometer The odometer that will provide the position information
      */
-    public Navigation(Odometer odometer) {
+    public Navigation(NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, Odometer odometer) {
+        this.leftMotor = leftMotor;
+        this.rightMotor = rightMotor;
         this.odometer = odometer;
     }
 

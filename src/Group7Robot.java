@@ -1,16 +1,36 @@
+import lejos.nxt.*;
 
 public class Group7Robot {
-
-	private Map map;
-	private Odometer odo;
-	private Navigation nav = new Navigation(odo);
-	private CalibrationController CC = new CalibrationController(nav);
-	private LocalizationController LC = new LocalizationController(nav, map);
-	private SearchAndRescueController SRC = new SearchAndRescueController(nav, map);
-	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		// MOTORS
+		NXTRegulatedMotor leftMotor = Motor.A;
+		NXTRegulatedMotor rightMotor = Motor.C;
+		NXTRegulatedMotor clawMotor = Motor.B;
 
+		// SENSORS
+		FilteredLightSensor lightSensor = new FilteredLightSensor(SensorPort.S1);
+
+		// HELPER THREADS
+		Odometer odometer = new Odometer(leftMotor, rightMotor, lightSensor);
+		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
+
+		// CONTROLLERS
+		LocalizationController localization = new LocalizationController(navigation, null);
+
+		// LOGIC
+		odometer.start();
+		navigation.start();
+
+		Button.waitForAnyPress();
+
+		// logic for presentation vid
+		// TODO: use claw correctly
+		// TODO: do quick callibration so navig works (Odometer WHEEL_RADIUS and WHEEL_DISTANCE)
+		clawMotor.rotate(180);
+		navigation.forward(60);
+		navigation.waitUntilDone();
+		clawMotor.rotate(-180);
+		navigation.forward(-60);
+		navigation.waitUntilDone();
 	}
-
 }
