@@ -16,7 +16,7 @@ public class Odometer extends Thread {
     private static final double SEVEN_QUARTER_PI = 7 * ONE_QUARTER_PI;
     // Robot design parameters
     public static final double WHEEL_RADIUS = 2.05;
-    public static final double WHEEL_DISTANCE = 14.9;
+    public static final double WHEEL_DISTANCE = 14.2;
     // Max light value reading for a grid line
     private static final int LINE_LIGHT = 500;
     // The distance of the sensor from the wheel axle
@@ -37,7 +37,7 @@ public class Odometer extends Thread {
     private final NXTRegulatedMotor leftMotor;
     private final NXTRegulatedMotor rightMotor;
     // Whether or not to do correction with the light sensor
-    private volatile boolean performCorrection = true;
+    private volatile boolean performCorrection = false;
     // Light sensor for correction
     private final FilteredLightSensor lightSensor;
 

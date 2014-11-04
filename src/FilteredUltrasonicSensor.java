@@ -17,6 +17,7 @@ public class FilteredUltrasonicSensor {
      */
     public FilteredUltrasonicSensor(SensorPort port) {
         handle = new UltrasonicSensor(port);
+        setSampleCount(5);
     }
 
     /**

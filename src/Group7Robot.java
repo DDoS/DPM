@@ -25,13 +25,18 @@ public class Group7Robot {
 		Button.waitForAnyPress();
 
 		// logic for presentation vid
-		// TODO: use claw correctly
-		// TODO: do quick callibration so navig works (Odometer WHEEL_RADIUS and WHEEL_DISTANCE)
-		clawMotor.rotate(180);
+		clawMotor.setSpeed(100);
+		clawMotor.rotate(-120);
+		clawMotor.flt();
 		navigation.forward(60);
 		navigation.waitUntilDone();
-		clawMotor.rotate(-180);
+		clawMotor.rotate(120);
+		clawMotor.flt();
 		navigation.forward(-60);
 		navigation.waitUntilDone();
+
+		// EXIT
+		Button.waitForAnyPress();
+		System.exit(0);
 	}
 }
