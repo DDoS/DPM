@@ -3,9 +3,10 @@ public class Group7Robot {
 
 	private Map map;
 	private Odometer odo;
+	private FilteredUltrasonicSensor frontSensor;
 	private Navigation nav = new Navigation(odo);
 	private CalibrationController CC = new CalibrationController(nav);
-	private LocalizationController LC = new LocalizationController(nav, map);
+	private LocalizationController LC = new LocalizationController(nav, map, frontSensor);
 	private SearchAndRescueController SRC = new SearchAndRescueController(nav, map);
 	
 	public static void main(String[] args) {

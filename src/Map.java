@@ -53,6 +53,13 @@ public class Map {
 					
 					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 0]);
 					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 2]);
+					
+					if(map[j][i]==1){
+						nodes[(i + j*map.length)*4 + 0].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 1].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 2].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 3].setIsValidStart(false);
+					}
 				}
 			}
 		}
