@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 /**
  * Map class holds all of the MapNodes
- * @author Jonah
  *
+ * @author Jonah
  */
 public class Map {
 	private MapNode[] nodes;
@@ -53,6 +53,13 @@ public class Map {
 					
 					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 0]);
 					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 2]);
+					
+					if(map[j][i]==1){
+						nodes[(i + j*map.length)*4 + 0].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 1].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 2].setIsValidStart(false);
+						nodes[(i + j*map.length)*4 + 3].setIsValidStart(false);
+					}
 				}
 			}
 		}
@@ -111,4 +118,5 @@ public class Map {
 		return nodes[(x + y*(int)Math.sqrt((double)nodes.length/4))*4 + t/90];
 	}
 	
+
 }
