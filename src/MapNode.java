@@ -1,8 +1,10 @@
 import java.util.Queue;
 
-
-
-
+/**
+ * MapNode class used to represent a single position of the robot
+ * @author Jonah
+ *
+ */
 public class MapNode {
 	private MapNode left;
 	private MapNode right;
@@ -13,6 +15,9 @@ public class MapNode {
 	private boolean visited;
 	private MapNode parent;
 	
+	/**
+	 * Constructs a new empty MapNode
+	 */
 	public MapNode(){
 		isValidStart = false;
 		visited = false;
@@ -20,6 +25,12 @@ public class MapNode {
 		right = null;
 		front = null;	
 	}
+	
+	/**
+	 * Returns the MapNode at the end of the MapPath as followed if starting from this MapPath
+	 * @param path The MapPath to follow
+	 * @return The MapNode at the end of the path
+	 */
 	public MapNode getNodeFromPath(MapPath path){
 		if(path!=null){
 			if(path.getDirection() == MapPath.Direction.LEFT){
@@ -42,6 +53,11 @@ public class MapNode {
 		return this;
 	}
 	
+	/**
+	 * Returns a MapPath representing the shortest path from this node to a given MapNode
+	 * @param m MapNode to find shortest path to
+	 * @return MapPath representing the shortest path
+	 */
 	public MapPath getShortestPathTo(MapNode m){
 		Queue<MapNode> queue = new Queue<MapNode>();
 		this.parent = null;
@@ -85,6 +101,11 @@ public class MapNode {
 		return result;
 	}
 	
+	/**
+	 * Sets one of the three children of the MapNode
+	 * @param d Direction to specify which child to set
+	 * @param m MapNode to set the child to
+	 */
 	public void setChild(MapPath.Direction d, MapNode m){
 		if(d == MapPath.Direction.LEFT){
 			left = m;
@@ -95,26 +116,50 @@ public class MapNode {
 		}
 	}
 	
+	/**
+	 * Getter for the isValidStart boolean
+	 * @return isValidStart
+	 */
 	public boolean getIsValidStart(){
 		return isValidStart;
 	}
 	
+	/**
+	 * Setter for the isValidStart boolean
+	 * @param b Value to set isValidStart
+	 */
 	public void setIsValidStart(boolean b){
 		isValidStart = b;
 	}
 	
+	/**
+	 * Getter for the parent MapNode
+	 * @return parent
+	 */
 	public MapNode getParent(){
 		return parent;
 	}
 	
+	/**
+	 * Setter for the parent MapNode
+	 * @param p Value to set parent
+	 */
 	public void setParent(MapNode p){
 		parent = p;
 	}
 	
+	/**
+	 * Getter for the visited boolean
+	 * @return visited
+	 */
 	public boolean getVisited(){
 		return visited;
 	}
 	
+	/**
+	 * Setter for the visited boolean
+	 * @param b Value to set visited
+	 */
 	public void setVisited(boolean b){
 		visited = b;
 	}

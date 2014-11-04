@@ -1,13 +1,25 @@
 import java.util.ArrayList;
 
-
+/**
+ * Map class holds all of the MapNodes
+ * @author Jonah
+ *
+ */
 public class Map {
 	private MapNode[] nodes;
 	
+	/**
+	 * Initialize a new Map object with a set size.
+	 * @param size An integer designating the number of nodes in the map.
+	 */
 	public Map(int size){
 		nodes = new MapNode[size];
 	}
 	
+	/**
+	 * Initialize a new Map object based on an integer array of binary values.
+	 * @param map A 2D array of integers representing the layout of the map.
+	 */
 	public Map(int[][] map){
 		if(map.length>0){
 			nodes = new MapNode[map.length * map[0].length * 4];
@@ -46,6 +58,11 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Returns an ArrayList of MapNode objects
+	 * This is populated only with the MapNode objects that are still valid starting locations
+	 * @return The ArrayList<MapNode> with the nodes that are still valid.
+	 */
 	public ArrayList<MapNode> getRemaningNodes(){
 		ArrayList<MapNode> result = new ArrayList<MapNode>();
 		for(int i=0; i<nodes.length; i++){
@@ -56,17 +73,40 @@ public class Map {
 		return result;
 	}
 	
-	public MapPath getPathFromNodeToNode(MapNode f, MapNode t){
+	/**
+	 * Returns the shortest MapPath between two nodes.
+	 * Takes in a node to begin, and a node to end.
+	 * Calls MapNode.getShortestPathTo(MapNode n)
+	 * @param from The MapNode to start at
+	 * @param to The MapNode to finish
+	 * @return A MapPath which represents the shortest path between the nodes
+	 */
+	public MapPath getPathFromNodeToNode(MapNode from, MapNode to){
 		for(int i=0; i<nodes.length; i++){
 			nodes[i].setVisited(false);
 		}
-		return f.getShortestPathTo(t);
+		return from.getShortestPathTo(to);
 	}
 	
+	/**
+	 * Returns the MapNode at the specified index
+	 * @param i An integer representing the index
+	 * @return The MapNode at that index
+	 */
 	public MapNode getNodeAtIndex(int i){
 		return nodes[i];
 	}
 	
+	/**
+	 * Returns the MapNode at the specified position
+	 * Based on the x value (increasing to the east from 0 at the left)
+	 * And the y value (increasing to the south from 0 at the top)
+	 * And the theta value (0 facing east, increasing counter clockwise)
+	 * @param x X value of the node
+	 * @param y Y value of the node
+	 * @param t Theta value of the node in degrees
+	 * @return The MapNode matching the parameters
+	 */
 	public MapNode getNodeAtPosition(int x, int y, int t){
 		return nodes[(x + y*(int)Math.sqrt((double)nodes.length/4))*4 + t/90];
 	}
