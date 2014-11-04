@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 
 public class LocalizationController {
+<<<<<<< HEAD
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor us;
@@ -148,4 +149,17 @@ public class LocalizationController {
 			}
 		}
 	}
+=======
+    private Navigation nav;
+    private Map map;
+
+    public LocalizationController(Navigation n, Map m) {
+        nav = n;
+        map = m;
+    }
+
+    public void run() {
+
+    }
+>>>>>>> aaf1c3b2cc902526ac7026812173e43063108362
 }
