@@ -1,3 +1,5 @@
+import lejos.nxt.*;
+
 /**
  * An average filtered color sensor. This is implemented as thin wrapper around the ColorSensor class. This class is meant for random sampling.
  * <p/>
@@ -9,7 +11,7 @@ public class FilteredColorSensor {
      *
      * @param port The sensor port
      */
-    public FilteredLightSensor(SensorPort port) {
+    public FilteredColorSensor(SensorPort port) {
     }
 
     /**
