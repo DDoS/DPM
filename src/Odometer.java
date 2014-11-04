@@ -221,7 +221,7 @@ public class Odometer extends Thread {
     }
 
     /**
-     * Wraps an angle between 0 (inclusive) and 2pi (exclusive). This is a utility method exposed for usage by other classes. </p> TODO: mode this to another class?
+     * Wraps an angle between 0 (inclusive) and 2pi (exclusive). This is a utility method exposed for usage by other classes. <p/> TODO: move this to another class?
      *
      * @param rads The angle to wrap in radians.
      * @return The wrapped angle in radians
