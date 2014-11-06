@@ -52,7 +52,6 @@ public class FilteredUltrasonicSensor {
                 // More than half the samples are MAX, so MAX is returned
                 return MAX;
             }
-            // Else we'll average all the non-max samples
         } else {
             // Odd sample count
             final int first = samples[mid];
@@ -60,18 +59,17 @@ public class FilteredUltrasonicSensor {
                 // More than half the samples are MAX, so MAX is returned
                 return MAX;
             }
-            // Else we'll average all the non-max samples
         }
-        // Average the results
-        int sum = 0;
-        for (int i = 0, sample; i < count && (sample = samples[i]) < MAX; i++) {
+        // Average all the non-max samples
+        int index = 0, sum = 0;
+        for (int sample; index < count && (sample = samples[index]) < MAX; index++) {
             sum += sample;
         }
         // Make sure we're not dividing by zero
-        if (count == 0) {
+        if (index == 0) {
             return 0;
         }
-        return sum / count;
+        return sum / index;
     }
 
     private static void insertSorted(int[] list, int size, int element) {
