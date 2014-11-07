@@ -47,6 +47,11 @@ public class LocalizationController {
 	 * Handles all the logic of the controller
 	 */
 	public void run(){
+		//Setting up the display
+		Display.clear();
+		Display.reserve(new String[] {"Status", "X", "Y", "Th", "Moves"});
+		Display.update("Status", "Init");
+		
 		//The pattern given to us in the project specifications
 		int[][] arr = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -78,7 +83,11 @@ public class LocalizationController {
 		ArrayList<MapNode> nodes = map.getRemaningNodes();
 		
 		//We continue to run this algorithm until there is one (or zero) nodes left
+		Display.update("Status", "Run");
+		int moves = 0;
 		while(nodes.size()>1){
+			Display.update("Moves", ""+moves);
+			moves++;
 			//Get the distance data and use it to find out how many empty tiles surround the robot
 			int fDist = front_us.getDistanceData();
 			int rDist = rear_us.getDistanceData();
@@ -229,5 +238,29 @@ public class LocalizationController {
 				nav.turnBy(-90);
 			}
 		}
+		
+		//End of algorithm, update position
+		Display.update("Status", "Final");
+		
+		MapNode current;//Current spot that the robot is in
+		
+		nodes = map.getRemaningNodes();
+		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
+			current = map.getNodeAtIndex((int)(Math.random()*arr.length*4));
+		}else{
+			current = nodes.get(0);//Else use what the algorithm found
+		}
+		
+		int num = current.getNum();//Do math to find out the position
+		double theta = (num%4)*90;
+		double x = 15 + 30*(int)((num/4)%(arr.length));
+		double y = 15 + 30*(int)((num/4)/(arr.length));
+		
+		//Update the display and the odometer
+		Display.update("X", ""+x);
+		Display.update("Y", ""+y);
+		Display.update("Th", ""+theta);
+		nav.getOdometer().setPosition(x, y, theta);
+		
 	}
 }

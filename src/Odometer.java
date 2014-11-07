@@ -208,6 +208,20 @@ public class Odometer extends Thread {
             return theta;
         }
     }
+    
+    /**
+     * Sets the position to 3 specified values
+     * @param setX double, the new x position
+     * @param setY double, the new y position
+     * @param setT double, the new theta position
+     */
+    public void setPosition(double setX, double setY, double setT){
+    	synchronized (lock) {
+        	x = setX;
+        	y = setY;
+        	theta = setT;
+    	}
+    }
 
     /**
      * Returns the current x, y and theta as a position object.

@@ -10,7 +10,7 @@ public class MapNode {
     private MapNode left;
     private MapNode right;
     private MapNode front;
-    public int num;//DELETE -- temporary value used for testing
+    public int num;
     private boolean isValidStart;//Whether or not to consider this node as a valid starting node
     
     //These two used when searching for the shortest path
@@ -190,5 +190,21 @@ public class MapNode {
      */
     public void setVisited(boolean b) {
         visited = b;
+    }
+    
+    /**
+     * Getter for the num int
+     * @return num
+     */
+    public int getNum(){
+    	return num;
+    }
+    
+    /**
+     * Setter for the num int
+     * @param n Value to set num
+     */
+    public void setNum(int n){
+    	num = n;
     }
 }

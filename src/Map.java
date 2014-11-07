@@ -27,7 +27,7 @@ public class Map {
 			nodes = new MapNode[map.length * map[0].length * 4];
 			for(int i=0; i<nodes.length; i++){
 				nodes[i] = new MapNode();
-				nodes[i].num = i; //DELETE -- temporary property of MapNode used while I'm testing
+				nodes[i].setNum(i);
 			}
 			//For each square in the array, we need to do a bunch of math to add right children to the node
 			for(int i=0; i<map.length; i++){

@@ -137,6 +137,14 @@ public class Navigation extends Thread {
             runner.interrupt();
         }
     }
+    
+    /**
+     * Getter for the odometer
+     * @return the odometer
+     */
+    public Odometer getOdometer(){
+    	return odometer;
+    }
 
     // Starts a navigation command
     private void startCommand() {
