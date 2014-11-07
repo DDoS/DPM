@@ -21,44 +21,50 @@ public class Map {
 	 * @param map A 2D array of integers representing the layout of the map.
 	 */
 	public Map(int[][] map){
+		//As long as there's a map, we want to create the graph that represents the array
 		if(map.length>0){
+			//create a new MapNode array of the right size to hold all the values (4x the size of the array, one for each direction per square)
 			nodes = new MapNode[map.length * map[0].length * 4];
 			for(int i=0; i<nodes.length; i++){
 				nodes[i] = new MapNode();
-				nodes[i].num = i;
+				nodes[i].num = i; //DELETE -- temporary property of MapNode used while I'm testing
 			}
+			//For each square in the array, we need to do a bunch of math to add right children to the node
 			for(int i=0; i<map.length; i++){
 				for(int j=0; j<map[0].length; j++){
-					if(i<map.length-1&&map[j][i+1]==0){
-						nodes[(i + j*map.length)*4 + 0].setChild(MapPath.Direction.FRONT, nodes[(i+1 + j*map.length)*4 + 0]);
+					if(i<map.length-1&&map[j][i+1]==0){ //If the square isn't at the edge of the array, and it has an empty space to the east, we set the child to the next node over.
+						//Otherwise the child is already null, so we don't set anything
+						getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i+1, j, 0));
 					}
-					if(j>0&&map[j-1][i]==0){
-						nodes[(i + j*map.length)*4 + 1].setChild(MapPath.Direction.FRONT, nodes[(i + (j-1)*map.length)*4 + 1]);
+					if(j>0&&map[j-1][i]==0){//Check for the square to the north of this one
+						getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, 90));
 					}
-					if(i>0&&map[j][i-1]==0){
-						nodes[(i + j*map.length)*4 + 2].setChild(MapPath.Direction.FRONT, nodes[(i-1 + j*map.length)*4 + 2]);
+					if(i>0&&map[j][i-1]==0){//Check the square to the west
+						getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, 180));
 					}
-					if(j<map[0].length-1&&map[j+1][i]==0){
-						nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.FRONT, nodes[(i + (j+1)*map.length)*4 + 3]);
+					if(j<map[0].length-1&&map[j+1][i]==0){//Check the square to the south
+						getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 270));
 					}
 					
-					nodes[(i + j*map.length)*4 + 0].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 1]);
-					nodes[(i + j*map.length)*4 + 0].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 3]);
+					//Now we set all the left/right nodes properly
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 90));
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 270));
 					
-					nodes[(i + j*map.length)*4 + 1].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 2]);
-					nodes[(i + j*map.length)*4 + 1].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 0]);
+					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 180));
+					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
 					
-					nodes[(i + j*map.length)*4 + 2].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 3]);
-					nodes[(i + j*map.length)*4 + 2].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 1]);
+					getNodeAtPosition(i, j,180).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 270));
+					getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 90));
 					
-					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.LEFT, nodes[(i + j*map.length)*4 + 0]);
-					nodes[(i + j*map.length)*4 + 3].setChild(MapPath.Direction.RIGHT, nodes[(i + j*map.length)*4 + 2]);
+					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
+					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 180));
 					
+					//If we're currently on a tile with a block on it, make sure it's not considered a valid starting spot
 					if(map[j][i]==1){
-						nodes[(i + j*map.length)*4 + 0].setIsValidStart(false);
-						nodes[(i + j*map.length)*4 + 1].setIsValidStart(false);
-						nodes[(i + j*map.length)*4 + 2].setIsValidStart(false);
-						nodes[(i + j*map.length)*4 + 3].setIsValidStart(false);
+						getNodeAtPosition(i, j, 0).setIsValidStart(false);
+						getNodeAtPosition(i, j, 90).setIsValidStart(false);
+						getNodeAtPosition(i, j, 180).setIsValidStart(false);
+						getNodeAtPosition(i, j, 270).setIsValidStart(false);
 					}
 				}
 			}
@@ -71,6 +77,7 @@ public class Map {
 	 * @return The ArrayList<MapNode> with the nodes that are still valid.
 	 */
 	public ArrayList<MapNode> getRemaningNodes(){
+		//Loop through all the nodes, and if the node is a valid starting node, add it to the list which is returned
 		ArrayList<MapNode> result = new ArrayList<MapNode>();
 		for(int i=0; i<nodes.length; i++){
 			if(nodes[i].getIsValidStart()){
@@ -89,9 +96,11 @@ public class Map {
 	 * @return A MapPath which represents the shortest path between the nodes
 	 */
 	public MapPath getPathFromNodeToNode(MapNode from, MapNode to){
+		//Reset all the nodes to not visited
 		for(int i=0; i<nodes.length; i++){
 			nodes[i].setVisited(false);
 		}
+		//Call the MapNode function to get the right path
 		return from.getShortestPathTo(to);
 	}
 	

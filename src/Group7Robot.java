@@ -9,14 +9,16 @@ public class Group7Robot {
 
 		// SENSORS
 		FilteredLightSensor lightSensor = new FilteredLightSensor(SensorPort.S1);
-		FilteredUltrasonicSensor ultrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S2);
+		FilteredUltrasonicSensor frontUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S2);
+		FilteredUltrasonicSensor rearUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S3);
+
 
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, lightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
 
 		// CONTROLLERS
-		LocalizationController localization = new LocalizationController(navigation, null, ultrasonicSensor);
+		LocalizationController localization = new LocalizationController(navigation, null, frontUltrasonicSensor, rearUltrasonicSensor);
 
 		// LOGIC
 		odometer.start();
