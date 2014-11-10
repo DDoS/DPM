@@ -41,7 +41,7 @@ public class Group7Robot {
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 
-		navigation.turnBy(Math.PI / 2);
+		navigation.turnBy((float) Math.PI / 2);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 

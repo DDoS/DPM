@@ -7,7 +7,7 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Navigation extends Thread {
-    private static final double NAVIGATION_EPSILON = 0.5;
+    private static final float NAVIGATION_EPSILON = 0.5f;
     // Motor speed constants
     private static final int MOTOR_STRAIGHT = 200;
     // Motors (left and right)
@@ -64,7 +64,7 @@ public class Navigation extends Thread {
      * @param x The x distance
      * @param y The y distance
      */
-    public void travelBy(double x, double y) {
+    public void travelBy(float x, float y) {
         Odometer.Position pos = odometer.getPosition();
         travelTo(pos.x + x, pos.y + y);
     }
@@ -75,7 +75,7 @@ public class Navigation extends Thread {
      * @param x The x coordinate
      * @param y The y coordinate
      */
-    public void travelTo(double x, double y) {
+    public void travelTo(float x, float y) {
         command = new Travel(x, y);
         startCommand();
     }
@@ -85,7 +85,7 @@ public class Navigation extends Thread {
      *
      * @param theta The angle
      */
-    public void turnBy(double theta) {
+    public void turnBy(float theta) {
         turnTo(odometer.getTheta() + theta);
     }
 
@@ -94,7 +94,7 @@ public class Navigation extends Thread {
      *
      * @param theta The angle
      */
-    public void turnTo(double theta) {
+    public void turnTo(float theta) {
         command = new Turn(theta);
         startCommand();
     }
@@ -104,10 +104,10 @@ public class Navigation extends Thread {
      *
      * @param distance The distance to travel forward
      */
-    public void forward(double distance) {
-        double theta = odometer.getTheta();
-        double x = Math.cos(theta) * distance;
-        double y = Math.sin(theta) * distance;
+    public void forward(float distance) {
+        float theta = odometer.getTheta();
+        float x = (float) Math.cos(theta) * distance;
+        float y = (float) Math.sin(theta) * distance;
         travelBy(x, y);
     }
 
@@ -137,7 +137,7 @@ public class Navigation extends Thread {
             runner.interrupt();
         }
     }
-    
+
     /**
      * Getter for the odometer
      * @return the odometer
@@ -160,15 +160,15 @@ public class Navigation extends Thread {
         }
     }
 
-    private void doTravel(double x, double y) {
+    private void doTravel(float x, float y) {
         // Set motor speds
         leftMotor.setSpeed(MOTOR_STRAIGHT);
         rightMotor.setSpeed(MOTOR_STRAIGHT);
         // Find turn angle
-        double differenceX = x - odometer.getX();
-        double differenceY = y - odometer.getY();
+        float differenceX = x - odometer.getX();
+        float differenceY = y - odometer.getY();
         // Do turn
-        doTurn(Math.atan2(differenceY, differenceX));
+        doTurn((float) Math.atan2(differenceY, differenceX));
         // Set motors forward
         leftMotor.forward();
         rightMotor.forward();
@@ -190,19 +190,19 @@ public class Navigation extends Thread {
         endCommand();
     }
 
-    private void doTurn(double theta) {
+    private void doTurn(float theta) {
         // Set motor speeds
         leftMotor.setSpeed(MOTOR_STRAIGHT);
         rightMotor.setSpeed(MOTOR_STRAIGHT);
         // Find min angle difference
-        double difference = theta - odometer.getTheta();
-        if (difference >= Math.PI) {
-            difference = -2 * Math.PI + difference;
-        } else if (difference <= -Math.PI) {
-            difference = 2 * Math.PI + difference;
+        float difference = theta - odometer.getTheta();
+        if (difference >= (float) Math.PI) {
+            difference = -2 * (float) Math.PI + difference;
+        } else if (difference <= (float) -Math.PI) {
+            difference = 2 * (float) Math.PI + difference;
         }
         // Compute wheel rotation in angle
-        double wheelRotation = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS) / 2;
+        float wheelRotation = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS) / 2;
         int rotationDegrees = (int) Math.round(Math.toDegrees(wheelRotation));
         // Rotate
         leftMotor.rotate(-rotationDegrees, true);
@@ -226,9 +226,9 @@ public class Navigation extends Thread {
 
     // A command to travel to absolute coordinates
     private class Travel implements Runnable {
-        private final double x, y;
+        private final float x, y;
 
-        private Travel(double x, double y) {
+        private Travel(float x, float y) {
             this.x = x;
             this.y = y;
         }
@@ -240,9 +240,9 @@ public class Navigation extends Thread {
 
     // A command to rotate to an absolute angle
     private class Turn implements Runnable {
-        private final double theta;
+        private final float theta;
 
-        private Turn(double theta) {
+        private Turn(float theta) {
             this.theta = Odometer.wrapAngle(theta);
         }
 

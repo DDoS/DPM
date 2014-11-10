@@ -9,28 +9,28 @@ public class Odometer extends Thread {
     // odometer update period, in ms
     private static final long PERIOD = 25;
     // Various PI ratios
-    private static final double TWO_PI = Math.PI * 2;
-    private static final double ONE_QUARTER_PI = Math.PI / 4;
-    private static final double THREE_QUARTER_PI = 3 * ONE_QUARTER_PI;
-    private static final double FIVE_QUARTER_PI = 5 * ONE_QUARTER_PI;
-    private static final double SEVEN_QUARTER_PI = 7 * ONE_QUARTER_PI;
+    private static final float TWO_PI = (float) Math.PI * 2;
+    private static final float ONE_QUARTER_PI = (float) Math.PI / 4;
+    private static final float THREE_QUARTER_PI = 3 * ONE_QUARTER_PI;
+    private static final float FIVE_QUARTER_PI = 5 * ONE_QUARTER_PI;
+    private static final float SEVEN_QUARTER_PI = 7 * ONE_QUARTER_PI;
     // Robot design parameters
-    public static final double WHEEL_RADIUS = 2.05;
-    public static final double WHEEL_DISTANCE = 14.2;
+    public static final float WHEEL_RADIUS = 2.05f;
+    public static final float WHEEL_DISTANCE = 14.2f;
     // Max light value reading for a grid line
     private static final int LINE_LIGHT = 35;
     // The distance of the sensor from the wheel axle
-    private static final double SENSOR_OFFSET = 4.5;
+    private static final float SENSOR_OFFSET = 4.5f;
     // Spacing of the tiles in centimeters
-    private static final double TILE_SPACING = 30.48;
+    private static final float TILE_SPACING = 30.48f;
     // Half the said spacing
-    private static final double HALF_TILE_SPACING = TILE_SPACING / 2;
+    private static final float HALF_TILE_SPACING = TILE_SPACING / 2;
     // Whether or not the odometer is running
     private volatile boolean running = false;
     // robot position
-    private double x = 0, y = 0, theta = Math.PI / 2;
+    private float x = 0, y = 0, theta = (float) Math.PI / 2;
     // Tachometer last readings in radians, for right and left
-    private double lastRho = 0, lastLambda = 0;
+    private float lastRho = 0, lastLambda = 0;
     // lock object for mutual exclusion
     private final Object lock = new Object();
     // Left and right motors
@@ -103,25 +103,25 @@ public class Odometer extends Thread {
 			 */
 
             // compute rho and lambda
-            double rho = Math.toRadians(rightMotor.getTachoCount());
-            double lambda = Math.toRadians(leftMotor.getTachoCount());
+            float rho = (float) Math.toRadians(rightMotor.getTachoCount());
+            float lambda = (float) Math.toRadians(leftMotor.getTachoCount());
             // compute the delta rho and lambda from last values
-            double deltaRho = rho - lastRho;
-            double deltaLambda = lambda - lastLambda;
+            float deltaRho = rho - lastRho;
+            float deltaLambda = lambda - lastLambda;
             // update last values to current
             lastRho = rho;
             lastLambda = lambda;
             // multiply rho and lambda by the wheel radius
-            double deltaRhoRadius = deltaRho * WHEEL_RADIUS;
-            double deltaLambdaRadius = deltaLambda * WHEEL_RADIUS;
+            float deltaRhoRadius = deltaRho * WHEEL_RADIUS;
+            float deltaLambdaRadius = deltaLambda * WHEEL_RADIUS;
             // compute delta C
-            double deltaC = (deltaRhoRadius + deltaLambdaRadius) / 2;
+            float deltaC = (deltaRhoRadius + deltaLambdaRadius) / 2;
             // compute delta theta and it's half
-            double deltaTheta = (deltaRhoRadius - deltaLambdaRadius) / WHEEL_DISTANCE;
-            double halfDeltaTheta = deltaTheta / 2;
+            float deltaTheta = (deltaRhoRadius - deltaLambdaRadius) / WHEEL_DISTANCE;
+            float halfDeltaTheta = deltaTheta / 2;
             // compute delta x and y, using y forward and a right handed system (x right)
-            double deltaX = deltaC * Math.cos(theta + halfDeltaTheta);
-            double deltaY = deltaC * Math.sin(theta + halfDeltaTheta);
+            float deltaX = deltaC * (float) Math.cos(theta + halfDeltaTheta);
+            float deltaY = deltaC * (float) Math.sin(theta + halfDeltaTheta);
             // update position
             synchronized (lock) {
                 // update x, y, and theta by their deltas
@@ -143,9 +143,9 @@ public class Odometer extends Thread {
                     // check which line direction we just crossed using the heading
                     if (theta >= ONE_QUARTER_PI && theta < THREE_QUARTER_PI || theta >= FIVE_QUARTER_PI && theta < SEVEN_QUARTER_PI) {
                         // cross horizontal line
-                        double sensorYOffset = Math.sin(theta) * SENSOR_OFFSET;
+                        float sensorYOffset = (float) Math.sin(theta) * SENSOR_OFFSET;
                         // offset y to account for sensor distance
-                        double yy = y + sensorYOffset;
+                        float yy = y + sensorYOffset;
                         // snap y to closest line
                         yy = Math.round((yy + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct y, removing the offset
@@ -158,9 +158,9 @@ public class Odometer extends Thread {
                         }
                     } else {
                         // cross vertical line
-                        double sensorXOffset = Math.cos(theta) * SENSOR_OFFSET;
+                        float sensorXOffset = (float) Math.cos(theta) * SENSOR_OFFSET;
                         // offset x to account for sensor distance
-                        double xx = x + sensorXOffset;
+                        float xx = x + sensorXOffset;
                         // snap x to closest line
                         xx = Math.round((xx + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct x, removing the offset
@@ -207,9 +207,9 @@ public class Odometer extends Thread {
     }
 
     private void updateDebugDisplay() {
-        Display.update("ox", Double.toString(x));
-        Display.update("oy", Double.toString(y));
-        Display.update("ot", Double.toString(theta));
+        Display.update("ox", Float.toString(x));
+        Display.update("oy", Float.toString(y));
+        Display.update("ot", Float.toString(theta));
     }
 
     /**
@@ -217,7 +217,7 @@ public class Odometer extends Thread {
      *
      * @return The x coordinate
      */
-    public double getX() {
+    public float getX() {
         synchronized (lock) {
             return x;
         }
@@ -228,7 +228,7 @@ public class Odometer extends Thread {
      *
      * @return The y coordinate
      */
-    public double getY() {
+    public float getY() {
         synchronized (lock) {
             return y;
         }
@@ -239,7 +239,7 @@ public class Odometer extends Thread {
      *
      * @return The theta angle
      */
-    public double getTheta() {
+    public float getTheta() {
         synchronized (lock) {
             return theta;
         }
@@ -247,11 +247,11 @@ public class Odometer extends Thread {
 
     /**
      * Sets the position to 3 specified values
-     * @param setX double, the new x position
-     * @param setY double, the new y position
-     * @param setT double, the new theta position
+     * @param setX float, the new x position
+     * @param setY float, the new y position
+     * @param setT float, the new theta position
      */
-    public void setPosition(double setX, double setY, double setT){
+    public void setPosition(float setX, float setY, float setT){
     	synchronized (lock) {
         	x = setX;
         	y = setY;
@@ -276,7 +276,7 @@ public class Odometer extends Thread {
      * @param rads The angle to wrap in radians.
      * @return The wrapped angle in radians
      */
-    public static double wrapAngle(double rads) {
+    public static float wrapAngle(float rads) {
         return ((rads % TWO_PI) + TWO_PI) % TWO_PI;
     }
 
@@ -287,15 +287,15 @@ public class Odometer extends Thread {
         /**
          * The x coordinate
          */
-        public final double x;
+        public final float x;
         /**
          * The y coordinate
          */
-        public final double y;
+        public final float y;
         /**
          * The theta (heading) angle
          */
-        public final double theta;
+        public final float theta;
 
         /**
          * Constructs a new position object from the x, y and theta values.
@@ -304,7 +304,7 @@ public class Odometer extends Thread {
          * @param y The y coordinate
          * @param theta The theta (heading) angle
          */
-        public Position(double x, double y, double theta) {
+        public Position(float x, float y, float theta) {
             this.x = x;
             this.y = y;
             this.theta = theta;

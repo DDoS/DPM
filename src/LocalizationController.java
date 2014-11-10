@@ -25,21 +25,21 @@ public class LocalizationController {
 	/**
 	 * Computes the standard deviation of a given integer array
 	 * @param arr The array of integers (any size)
-	 * @return The standard deviation as a double
+	 * @return The standard deviation as a float
 	 */
-	public double stdDev(int[] arr){
+	public float stdDev(int[] arr){
 		//Loop through the array and sum the values divided by the length to find the average
-		double avg = 0;
+		float avg = 0;
 		for(int i=0; i<arr.length; i++){
-			avg += (double)arr[i]/arr.length;
+			avg += (float)arr[i]/arr.length;
 		}
 		//Loop through the array and add to a new sum (each element-avg)^2/length
-		double newAvg = 0;
+		float newAvg = 0;
 		for(int i=0; i<arr.length; i++){
 			newAvg += Math.pow(arr[i]-avg, 2)/arr.length;
 		}
 		//return the square root of that sum (the standard deviation of the original array)
-		return Math.sqrt(newAvg);
+		return (float) Math.sqrt(newAvg);
 	}
 
 	/**
@@ -203,9 +203,9 @@ public class LocalizationController {
 			}
 
 			//Now we compute the standard deviation of the arrays and use the lowest one for the move
-			double stdL = stdDev(tileCount[0]);
-			double stdR = stdDev(tileCount[1]);
-			double stdF = stdDev(tileCount[2]);
+			float stdL = stdDev(tileCount[0]);
+			float stdR = stdDev(tileCount[1]);
+			float stdF = stdDev(tileCount[2]);
 
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
 				//Add a forward node to the path
@@ -252,9 +252,9 @@ public class LocalizationController {
 		}
 
 		int num = current.getNum();//Do math to find out the position
-		double theta = (num%4)*90;
-		double x = 15 + 30*(int)((num/4)%(arr.length));
-		double y = 15 + 30*(int)((num/4)/(arr.length));
+		float theta = (num%4)*90;
+		float x = 15 + 30*(int)((num/4)%(arr.length));
+		float y = 15 + 30*(int)((num/4)/(arr.length));
 
 		//Update the display and the odometer
 		Display.update("X", ""+x);

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Map {
 	private MapNode[] nodes;
-	
+
 	/**
 	 * Initialize a new Map object with a set size.
 	 * @param size An integer designating the number of nodes in the map.
@@ -15,7 +15,7 @@ public class Map {
 	public Map(int size){
 		nodes = new MapNode[size];
 	}
-	
+
 	/**
 	 * Initialize a new Map object based on an integer array of binary values.
 	 * @param map A 2D array of integers representing the layout of the map.
@@ -45,20 +45,20 @@ public class Map {
 					if(j<map[0].length-1&&map[j+1][i]==0){//Check the square to the south
 						getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 270));
 					}
-					
+
 					//Now we set all the left/right nodes properly
 					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 90));
 					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 270));
-					
+
 					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 180));
 					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
-					
+
 					getNodeAtPosition(i, j,180).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 270));
 					getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 90));
-					
+
 					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
 					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 180));
-					
+
 					//If we're currently on a tile with a block on it, make sure it's not considered a valid starting spot
 					if(map[j][i]==1){
 						getNodeAtPosition(i, j, 0).setIsValidStart(false);
@@ -70,7 +70,7 @@ public class Map {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns an ArrayList of MapNode objects
 	 * This is populated only with the MapNode objects that are still valid starting locations
@@ -86,7 +86,7 @@ public class Map {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns the shortest MapPath between two nodes.
 	 * Takes in a node to begin, and a node to end.
@@ -103,7 +103,7 @@ public class Map {
 		//Call the MapNode function to get the right path
 		return from.getShortestPathTo(to);
 	}
-	
+
 	/**
 	 * Returns the MapNode at the specified index
 	 * @param i An integer representing the index
@@ -112,7 +112,7 @@ public class Map {
 	public MapNode getNodeAtIndex(int i){
 		return nodes[i];
 	}
-	
+
 	/**
 	 * Returns the MapNode at the specified position
 	 * Based on the x value (increasing to the east from 0 at the left)
@@ -124,8 +124,8 @@ public class Map {
 	 * @return The MapNode matching the parameters
 	 */
 	public MapNode getNodeAtPosition(int x, int y, int t){
-		return nodes[(x + y*(int)Math.sqrt((double)nodes.length/4))*4 + t/90];
+		return nodes[(x + y*(int)Math.sqrt((float)nodes.length/4))*4 + t/90];
 	}
-	
+
 
 }
