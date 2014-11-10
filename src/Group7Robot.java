@@ -21,12 +21,14 @@ public class Group7Robot {
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
 
 		// CONTROLLERS
-		LocalizationController localization = new LocalizationController(navigation, null, frontUltrasonicSensor, rearUltrasonicSensor);
+		LocalizationController localization = new LocalizationController(navigation, null, frontUltrasonicSensor, null);
 
 		// LOGIC
 		odometer.start();
 		navigation.start();
-
+		
+		localization.run();
+/*
 		Display.reserve("1", "2", "3", "4", "5");
 
 		odometer.enableDebugOutput(true);
@@ -52,7 +54,7 @@ public class Group7Robot {
 		navigation.forward(-60);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
-
+*/
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);

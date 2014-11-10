@@ -6,7 +6,8 @@ public class LocalizationController {
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
-	private static final int MAX_TILES = 8;
+	private static final int MAX_TILES = 3;
+	private static final boolean DUEL_SENSOR = false;
 
 	/**
 	 * Constructs a new localization controller with every property
@@ -68,15 +69,28 @@ public class LocalizationController {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 		};
+		
 		//A smaller test pattern
 		int[][] arr2 = {
 				{0, 0, 1},
 				{1, 0, 1},
 				{0, 0, 0}
 		};
+		//Test for midterm
+		int[][] arr3 = {
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{1, 0, 0, 1, 0, 0, 0, 0},	
+				{0, 1, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 1, 0, 0, 0, 0},	
+				{1, 0, 0, 0, 0, 0, 0, 0}
+		
+		};
 
 		//Initialize the map so we can set it to whichever array we pass in
-		Map map = new Map(arr);
+		Map map = new Map(arr3);
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
@@ -88,17 +102,22 @@ public class LocalizationController {
 		while(nodes.size()>1){
 			Display.update("Moves", ""+moves);
 			moves++;
+			int rearTiles;
 			//Get the distance data and use it to find out how many empty tiles surround the robot
 			int fDist = front_us.getDistanceData();
-			int rDist = rear_us.getDistanceData();
+			if(DUEL_SENSOR) {
+				int rDist = rear_us.getDistanceData();
+				rearTiles = rDist/30;
+			}
 			int frontTiles = fDist/30;
-			int rearTiles = rDist/30;
 			//cutoff at max number of tiles (due to sensor accuracy)
 			if(frontTiles>MAX_TILES){
 				frontTiles = MAX_TILES;
 			}
-			if(rearTiles>MAX_TILES){
-				rearTiles = MAX_TILES;
+			if(DUEL_SENSOR){
+				if(rearTiles>MAX_TILES){
+					rearTiles = MAX_TILES;
+				}
 			}
 
 			//Loop through all of the nodes that are still considered valid, so we can check if they're still valid when compared to this new sensor data
@@ -125,22 +144,23 @@ public class LocalizationController {
 					}
 				}
 
-
-				//Repeat the same logic for the rear sensor
-				for(int i=0; i<=rearTiles; i++){
-					if(i==MAX_TILES){ //If we are at the max distance, we don't actually care about this tile (due to sensor inaccuracy)
-						break;
-					}else if(i==rearTiles){//If we are at the end of what the sensor picked up, that means there's supposed to be a tile here
-						r = r.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
-						if(r!=null){//If there isn't a tile here, then remove m
-							m.setIsValidStart(false);
+				if(DUEL_SENSOR){
+					//Repeat the same logic for the rear sensor
+					for(int i=0; i<=rearTiles; i++){
+						if(i==MAX_TILES){ //If we are at the max distance, we don't actually care about this tile (due to sensor inaccuracy)
 							break;
-						}
-					}else{//Else, there's not supposed to be a tile here
-						r = r.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
-						if(r==null){//If there is a tile here, remove m
-							m.setIsValidStart(false);
-							break;
+						}else if(i==rearTiles){//If we are at the end of what the sensor picked up, that means there's supposed to be a tile here
+							r = r.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+							if(r!=null){//If there isn't a tile here, then remove m
+								m.setIsValidStart(false);
+								break;
+							}
+						}else{//Else, there's not supposed to be a tile here
+							r = r.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+							if(r==null){//If there is a tile here, remove m
+								m.setIsValidStart(false);
+								break;
+							}
 						}
 					}
 				}
