@@ -59,7 +59,7 @@ public class FilteredLightSensor {
     public int getLightData() {
         final int sampleCount = samples.length;
         // Get the light value
-        samples[index] = handle.getLightValue();
+        samples[index] = handle.getNormalizedLightValue();
         // Compute the sample count, maxing at the array size
         currentCount = Math.min(currentCount + 1, sampleCount);
         // Compute the next index, wrapping around

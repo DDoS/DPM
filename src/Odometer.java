@@ -7,7 +7,7 @@ import lejos.nxt.*;
  */
 public class Odometer extends Thread {
     // odometer update period, in ms
-    private static final long PERIOD = 25;
+    private static final long PERIOD = 10;
     // Various PI ratios
     private static final float TWO_PI = (float) Math.PI * 2;
     private static final float ONE_QUARTER_PI = (float) Math.PI / 4;
@@ -18,7 +18,7 @@ public class Odometer extends Thread {
     public static final float WHEEL_RADIUS = 2.05f;
     public static final float WHEEL_DISTANCE = 14.2f;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT = 35;
+    private static final int LINE_LIGHT = 400;
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = 4.5f;
     // Spacing of the tiles in centimeters
@@ -102,6 +102,9 @@ public class Odometer extends Thread {
              * ODOMETRY
 			 */
 
+            if (performCorrection) {
+                lightSensor.getLightData();
+            }
             // compute rho and lambda
             float rho = (float) Math.toRadians(rightMotor.getTachoCount());
             float lambda = (float) Math.toRadians(leftMotor.getTachoCount());
@@ -137,7 +140,6 @@ public class Odometer extends Thread {
             if (performCorrection) {
                 // read the light value
                 int lightValue = lightSensor.getLightData();
-                //Display.update("5", Integer.toString(lightValue));
                 // check if the light value corresponds to a line and it has yet to be crossed
                 if (lightValue <= LINE_LIGHT && !crossed) {
                     // check which line direction we just crossed using the heading
@@ -150,7 +152,7 @@ public class Odometer extends Thread {
                         yy = Math.round((yy + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct y, removing the offset
                         synchronized (lock) {
-                            y = yy - sensorYOffset / 2;
+                            y = yy - sensorYOffset;
                         }
                         // signal a horizontal correction with a low note
                         if (outputDebug) {
@@ -165,7 +167,7 @@ public class Odometer extends Thread {
                         xx = Math.round((xx + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct x, removing the offset
                         synchronized (lock) {
-                            x = xx - sensorXOffset / 2;
+                            x = xx - sensorXOffset;
                         }
                         // signal a vertical correction with a high note
                         if (outputDebug) {
@@ -192,6 +194,9 @@ public class Odometer extends Thread {
              * SLEEP
 		     */
 
+            if (performCorrection) {
+                lightSensor.getLightData();
+            }
             // this ensures that the odometer only runs once every period
             updateEnd = System.currentTimeMillis();
             if (updateEnd - updateStart < PERIOD) {
@@ -209,7 +214,7 @@ public class Odometer extends Thread {
     private void updateDebugDisplay() {
         Display.update("ox", Float.toString(x));
         Display.update("oy", Float.toString(y));
-        Display.update("ot", Float.toString(theta));
+        Display.update("ot", Float.toString((float) Math.toDegrees(theta)));
     }
 
     /**
