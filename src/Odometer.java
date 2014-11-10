@@ -18,7 +18,7 @@ public class Odometer extends Thread {
     public static final double WHEEL_RADIUS = 2.05;
     public static final double WHEEL_DISTANCE = 14.2;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT = 500;
+    private static final int LINE_LIGHT = 35;
     // The distance of the sensor from the wheel axle
     private static final double SENSOR_OFFSET = 4.5;
     // Spacing of the tiles in centimeters
@@ -38,6 +38,8 @@ public class Odometer extends Thread {
     private final NXTRegulatedMotor rightMotor;
     // Whether or not to do correction with the light sensor
     private volatile boolean performCorrection = false;
+    // Whether or not to output debug information to the display and sound
+    private volatile boolean outputDebug = false;
     // Light sensor for correction
     private final FilteredLightSensor lightSensor;
 
@@ -64,6 +66,17 @@ public class Odometer extends Thread {
         if (running) {
             lightSensor.setFloodlight(performCorrection);
         }
+    }
+
+    public void enableDebugOutput(boolean enable) {
+        if (enable) {
+            Display.reserve("ox", "oy", "ot");
+        } else {
+            Display.remove("ox");
+            Display.remove("oy");
+            Display.remove("ot");
+        }
+        outputDebug = enable;
     }
 
     /**
@@ -118,12 +131,13 @@ public class Odometer extends Thread {
             }
 
 			/*
-            * CORRECTION
-			*/
+             * CORRECTION
+			 */
 
             if (performCorrection) {
                 // read the light value
                 int lightValue = lightSensor.getLightData();
+                //Display.update("5", Integer.toString(lightValue));
                 // check if the light value corresponds to a line and it has yet to be crossed
                 if (lightValue <= LINE_LIGHT && !crossed) {
                     // check which line direction we just crossed using the heading
@@ -138,6 +152,10 @@ public class Odometer extends Thread {
                         synchronized (lock) {
                             y = yy - sensorYOffset / 2;
                         }
+                        // signal a horizontal correction with a low note
+                        if (outputDebug) {
+                            Sound.playNote(Sound.FLUTE, 440, 250);
+                        }
                     } else {
                         // cross vertical line
                         double sensorXOffset = Math.cos(theta) * SENSOR_OFFSET;
@@ -149,6 +167,10 @@ public class Odometer extends Thread {
                         synchronized (lock) {
                             x = xx - sensorXOffset / 2;
                         }
+                        // signal a vertical correction with a high note
+                        if (outputDebug) {
+                            Sound.playNote(Sound.FLUTE, 880, 250);
+                        }
                     }
                     // set the line as crossed to prevent repeated events
                     crossed = true;
@@ -158,9 +180,17 @@ public class Odometer extends Thread {
                 }
             }
 
+            /*
+             * DEBUG
+             */
+
+            if (outputDebug) {
+                updateDebugDisplay();
+            }
+
 			/*
-            * SLEEP
-			*/
+             * SLEEP
+		     */
 
             // this ensures that the odometer only runs once every period
             updateEnd = System.currentTimeMillis();
@@ -174,6 +204,12 @@ public class Odometer extends Thread {
                 }
             }
         }
+    }
+
+    private void updateDebugDisplay() {
+        Display.update("ox", Double.toString(x));
+        Display.update("oy", Double.toString(y));
+        Display.update("ot", Double.toString(theta));
     }
 
     /**
@@ -208,7 +244,7 @@ public class Odometer extends Thread {
             return theta;
         }
     }
-    
+
     /**
      * Sets the position to 3 specified values
      * @param setX double, the new x position

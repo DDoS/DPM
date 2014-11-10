@@ -7,7 +7,7 @@ public class LocalizationController {
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
 	private static final int MAX_TILES = 8;
-	
+
 	/**
 	 * Constructs a new localization controller with every property
 	 * @param n The nav for the controller to use
@@ -21,7 +21,7 @@ public class LocalizationController {
 		front_us = s1;
 		rear_us = s2;
 	}
-	
+
 	/**
 	 * Computes the standard deviation of a given integer array
 	 * @param arr The array of integers (any size)
@@ -41,7 +41,7 @@ public class LocalizationController {
 		//return the square root of that sum (the standard deviation of the original array)
 		return Math.sqrt(newAvg);
 	}
-	
+
 	/**
 	 * Method called to start the Localization Controller
 	 * Handles all the logic of the controller
@@ -49,9 +49,9 @@ public class LocalizationController {
 	public void run(){
 		//Setting up the display
 		Display.clear();
-		Display.reserve(new String[] {"Status", "X", "Y", "Th", "Moves"});
+		Display.reserve("Status", "X", "Y", "Th", "Moves");
 		Display.update("Status", "Init");
-		
+
 		//The pattern given to us in the project specifications
 		int[][] arr = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -66,7 +66,7 @@ public class LocalizationController {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
 				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-				
+
 		};
 		//A smaller test pattern
 		int[][] arr2 = {
@@ -74,14 +74,14 @@ public class LocalizationController {
 				{1, 0, 1},
 				{0, 0, 0}
 		};
-		
+
 		//Initialize the map so we can set it to whichever array we pass in
 		Map map = new Map(arr);
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
 		ArrayList<MapNode> nodes = map.getRemaningNodes();
-		
+
 		//We continue to run this algorithm until there is one (or zero) nodes left
 		Display.update("Status", "Run");
 		int moves = 0;
@@ -100,7 +100,7 @@ public class LocalizationController {
 			if(rearTiles>MAX_TILES){
 				rearTiles = MAX_TILES;
 			}
-			
+
 			//Loop through all of the nodes that are still considered valid, so we can check if they're still valid when compared to this new sensor data
 			for(MapNode m : nodes){
 				//if m represents the node we started from, n represents the place that the robot would be if it followed path from m
@@ -124,8 +124,8 @@ public class LocalizationController {
 						}
 					}
 				}
-				
-				
+
+
 				//Repeat the same logic for the rear sensor
 				for(int i=0; i<=rearTiles; i++){
 					if(i==MAX_TILES){ //If we are at the max distance, we don't actually care about this tile (due to sensor inaccuracy)
@@ -145,10 +145,10 @@ public class LocalizationController {
 					}
 				}
 			}
-			
+
 			//Now that we have removed some nodes, we update nodes
 			nodes = map.getRemaningNodes();
-			
+
 			//Now we will look for the next move.
 			//This array stores values that will be used to determine which move to take
 			//Eg. If there is a tile 4 blocks in front of a given space, it will increment tileCount[2][4]
@@ -165,7 +165,7 @@ public class LocalizationController {
 				MapNode l = n.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 				MapNode r = n.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
 				MapNode f = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
-				
+
 				//We loop and move the node forward until we hit a wall, then we increment the corresponding value in tileCount
 				int i=0;
 				while(l!=null){
@@ -178,7 +178,7 @@ public class LocalizationController {
 				}
 				//Increment the right position in the array
 				tileCount[0][i]++;
-				
+
 				//reset and repeat for facing right
 				i=0;
 				while(r!=null){
@@ -189,7 +189,7 @@ public class LocalizationController {
 					i=MAX_TILES;
 				}
 				tileCount[1][i]++;
-				
+
 				//reset and repeat facing front
 				i=0;
 				while(f!=null){
@@ -201,12 +201,12 @@ public class LocalizationController {
 				}
 				tileCount[2][i]++;
 			}
-			
+
 			//Now we compute the standard deviation of the arrays and use the lowest one for the move
 			double stdL = stdDev(tileCount[0]);
 			double stdR = stdDev(tileCount[1]);
 			double stdF = stdDev(tileCount[2]);
-			
+
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
 				//Add a forward node to the path
 				if(path!=null){
@@ -216,7 +216,7 @@ public class LocalizationController {
 				}
 				//Move forward
 				nav.forward(30);
-				
+
 			}else if(stdL<stdR){ //If we want to move left, left has to have a lower standard deviation
 				//Add a left node to the path
 				if(path!=null){
@@ -226,7 +226,7 @@ public class LocalizationController {
 				}
 				//Move left
 				nav.turnBy(90);
-				
+
 			}else{//else we want to move right
 				//add a right node to the path
 				if(path!=null){
@@ -238,29 +238,29 @@ public class LocalizationController {
 				nav.turnBy(-90);
 			}
 		}
-		
+
 		//End of algorithm, update position
 		Display.update("Status", "Final");
-		
+
 		MapNode current;//Current spot that the robot is in
-		
+
 		nodes = map.getRemaningNodes();
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
 			current = map.getNodeAtIndex((int)(Math.random()*arr.length*4));
 		}else{
 			current = nodes.get(0);//Else use what the algorithm found
 		}
-		
+
 		int num = current.getNum();//Do math to find out the position
 		double theta = (num%4)*90;
 		double x = 15 + 30*(int)((num/4)%(arr.length));
 		double y = 15 + 30*(int)((num/4)/(arr.length));
-		
+
 		//Update the display and the odometer
 		Display.update("X", ""+x);
 		Display.update("Y", ""+y);
 		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
-		
+
 	}
 }
