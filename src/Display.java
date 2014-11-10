@@ -28,7 +28,7 @@ public final class Display {
                 return 0;
             }
             int reserved = 0;
-            for (; currentIndex < LINE_COUNT; currentIndex++, reserved++) {
+            for (; reserved < keys.length && currentIndex < LINE_COUNT; currentIndex++, reserved++) {
                 map[currentIndex] = new Entry(keys[reserved]);
                 draw(currentIndex);
             }
