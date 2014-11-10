@@ -24,6 +24,7 @@ public class FilteredLightSensor {
     public FilteredLightSensor(SensorPort port) {
         handle = new ColorSensor(port);
         setSampleCount(3);
+        setFloodlight(true);
     }
 
     /**
