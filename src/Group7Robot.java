@@ -8,10 +8,13 @@ public class Group7Robot {
 		NXTRegulatedMotor clawMotor = Motor.B;
 
 		// SENSORS
-		FilteredLightSensor lightSensor = new FilteredLightSensor(SensorPort.S1);
-		FilteredUltrasonicSensor frontUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S2);
-		FilteredUltrasonicSensor rearUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S3);
+		FilteredUltrasonicSensor frontUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S1);
+		FilteredUltrasonicSensor rearUltrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S2);
+		FilteredLightSensor lightSensor = new FilteredLightSensor(SensorPort.S3);
+		FilteredColorSensor colorSensor = new FilteredColorSensor(SensorPort.S4);
 
+		// ACTUATORS
+		Claw claw = new Claw(clawMotor);
 
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, lightSensor);
@@ -23,19 +26,6 @@ public class Group7Robot {
 		// LOGIC
 		odometer.start();
 		navigation.start();
-
-		Button.waitForAnyPress();
-
-		// logic for presentation vid
-		clawMotor.setSpeed(100);
-		clawMotor.rotate(-120);
-		clawMotor.flt();
-		navigation.forward(60);
-		navigation.waitUntilDone();
-		clawMotor.rotate(120);
-		clawMotor.flt();
-		navigation.forward(-60);
-		navigation.waitUntilDone();
 
 		// EXIT
 		Button.waitForAnyPress();
