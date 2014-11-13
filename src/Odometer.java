@@ -20,7 +20,8 @@ public class Odometer extends Thread {
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT = 400;
+    private static final int LINE_LIGHT_LEFT = 500;
+    private static final int LINE_LIGHT_RIGHT = 450;
     // Spacing of the tiles in centimeters
     private static final float TILE_SPACING = 30.48f;
     // Half the said spacing
@@ -95,8 +96,10 @@ public class Odometer extends Thread {
      */
     public void run() {
         long updateStart, updateEnd;
-        // set the line as un-crossed
+        // set the line as un-crossed for both sensors
         boolean leftCrossed = false, rightCrossed = false;
+        // same as above but combined into one variable
+        int crossFlags = 0;
         // stored values when crossing lines for the left and right sensors
         float leftTacho = 0, rightTacho = 0;
         Position leftOdo = null, rightOdo = null;
@@ -154,34 +157,41 @@ public class Odometer extends Thread {
 			 */
 
             if (performCorrection) {
-                // check if the left line has yet to be crossed
-                if (!leftCrossed) {
-                    // read the left light value
-                    int leftLightValue = leftLightSensor.getLightData();
-                    // if the left light value corresponds to a line
-                    if (leftLightValue <= LINE_LIGHT) {
+                // force a sample and read the left light value
+                int leftLightValue = leftLightSensor.getLightData();
+                // check if the left light value corresponds to a line
+                if (leftLightValue <= LINE_LIGHT_LEFT) {
+                    // check if the left line has yet to be crossed
+                    if (!leftCrossed) {
                         leftTacho = lambda;
                         leftOdo = getPosition();
                         leftCrossed = true;
+                        crossFlags |= 0x1;
                     }
+                } else {
+                    leftCrossed = false;
                 }
-                // check if the right line has yet to be crossed
-                if (!rightCrossed) {
-                    // read the right light value
-                    int rightLightValue = rightLightSensor.getLightData();
-                    // if the right light value corresponds to a line
-                    if (rightLightValue <= LINE_LIGHT) {
-                        rightTacho = rho;
+                // force a sample and read the right light value
+                int rightLightValue = rightLightSensor.getLightData();
+                // check if the right light value corresponds to a line
+                if (rightLightValue <= LINE_LIGHT_RIGHT) {
+                    // check if the right line has yet to be crossed
+                    if (!rightCrossed) {
+                        rightTacho = lambda;
                         rightOdo = getPosition();
                         rightCrossed = true;
+                        crossFlags |= 0x2;
                     }
+                } else {
+                    rightCrossed = false;
                 }
                 // perform the correction when both sensors have crossed the line
-                if (leftCrossed && rightCrossed) {
+                if ((crossFlags & 0x3) == 0x3) {
                     // make sure the lines have been crossed on different odometer ticks for theta correction
-                    if (leftOdo.x != rightOdo.x || leftOdo.y != rightOdo.y) {
+                    if (leftTacho != rightTacho) {
                         // compute correction from tachometer delta
                         float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS, WHEEL_DISTANCE);
+                        //Display.update("5", Float.toString((float) Math.toDegrees(correction)));
                         // apply correction
                         synchronized (lock) {
                             theta = theta + correction;
@@ -219,9 +229,7 @@ public class Odometer extends Thread {
                             Sound.playNote(Sound.FLUTE, 880, 250);
                         }
                     }
-                    // set the lines as not crossed to prevent duplicate events
-                    leftCrossed = false;
-                    rightCrossed = false;
+                    crossFlags = 0;
                 }
             }
 

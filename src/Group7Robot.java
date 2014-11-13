@@ -27,8 +27,10 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
+		/*
 		localization.run();
-/*
+		*/
+
 		Display.reserve("1", "2", "3", "4", "5");
 
 		odometer.enableDebugOutput(true);
@@ -45,7 +47,6 @@ public class Group7Robot {
 
 		navigation.turnBy((float) Math.PI / 2);
 		navigation.waitUntilDone();
-		Button.waitForAnyPress();
 
 		navigation.forward(60);
 		navigation.waitUntilDone();
@@ -54,7 +55,7 @@ public class Group7Robot {
 		navigation.forward(-60);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
-*/
+
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);
