@@ -17,10 +17,10 @@ public class Odometer extends Thread {
     // Robot design parameters
     public static final float WHEEL_RADIUS = 2.05f;
     public static final float WHEEL_DISTANCE = 14.2f;
+    // The distance of the sensor from the wheel axle
+    private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
     private static final int LINE_LIGHT = 400;
-    // The distance of the sensor from the wheel axle
-    private static final float SENSOR_OFFSET = -9.8f;
     // Spacing of the tiles in centimeters
     private static final float TILE_SPACING = 30.48f;
     // Half the said spacing
