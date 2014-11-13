@@ -41,42 +41,53 @@ public class Odometer extends Thread {
     // Whether or not to output debug information to the display and sound
     private volatile boolean outputDebug = false;
     // Light sensor for correction
-    private final FilteredLightSensor lightSensor;
+    private final FilteredLightSensor leftLightSensor;
+    private final FilteredLightSensor rightLightSensor;
 
     /**
      * Constructs a new odometer from the left and right motors of the robot and the light sensor for correction (can be null if this won't ever be used).
      *
      * @param leftMotor The left motor
      * @param rightMotor The right motor
-     * @param lightSensor The correction light sensor
+     * @param leftLightSensor The left wheel orrection light sensor
+     * @param rightLightSensor The right wheel correction light sensor
      */
-    public Odometer(NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, FilteredLightSensor lightSensor) {
+    public Odometer(NXTRegulatedMotor leftMotor, NXTRegulatedMotor rightMotor, FilteredLightSensor leftLightSensor, FilteredLightSensor rightLightSensor) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
-        this.lightSensor = lightSensor;
+        this.leftLightSensor = leftLightSensor;
+        this.rightLightSensor = rightLightSensor;
     }
 
     /**
-     * Whether or not to enable the position correction using the light sensor. Do not enable this if the odometer was constructed using a null light sensor.
+     * Whether or not to enable the position correction using the light sensor. Do not enable this if the odometer was constructed using null light sensors.
      *
      * @param enabled The enable state
      */
     public void enableCorrection(boolean enabled) {
         performCorrection = enabled;
         if (running) {
-            lightSensor.setFloodlight(performCorrection);
+            leftLightSensor.setFloodlight(performCorrection);
+            rightLightSensor.setFloodlight(performCorrection);
         }
     }
 
-    public void enableDebugOutput(boolean enable) {
-        if (enable) {
+    /**
+     * Whether or not to enable the debug output: the odometer position will be mapped to the Display to "ox", "oy" and "ot".
+     * When crossing a horizontal line, a low pitch sound will be played.
+     * When crossing a vertical line, the sound will be higher pitched.
+     *
+     * @param enabled The enable state
+     */
+    public void enableDebugOutput(boolean enabled) {
+        if (enabled) {
             Display.reserve("ox", "oy", "ot");
         } else {
             Display.remove("ox");
             Display.remove("oy");
             Display.remove("ot");
         }
-        outputDebug = enable;
+        outputDebug = enabled;
     }
 
     /**
@@ -85,10 +96,14 @@ public class Odometer extends Thread {
     public void run() {
         long updateStart, updateEnd;
         // set the line as un-crossed
-        boolean crossed = false;
+        boolean leftCrossed = false, rightCrossed = false;
+        // stored values when crossing lines for the left and right sensors
+        float leftTacho = 0, rightTacho = 0;
+        Position leftOdo = null, rightOdo = null;
         // set the sensor flood on if we're using it
         if (performCorrection) {
-            lightSensor.setFloodlight(true);
+            leftLightSensor.setFloodlight(true);
+            rightLightSensor.setFloodlight(true);
         }
         // reset motor tachos
         rightMotor.resetTachoCount();
@@ -103,7 +118,8 @@ public class Odometer extends Thread {
 			 */
 
             if (performCorrection) {
-                lightSensor.getLightData();
+                leftLightSensor.getLightData();
+                rightLightSensor.getLightData();
             }
             // compute rho and lambda
             float rho = (float) Math.toRadians(rightMotor.getTachoCount());
@@ -138,16 +154,45 @@ public class Odometer extends Thread {
 			 */
 
             if (performCorrection) {
-                // read the light value
-                int lightValue = lightSensor.getLightData();
-                // check if the light value corresponds to a line and it has yet to be crossed
-                if (lightValue <= LINE_LIGHT && !crossed) {
-                    // check which line direction we just crossed using the heading
+                // check if the left line has yet to be crossed
+                if (!leftCrossed) {
+                    // read the left light value
+                    int leftLightValue = leftLightSensor.getLightData();
+                    // if the left light value corresponds to a line
+                    if (leftLightValue <= LINE_LIGHT) {
+                        leftTacho = lambda;
+                        leftOdo = getPosition();
+                        leftCrossed = true;
+                    }
+                }
+                // check if the right line has yet to be crossed
+                if (!rightCrossed) {
+                    // read the right light value
+                    int rightLightValue = rightLightSensor.getLightData();
+                    // if the right light value corresponds to a line
+                    if (rightLightValue <= LINE_LIGHT) {
+                        rightTacho = rho;
+                        rightOdo = getPosition();
+                        rightCrossed = true;
+                    }
+                }
+                // perform the correction when both sensors have crossed the line
+                if (leftCrossed && rightCrossed) {
+                    // make sure the lines have been crossed on different odometer ticks for theta correction
+                    if (leftOdo.x != rightOdo.x || leftOdo.y != rightOdo.y) {
+                        // compute correction from tachometer delta
+                        float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS, WHEEL_DISTANCE);
+                        // apply correction
+                        synchronized (lock) {
+                            theta = theta + correction;
+                        }
+                    }
+                    // do coordinate correction: check which line direction we just crossed using the heading
                     if (theta >= ONE_QUARTER_PI && theta < THREE_QUARTER_PI || theta >= FIVE_QUARTER_PI && theta < SEVEN_QUARTER_PI) {
-                        // cross horizontal line
+                        // crossed a horizontal line
                         float sensorYOffset = (float) Math.sin(theta) * SENSOR_OFFSET;
-                        // offset y to account for sensor distance
-                        float yy = y + sensorYOffset;
+                        // offset y to account for sensor distance, using the odo average as the position of the sensor
+                        float yy = (leftOdo.y + rightOdo.y) / 2 + sensorYOffset;
                         // snap y to closest line
                         yy = Math.round((yy + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct y, removing the offset
@@ -159,10 +204,10 @@ public class Odometer extends Thread {
                             Sound.playNote(Sound.FLUTE, 440, 250);
                         }
                     } else {
-                        // cross vertical line
+                        // crossed a vertical line
                         float sensorXOffset = (float) Math.cos(theta) * SENSOR_OFFSET;
-                        // offset x to account for sensor distance
-                        float xx = x + sensorXOffset;
+                        // offset x to account for sensor distance, using the odo average as the position of the sensor
+                        float xx = (leftOdo.x + rightOdo.x) / 2 + sensorXOffset;
                         // snap x to closest line
                         xx = Math.round((xx + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
                         // correct x, removing the offset
@@ -174,11 +219,9 @@ public class Odometer extends Thread {
                             Sound.playNote(Sound.FLUTE, 880, 250);
                         }
                     }
-                    // set the line as crossed to prevent repeated events
-                    crossed = true;
-                } else {
-                    // mark the line as done being crossed
-                    crossed = false;
+                    // set the lines as not crossed to prevent duplicate events
+                    leftCrossed = false;
+                    rightCrossed = false;
                 }
             }
 
@@ -186,6 +229,10 @@ public class Odometer extends Thread {
              * DEBUG
              */
 
+            if (performCorrection) {
+                leftLightSensor.getLightData();
+                rightLightSensor.getLightData();
+            }
             if (outputDebug) {
                 updateDebugDisplay();
             }
@@ -194,9 +241,6 @@ public class Odometer extends Thread {
              * SLEEP
 		     */
 
-            if (performCorrection) {
-                lightSensor.getLightData();
-            }
             // this ensures that the odometer only runs once every period
             updateEnd = System.currentTimeMillis();
             if (updateEnd - updateStart < PERIOD) {
