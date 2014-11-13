@@ -9,7 +9,7 @@ public class Group7Robot {
 
 		// SENSORS
 		FilteredUltrasonicSensor ultrasonicSensor = new FilteredUltrasonicSensor(SensorPort.S1);
-		FilteredLightSensor leftLightSensor = new FilteredLightSensor(SensorPort.S3);
+		FilteredLightSensor leftLightSensor = new FilteredLightSensor(SensorPort.S2);
 		FilteredLightSensor rightLightSensor = new FilteredLightSensor(SensorPort.S3);
 		FilteredColorSensor colorSensor = new FilteredColorSensor(SensorPort.S4);
 

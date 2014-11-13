@@ -52,11 +52,10 @@ public class FilteredLightSensor {
     }
 
     /**
-     * Applies the filtering and returns the light data, a value between 0 and 100 (darkest to brightest). Performs only one sampling per call.
-     *
-     * @return The light level data
+     * Forces the sensor to take a sample and add it to the sliding average filter, effectively slidding it forward by one sample. This doesn't actually compute the light value,
+     * but can help improve the frequency of sampling even in slow threads when called at a few strategic locations in the code. The disadvantage is the lost of time coherency in the samples.
      */
-    public int getLightData() {
+    public void forceSample() {
         final int sampleCount = samples.length;
         // Get the light value
         samples[index] = handle.getNormalizedLightValue();
@@ -64,6 +63,16 @@ public class FilteredLightSensor {
         currentCount = Math.min(currentCount + 1, sampleCount);
         // Compute the next index, wrapping around
         index = (index + 1) % sampleCount;
+    }
+
+    /**
+     * Applies the filtering and returns the light data, a value between 0 and 100 (darkest to brightest). Performs one sampling per call.
+     *
+     * @return The light level data
+     */
+    public int getLightData() {
+        // compute a new sample
+        forceSample();
         // Get the start of the array, which is different before wrapping
         int start = currentCount < sampleCount ? 0 : index;
         int average = 0;

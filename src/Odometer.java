@@ -118,8 +118,8 @@ public class Odometer extends Thread {
 			 */
 
             if (performCorrection) {
-                leftLightSensor.getLightData();
-                rightLightSensor.getLightData();
+                leftLightSensor.forceSample();
+                rightLightSensor.forceSample();
             }
             // compute rho and lambda
             float rho = (float) Math.toRadians(rightMotor.getTachoCount());
@@ -230,8 +230,8 @@ public class Odometer extends Thread {
              */
 
             if (performCorrection) {
-                leftLightSensor.getLightData();
-                rightLightSensor.getLightData();
+                leftLightSensor.forceSample();
+                rightLightSensor.forceSample();
             }
             if (outputDebug) {
                 updateDebugDisplay();
