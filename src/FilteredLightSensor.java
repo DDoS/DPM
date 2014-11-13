@@ -71,6 +71,7 @@ public class FilteredLightSensor {
      * @return The light level data
      */
     public int getLightData() {
+        final int sampleCount = samples.length;
         // compute a new sample
         forceSample();
         // Get the start of the array, which is different before wrapping
