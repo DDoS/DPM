@@ -44,7 +44,7 @@ public class SearchAndRescueController {
 				}
 			}
 			
-			//COLOR SENSING
+			//COLOR SENSING --needs so much work
 			while(color.getColorData()==0){
 				nav.forward(1);
 				while(nav.isNavigating()){}
