@@ -19,9 +19,51 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
+		
+		// MAP
+		Map map;
+		//The pattern given to us in the project specifications
+		int[][] arr = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+		};
+		
+		//A smaller test pattern
+		int[][] arr2 = {
+				{0, 0, 1},
+				{1, 0, 1},
+				{0, 0, 0}
+		};
+		//Test for midterm
+		int[][] arr3 = {
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},	
+				{1, 0, 0, 1, 0, 0, 0, 0},	
+				{0, 1, 0, 0, 0, 0, 0, 0},	
+				{0, 0, 0, 1, 0, 0, 0, 0},	
+				{1, 0, 0, 0, 0, 0, 0, 0}
+		
+		};
+
+		//Initialize the map so we can set it to whichever array we pass in
+		map = new Map(arr3);
 
 		// CONTROLLERS
-		LocalizationController localization = new LocalizationController(navigation, null, ultrasonicSensor, null);
+		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
+		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);
 
 		// LOGIC
 		odometer.start();

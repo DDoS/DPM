@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 public class Map {
 	private MapNode[] nodes;
+	private int start;
+	private int finish;
 
 	/**
 	 * Initialize a new Map object with a set size.
@@ -14,6 +16,8 @@ public class Map {
 	 */
 	public Map(int size){
 		nodes = new MapNode[size];
+		start = 0;
+		finish = 0;
 	}
 
 	/**
@@ -127,5 +131,31 @@ public class Map {
 		return nodes[(x + y*(int)Math.sqrt((float)nodes.length/4))*4 + t/90];
 	}
 
+	/**
+	 * Returns the MapNode where the blocks should be delivered
+	 * This node is specified when creating the Map
+	 * @return MapNode where blocks need to go
+	 */
+	public MapNode getDeliveryNode(){
+		return nodes[start];
+	}
+	
+	/**
+	 * Returns the MapNode where blocks should be picked up
+	 * The block search algorithm should start here
+	 * This node is specified when creating the Map
+	 * @return MapNode where blocks are picked up
+	 */
+	public MapNode getCollectionNode(){
+		return nodes[finish];
+	}
+	
+	/**
+	 * Get the "length" of the map, as in the length of one side (so 12 for the final project)
+	 * @return int length based on the number of nodes. assumes map is square
+	 */
+	public int getLength(){
+		return (int) Math.sqrt(nodes.length/4);
+	}
 
 }

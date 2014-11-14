@@ -8,6 +8,7 @@ public class LocalizationController {
 	private FilteredUltrasonicSensor front_us, rear_us;
 	private static final int MAX_TILES = 3;
 	private static final boolean DUEL_SENSOR = false;
+	private SearchAndRescueController searchAndRescue;
 
 	/**
 	 * Constructs a new localization controller with every property
@@ -16,11 +17,12 @@ public class LocalizationController {
 	 * @param s1 The front ultrasonic sensor
 	 * @param s2 The rear ultrasonic sensor
 	 */
-	public LocalizationController(Navigation n, Map m, FilteredUltrasonicSensor s1, FilteredUltrasonicSensor s2){
+	public LocalizationController(Navigation n, Map m, FilteredUltrasonicSensor s1, FilteredUltrasonicSensor s2, SearchAndRescueController sarC){
 		nav = n;
 		map = m;
 		front_us = s1;
 		rear_us = s2;
+		searchAndRescue = sarC;
 	}
 
 	/**
@@ -53,44 +55,6 @@ public class LocalizationController {
 		Display.reserve("Status", "X", "Y", "Th", "Moves");
 		Display.update("Status", "Init");
 
-		//The pattern given to us in the project specifications
-		int[][] arr = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
-		};
-		
-		//A smaller test pattern
-		int[][] arr2 = {
-				{0, 0, 1},
-				{1, 0, 1},
-				{0, 0, 0}
-		};
-		//Test for midterm
-		int[][] arr3 = {
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{1, 0, 0, 1, 0, 0, 0, 0},	
-				{0, 1, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 1, 0, 0, 0, 0},	
-				{1, 0, 0, 0, 0, 0, 0, 0}
-		
-		};
-
-		//Initialize the map so we can set it to whichever array we pass in
-		Map map = new Map(arr3);
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
@@ -266,21 +230,23 @@ public class LocalizationController {
 
 		nodes = map.getRemaningNodes();
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*arr.length*4));
+			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
 		}else{
 			current = nodes.get(0);//Else use what the algorithm found
 		}
 
 		int num = current.getNum();//Do math to find out the position
 		float theta = (num%4)*90;
-		float x = 15 + 30*(int)((num/4)%(arr.length));
-		float y = 15 + 30*(int)((num/4)/(arr.length));
+		float x = 15 + 30*(int)((num/4)%(map.getLength()));
+		float y = 15 + 30*(int)((num/4)/(map.getLength()));
 
 		//Update the display and the odometer
 		Display.update("X", ""+x);
 		Display.update("Y", ""+y);
 		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
+		
+		searchAndRescue.setCurrent(current);
 
 	}
 }
