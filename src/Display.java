@@ -106,12 +106,13 @@ public final class Display {
     }
 
     private static void draw(int line) {
-        LCD.clear(line);
+        int displayLine = LINE_COUNT - 1 - line;
+        LCD.clear(displayLine);
         final Entry entry = map[line];
         if (entry == null) {
             return;
         }
-        LCD.drawString(entry.key + ": " + (entry.value != null ? entry.value : ""), 0, line);
+        LCD.drawString(entry.key + ": " + (entry.value != null ? entry.value : ""), 0, displayLine);
     }
 
     private static class Entry {
