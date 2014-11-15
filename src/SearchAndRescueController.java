@@ -55,8 +55,8 @@ public class SearchAndRescueController {
 			int r = (c >> 16) & 255;
 			while(r<100 && g<100 && b<100){
 				nav.forward(1);
-				while(nav.isNavigating()){}
-				c = color.getColorData();
+				nav.waitUntilDone();
+                c = color.getColorData();
 				b = c & 255;
 				g = (c >> 8) & 255;
 				r = (c >> 16) & 255;
