@@ -247,6 +247,7 @@ public class LocalizationController {
 		nav.getOdometer().setPosition(x, y, theta);
 		
 		searchAndRescue.setCurrent(current);
+		searchAndRescue.run();
 
 	}
 }
