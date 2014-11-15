@@ -7,7 +7,7 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Navigation extends Thread {
-    private static final float NAVIGATION_EPSILON = 0.5f;
+    private static final float TARGET_DISTANCE_MULTIPLIER = 1.025f;
     // Motor speed constants
     private static final int MOTOR_STRAIGHT = 200;
     // Motors (left and right)
@@ -165,13 +165,17 @@ public class Navigation extends Thread {
         leftMotor.setSpeed(MOTOR_STRAIGHT);
         rightMotor.setSpeed(MOTOR_STRAIGHT);
         // Find turn angle
-        float differenceX = x - odometer.getX();
-        float differenceY = y - odometer.getY();
+        float startX = odometer.getX();
+        float startY = odometer.getY();
+        float differenceX = x - startX;
+        float differenceY = y - startY;
         // Do turn
         doTurn((float) Math.atan2(differenceY, differenceX));
         // Set motors forward
         leftMotor.forward();
         rightMotor.forward();
+        // A bit larger than the square of the distance to the target
+        float distanceToTarget = differenceX * differenceX + differenceY * differenceY * TARGET_DISTANCE_MULTIPLIER;
         // Main loop
         while (true) {
             // check for thread interruption, aka command abort
@@ -180,9 +184,9 @@ public class Navigation extends Thread {
                 break;
             }
             // Check for target reached
-            differenceX = x - odometer.getX();
-            differenceY = y - odometer.getY();
-            if (differenceX * differenceX + differenceY * differenceY < NAVIGATION_EPSILON * NAVIGATION_EPSILON) {
+            differenceX = startX - odometer.getX();
+            differenceY = startY - odometer.getY();
+            if (differenceX * differenceX + differenceY * differenceY >= distanceToTarget) {
                 break;
             }
         }
