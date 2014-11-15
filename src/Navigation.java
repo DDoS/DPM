@@ -7,9 +7,9 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Navigation extends Thread {
-    private static final float TARGET_DISTANCE_MULTIPLIER = 1.025f;
     // Motor speed constants
-    private static final int MOTOR_STRAIGHT = 200;
+    private static final int MOTOR_SPEED = 200;
+    private static final int MOTOR_ACCELERATION = 1000;
     // Motors (left and right)
     private final NXTRegulatedMotor leftMotor;
     private final NXTRegulatedMotor rightMotor;
@@ -161,43 +161,41 @@ public class Navigation extends Thread {
     }
 
     private void doTravel(float x, float y) {
-        // Set motor speds
-        leftMotor.setSpeed(MOTOR_STRAIGHT);
-        rightMotor.setSpeed(MOTOR_STRAIGHT);
+        // Set motor speeds and acceleration
+        leftMotor.setSpeed(MOTOR_SPEED);
+        leftMotor.setAcceleration(MOTOR_ACCELERATION);
+        rightMotor.setSpeed(MOTOR_SPEED);
+        rightMotor.setAcceleration(MOTOR_ACCELERATION);
         // Find turn angle
-        float startX = odometer.getX();
-        float startY = odometer.getY();
-        float differenceX = x - startX;
-        float differenceY = y - startY;
+        float differenceX = x - odometer.getX();
+        float differenceY = y - odometer.getY();
         // Do turn
         doTurn((float) Math.atan2(differenceY, differenceX));
-        // Set motors forward
-        leftMotor.forward();
-        rightMotor.forward();
-        // A bit larger than the square of the distance to the target
-        float distanceToTarget = differenceX * differenceX + differenceY * differenceY * TARGET_DISTANCE_MULTIPLIER;
-        // Main loop
-        while (true) {
+        // Calculate the rotation to apply to the wheels
+        float distance = (float) Math.sqrt(differenceX * differenceX + differenceY * differenceY);
+        int rotationDegreesLeft = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_LEFT));
+        int rotationDegreesRight = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_RIGHT));
+        // Move the robot
+        leftMotor.rotate(rotationDegreesLeft, true);
+        rightMotor.rotate(rotationDegreesRight, true);
+        // Wait for completion
+        while (leftMotor.isMoving() || rightMotor.isMoving()) {
             // check for thread interruption, aka command abort
             if (interrupted()) {
                 // end early
                 break;
             }
-            // Check for target reached
-            differenceX = startX - odometer.getX();
-            differenceY = startY - odometer.getY();
-            if (differenceX * differenceX + differenceY * differenceY >= distanceToTarget) {
-                break;
-            }
+            Thread.yield();
         }
-        // complete command
         endCommand();
     }
 
     private void doTurn(float theta) {
-        // Set motor speeds
-        leftMotor.setSpeed(MOTOR_STRAIGHT);
-        rightMotor.setSpeed(MOTOR_STRAIGHT);
+        // Set motor speeds and acceleration
+        leftMotor.setSpeed(MOTOR_SPEED);
+        leftMotor.setAcceleration(MOTOR_ACCELERATION);
+        rightMotor.setSpeed(MOTOR_SPEED);
+        rightMotor.setAcceleration(MOTOR_ACCELERATION);
         // Find min angle difference
         float difference = theta - odometer.getTheta();
         if (difference >= (float) Math.PI) {
@@ -206,11 +204,13 @@ public class Navigation extends Thread {
             difference = 2 * (float) Math.PI + difference;
         }
         // Compute wheel rotation in angle
-        float wheelRotation = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS) / 2;
-        int rotationDegrees = (int) Math.round(Math.toDegrees(wheelRotation));
+        float wheelRotationLeft = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS_LEFT) / 2;
+        float wheelRotationRight = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS_RIGHT) / 2;
+        int rotationDegreesLeft = (int) Math.round(Math.toDegrees(wheelRotationLeft));
+        int rotationDegreesRight = (int) Math.round(Math.toDegrees(wheelRotationRight));
         // Rotate
-        leftMotor.rotate(-rotationDegrees, true);
-        rightMotor.rotate(rotationDegrees, true);
+        leftMotor.rotate(-rotationDegreesLeft, true);
+        rightMotor.rotate(rotationDegreesRight, true);
         // Wait for completion
         while (leftMotor.isMoving() || rightMotor.isMoving()) {
             // check for thread interruption, aka command abort
@@ -218,6 +218,7 @@ public class Navigation extends Thread {
                 // end early
                 break;
             }
+            Thread.yield();
         }
         endCommand();
     }
