@@ -57,13 +57,13 @@ public class Group7Robot {
 				{1, 0, 0, 0, 0, 0, 0, 0}
 
 		};
-		
+
 		//Test for small scale
 		int[][] arr4 = {
-				{3, 1, 0, 0},
+				{3, 1, 2, 0},
 				{0, 0, 0, 1},
-				{1, 0, 1, 2},
-				{1, 0, 0, 0}
+				{1, 0, 0, 0},
+				{1, 0, 1, 0}
 		};
 
 		//Initialize the map so we can set it to whichever array we pass in
@@ -80,11 +80,10 @@ public class Group7Robot {
 		odometer.enableCorrection(false);
 		
 		Button.waitForAnyPress();
-		
-		localization.run();
-		
-		/*
 
+		localization.run();
+
+		/*
 		Display.reserve("1", "2", "3", "4", "5");
 
 		//odometer.enableDebugOutput(true);
@@ -100,7 +99,6 @@ public class Group7Robot {
 			navigation.waitUntilDone();
 		}
 
-		/*
 		navigation.travelTo(0, 0);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
@@ -117,6 +115,6 @@ public class Group7Robot {
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);
-		
+
 	}
 }

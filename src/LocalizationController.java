@@ -74,7 +74,7 @@ public class LocalizationController {
 //				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 //
 //		};
-//		
+//
 //		//A smaller test pattern
 //		int[][] arr2 = {
 //				{0, 0, 1},
@@ -83,17 +83,17 @@ public class LocalizationController {
 //		};
 //		//Test for midterm
 //		int[][] arr3 = {
-//				{0, 0, 0, 0, 0, 0, 0, 0},	
-//				{0, 0, 0, 0, 0, 0, 0, 0},	
-//				{0, 0, 0, 0, 0, 0, 0, 0},	
-//				{0, 0, 0, 0, 0, 0, 0, 0},	
-//				{1, 0, 0, 1, 0, 0, 0, 0},	
-//				{0, 1, 0, 0, 0, 0, 0, 0},	
-//				{0, 0, 0, 1, 0, 0, 0, 0},	
+//				{0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0},
+//				{1, 0, 0, 1, 0, 0, 0, 0},
+//				{0, 1, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 1, 0, 0, 0, 0},
 //				{1, 0, 0, 0, 0, 0, 0, 0}
-//		
+//
 //		};
-		
+
 		int[][] arr = {
 				{0, 1, 0, 1},
 				{0, 0, 0, 1},
@@ -132,7 +132,7 @@ public class LocalizationController {
 				}
 			}
 
-			
+
 			//Loop through all of the nodes that are still considered valid, so we can check if they're still valid when compared to this new sensor data
 			for(MapNode m : nodes){
 				//if m represents the node we started from, n represents the place that the robot would be if it followed path from m
@@ -178,7 +178,7 @@ public class LocalizationController {
 					}
 				}
 			}
-			
+
 			//Now that we have removed some nodes, we update nodes
 			nodes = map.getRemaningNodes();
 
@@ -192,10 +192,10 @@ public class LocalizationController {
 					{0, 0, 0, 0, 0, 0, 0, 0, 0},//right
 					{0, 0, 0, 0, 0, 0, 0, 0, 0}//front
 			};
-			
+
 			//for each valid starting node left, we check the distance to the next tile from each direction
 			for(MapNode m : nodes){
-				
+
 				MapNode n = m.getNodeFromPath(path);
 				n = n.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 
@@ -244,7 +244,7 @@ public class LocalizationController {
 			float stdL = stdDev(tileCount[0]);
 			float stdR = stdDev(tileCount[1]);
 			float stdF = stdDev(tileCount[2]);
-			
+
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
 				//Add a forward node to the path
 				try{
@@ -303,7 +303,7 @@ public class LocalizationController {
 		nav.getOdometer().setPosition(x, y, theta);
 		
 		lejos.nxt.Button.waitForAnyPress();
-		
+
 		searchAndRescue.setCurrent(current);
 		searchAndRescue.run();
 

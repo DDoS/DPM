@@ -19,20 +19,20 @@ public class SearchAndRescueController {
 		Display.update("Status", "Init");
 		int blocks = 0;
 		int points = 0;
-		
+
 		MapNode dest;
-		
+
 		while(true){ //change to timer things
 			//MOVE TO PICKUP
 			dest = map.getCollectionNode();
 			MapPath path = map.getPathFromNodeToNode(current, dest);
 			MapNode next;
-			
+
 			Display.update("Status", "Moving");
 			while(path!=null){
 				next = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
-				
+
 				int num = next.getNum();
 				float x = 15 + 30*(int)((num/4)%(map.getLength()));
 				float y = 15 + 30*(int)((num/4)/(map.getLength()));
@@ -44,9 +44,11 @@ public class SearchAndRescueController {
 					nav.waitUntilDone();
 				}
 			}
-			
+
 			Display.update("Status", "Searching");
 			//COLOR SENSING --needs so much work
+
+            claw.sense();
 			int c = color.getColorData();
 			int b = c & 255;
 			int g = (c >> 8) & 255;
@@ -60,22 +62,23 @@ public class SearchAndRescueController {
 				r = (c >> 16) & 255;
 			}
 			Display.update("Status", "Collecting");
-			nav.forward(10);
+
+			nav.forward(15);
 			nav.waitUntilDone();
-			
+
 			//CLAW
 			claw.close();
-			
-			
+
+
 			//MOVE TO DROP OFF
 			dest = map.getDeliveryNode();
 			path = map.getPathFromNodeToNode(current, dest);
-			
+
 			Display.update("Status", "Returning");
 			while(path!=null){
 				next = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
-				
+
 				int num = next.getNum();
 				float x = 15 + 30*(int)((num/4)%(map.getLength()));
 				float y = 15 + 30*(int)((num/4)/(map.getLength()));
@@ -87,15 +90,15 @@ public class SearchAndRescueController {
 					nav.waitUntilDone();
 				}
 			}
-			
+
 			//CLAW AGAIN
 			claw.open();
-			
+
 			Display.update("Status", "Final");
 		}
-		
+
     }
-    
+
     public void setCurrent(MapNode c){
     	current = c;
     }

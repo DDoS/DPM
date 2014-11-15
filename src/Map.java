@@ -145,7 +145,7 @@ public class Map {
 	public MapNode getDeliveryNode(){
 		return nodes[start];
 	}
-	
+
 	/**
 	 * Returns the MapNode where blocks should be picked up
 	 * The block search algorithm should start here
@@ -155,7 +155,7 @@ public class Map {
 	public MapNode getCollectionNode(){
 		return nodes[finish];
 	}
-	
+
 	/**
 	 * Get the "length" of the map, as in the length of one side (so 12 for the final project)
 	 * @return int length based on the number of nodes. assumes map is square
