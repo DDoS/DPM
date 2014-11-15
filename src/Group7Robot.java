@@ -19,7 +19,7 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
-		
+
 		// MAP
 		Map map;
 		//The pattern given to us in the project specifications
@@ -38,7 +38,7 @@ public class Group7Robot {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 		};
-		
+
 		//A smaller test pattern
 		int[][] arr2 = {
 				{0, 0, 1},
@@ -47,15 +47,15 @@ public class Group7Robot {
 		};
 		//Test for midterm
 		int[][] arr3 = {
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 0, 0, 0, 0, 0},	
-				{1, 0, 0, 1, 0, 0, 0, 0},	
-				{0, 1, 0, 0, 0, 0, 0, 0},	
-				{0, 0, 0, 1, 0, 0, 0, 0},	
+				{0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 0, 0, 0, 0},
+				{0, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0},
 				{1, 0, 0, 0, 0, 0, 0, 0}
-		
+
 		};
 		
 		//Test for small scale
@@ -84,28 +84,32 @@ public class Group7Robot {
 
 		Display.reserve("1", "2", "3", "4", "5");
 
-		odometer.enableDebugOutput(true);
+		//odometer.enableDebugOutput(true);
 		Button.waitForAnyPress();
-		odometer.enableCorrection(true);
+		//odometer.enableCorrection(true);
 
-		navigation.forward(60);
+		navigation.travelTo(0, 60);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 
-		navigation.forward(-60);
+		for (int i = 0; i < 4; i++) {
+			navigation.turnBy(Math.PI / 2);
+			navigation.waitUntilDone();
+		}
+
+		/*
+		navigation.travelTo(0, 0);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 
-		navigation.turnBy((float) Math.PI / 2);
-		navigation.waitUntilDone();
-
-		navigation.forward(60);
+		navigation.travelTo(60, 0);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 
-		navigation.forward(-60);
+		navigation.travelTo(0, 0);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
+		*/
 
 		// EXIT
 		Button.waitForAnyPress();

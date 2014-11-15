@@ -20,8 +20,8 @@ public class Odometer extends Thread {
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT_LEFT = 500;
-    private static final int LINE_LIGHT_RIGHT = 450;
+    private static final int LINE_LIGHT_LEFT = 480;
+    private static final int LINE_LIGHT_RIGHT = 410;
     // Spacing of the tiles in centimeters
     private static final float TILE_SPACING = 30.48f;
     // Half the said spacing
@@ -191,7 +191,6 @@ public class Odometer extends Thread {
                     if (leftTacho != rightTacho) {
                         // compute correction from tachometer delta
                         float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS, WHEEL_DISTANCE);
-                        //Display.update("5", Float.toString((float) Math.toDegrees(correction)));
                         // apply correction
                         synchronized (lock) {
                             theta = theta + correction;
