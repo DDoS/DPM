@@ -15,15 +15,16 @@ public class Odometer extends Thread {
     private static final float FIVE_QUARTER_PI = 5 * ONE_QUARTER_PI;
     private static final float SEVEN_QUARTER_PI = 7 * ONE_QUARTER_PI;
     // Robot design parameters
-    public static final float WHEEL_RADIUS = 2.05f;
-    public static final float WHEEL_DISTANCE = 14.2f;
+    public static final float WHEEL_RADIUS_LEFT = 2.1f;
+    public static final float WHEEL_RADIUS_RIGHT = 2.1f;
+    public static final float WHEEL_DISTANCE = 14.55f;
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
     private static final int LINE_LIGHT_LEFT = 480;
     private static final int LINE_LIGHT_RIGHT = 410;
     // Spacing of the tiles in centimeters
-    private static final float TILE_SPACING = 30.48f;
+    public static final float TILE_SPACING = 30.48f;
     // Half the said spacing
     private static final float HALF_TILE_SPACING = TILE_SPACING / 2;
     // Whether or not the odometer is running
@@ -134,8 +135,8 @@ public class Odometer extends Thread {
             lastRho = rho;
             lastLambda = lambda;
             // multiply rho and lambda by the wheel radius
-            float deltaRhoRadius = deltaRho * WHEEL_RADIUS;
-            float deltaLambdaRadius = deltaLambda * WHEEL_RADIUS;
+            float deltaRhoRadius = deltaRho * WHEEL_RADIUS_RIGHT;
+            float deltaLambdaRadius = deltaLambda * WHEEL_RADIUS_LEFT;
             // compute delta C
             float deltaC = (deltaRhoRadius + deltaLambdaRadius) / 2;
             // compute delta theta and it's half
@@ -190,7 +191,7 @@ public class Odometer extends Thread {
                     // make sure the lines have been crossed on different odometer ticks for theta correction
                     if (leftTacho != rightTacho) {
                         // compute correction from tachometer delta
-                        float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS, WHEEL_DISTANCE);
+                        float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS_LEFT, WHEEL_DISTANCE);
                         // apply correction
                         synchronized (lock) {
                             theta = theta + correction;
