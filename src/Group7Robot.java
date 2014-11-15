@@ -77,6 +77,9 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
+		odometer.enableCorrection(false);
+		
+		Button.waitForAnyPress();
 		
 		localization.run();
 		
@@ -114,6 +117,6 @@ public class Group7Robot {
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);
-		*/
+		
 	}
 }
