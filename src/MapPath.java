@@ -25,6 +25,7 @@ public class MapPath {
      */
     public MapPath(Direction d) {
         dir = d;
+        next = null;
     }
 
     /**
@@ -45,7 +46,7 @@ public class MapPath {
      */
     public void addMapPath(MapPath m) {
         if (this.next != null) {
-            this.addMapPath(m);
+            this.next.addMapPath(m);
         } else {
             this.next = m;
         }

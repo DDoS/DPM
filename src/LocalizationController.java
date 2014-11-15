@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+import lejos.nxt.Sound;
+import lejos.nxt.comm.RConsole;
+
 
 public class LocalizationController {
 	//Has a copy of the nav, has a map, and has two sensors
@@ -55,6 +58,51 @@ public class LocalizationController {
 		Display.reserve("Status", "X", "Y", "Th", "Moves");
 		Display.update("Status", "Init");
 
+//		//The pattern given to us in the project specifications
+//		int[][] arr = {
+//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+//				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+//				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+//
+//		};
+//		
+//		//A smaller test pattern
+//		int[][] arr2 = {
+//				{0, 0, 1},
+//				{1, 0, 1},
+//				{0, 0, 0}
+//		};
+//		//Test for midterm
+//		int[][] arr3 = {
+//				{0, 0, 0, 0, 0, 0, 0, 0},	
+//				{0, 0, 0, 0, 0, 0, 0, 0},	
+//				{0, 0, 0, 0, 0, 0, 0, 0},	
+//				{0, 0, 0, 0, 0, 0, 0, 0},	
+//				{1, 0, 0, 1, 0, 0, 0, 0},	
+//				{0, 1, 0, 0, 0, 0, 0, 0},	
+//				{0, 0, 0, 1, 0, 0, 0, 0},	
+//				{1, 0, 0, 0, 0, 0, 0, 0}
+//		
+//		};
+		
+		int[][] arr = {
+				{0, 1, 0, 1},
+				{0, 0, 0, 1},
+				{1, 0, 0, 0},
+				{0, 0, 1, 0}
+		};
+
+		//Initialize the map so we can set it to whichever array we pass in
+		Map map = new Map(arr);
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
@@ -84,6 +132,7 @@ public class LocalizationController {
 				}
 			}
 
+			
 			//Loop through all of the nodes that are still considered valid, so we can check if they're still valid when compared to this new sensor data
 			for(MapNode m : nodes){
 				//if m represents the node we started from, n represents the place that the robot would be if it followed path from m
@@ -129,7 +178,7 @@ public class LocalizationController {
 					}
 				}
 			}
-
+			
 			//Now that we have removed some nodes, we update nodes
 			nodes = map.getRemaningNodes();
 
@@ -143,18 +192,18 @@ public class LocalizationController {
 					{0, 0, 0, 0, 0, 0, 0, 0, 0},//right
 					{0, 0, 0, 0, 0, 0, 0, 0, 0}//front
 			};
+			
 			//for each valid starting node left, we check the distance to the next tile from each direction
 			for(MapNode m : nodes){
+				
 				MapNode n = m.getNodeFromPath(path);
-				MapNode l = n.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
-				MapNode r = n.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
-				MapNode f = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+				n = n.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
 
 				//We loop and move the node forward until we hit a wall, then we increment the corresponding value in tileCount
 				int i=0;
-				while(l!=null){
+				while(n!=null){
 					i++;
-					l = l.getNodeFromPath(new MapPath(MapPath.Direction.FRONT)); //Using l, facing left
+					n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT)); //Using l, facing left
 				}
 				//Cutoff at the max
 				if(i>MAX_TILES){
@@ -164,10 +213,12 @@ public class LocalizationController {
 				tileCount[0][i]++;
 
 				//reset and repeat for facing right
+				n = m.getNodeFromPath(path);
+				n = n.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
 				i=0;
-				while(r!=null){
+				while(n!=null){
 					i++;
-					r = r.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using r, facing right
+					n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using r, facing right
 				}
 				if(i>MAX_TILES){
 					i=MAX_TILES;
@@ -175,10 +226,13 @@ public class LocalizationController {
 				tileCount[1][i]++;
 
 				//reset and repeat facing front
+				n = m.getNodeFromPath(path);
+				n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
 				i=0;
-				while(f!=null){
+				i=0;
+				while(n!=null){
 					i++;
-					f = f.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using f, facing front
+					n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using f, facing front
 				}
 				if(i>MAX_TILES){
 					i=MAX_TILES;
@@ -190,36 +244,38 @@ public class LocalizationController {
 			float stdL = stdDev(tileCount[0]);
 			float stdR = stdDev(tileCount[1]);
 			float stdF = stdDev(tileCount[2]);
-
+			
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
 				//Add a forward node to the path
-				if(path!=null){
+				try{
 					path.addMapPath(new MapPath(MapPath.Direction.FRONT));
-				}else{
+				}catch(Exception e){
 					path = new MapPath(MapPath.Direction.FRONT);
 				}
 				//Move forward
 				nav.forward(30);
-
+				nav.waitUntilDone();//Wait for the navigation to finish
 			}else if(stdL<stdR){ //If we want to move left, left has to have a lower standard deviation
 				//Add a left node to the path
-				if(path!=null){
+				try{
 					path.addMapPath(new MapPath(MapPath.Direction.LEFT));
-				}else{
+				}catch(Exception e){
 					path = new MapPath(MapPath.Direction.LEFT);
 				}
 				//Move left
-				nav.turnBy(90);
+				nav.turnBy((float) (Math.PI/2));
+				nav.waitUntilDone();//Wait for the navigation to finish
 
 			}else{//else we want to move right
 				//add a right node to the path
-				if(path!=null){
-					path.addMapPath(new MapPath(MapPath.Direction.RIGHT));
-				}else{
+				try{
+				 	path.addMapPath(new MapPath(MapPath.Direction.RIGHT));
+				}catch(Exception e){
 					path = new MapPath(MapPath.Direction.RIGHT);
 				}
 				//Move right
-				nav.turnBy(-90);
+				nav.turnBy((float) (-Math.PI/2));
+				nav.waitUntilDone();//Wait for the navigation to finish
 			}
 		}
 
@@ -230,21 +286,23 @@ public class LocalizationController {
 
 		nodes = map.getRemaningNodes();
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
+			current = map.getNodeAtIndex((int)(Math.random()*arr.length*4));
 		}else{
 			current = nodes.get(0);//Else use what the algorithm found
 		}
 
 		int num = current.getNum();//Do math to find out the position
-		float theta = (num%4)*90;
-		float x = 15 + 30*(int)((num/4)%(map.getLength()));
-		float y = 15 + 30*(int)((num/4)/(map.getLength()));
+		float theta = (float) ((num%4)*(Math.PI/2));
+		float x = 15 + 30*(int)((num/4)%(arr.length));
+		float y = 15 + 30*(int)((num/4)/(arr.length));
 
 		//Update the display and the odometer
 		Display.update("X", ""+x);
 		Display.update("Y", ""+y);
 		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
+		
+		lejos.nxt.Button.waitForAnyPress();
 		
 		searchAndRescue.setCurrent(current);
 		searchAndRescue.run();

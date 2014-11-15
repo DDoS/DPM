@@ -38,10 +38,10 @@ public class SearchAndRescueController {
 				float y = 15 + 30*(int)((num/4)/(map.getLength()));
 				float theta = (num%4)*90;
 				nav.travelTo(x, y);
-				while(nav.isNavigating()){}
+				nav.waitUntilDone();
 				if(path==null){
 					nav.turnTo(theta);
-					while(nav.isNavigating()){}
+					nav.waitUntilDone();
 				}
 			}
 			
@@ -61,7 +61,7 @@ public class SearchAndRescueController {
 			}
 			Display.update("Status", "Collecting");
 			nav.forward(10);
-			while(nav.isNavigating()){}
+			nav.waitUntilDone();
 			
 			//CLAW
 			claw.close();
@@ -81,10 +81,10 @@ public class SearchAndRescueController {
 				float y = 15 + 30*(int)((num/4)/(map.getLength()));
 				float theta = (num%4)*90;
 				nav.travelTo(x, y);
-				while(nav.isNavigating()){}
+				nav.waitUntilDone();
 				if(path==null){
 					nav.turnTo(theta);
-					while(nav.isNavigating()){}
+					nav.waitUntilDone();
 				}
 			}
 			
