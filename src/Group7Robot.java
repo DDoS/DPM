@@ -57,9 +57,17 @@ public class Group7Robot {
 				{1, 0, 0, 0, 0, 0, 0, 0}
 		
 		};
+		
+		//Test for small scale
+		int[][] arr4 = {
+				{3, 1, 0, 0},
+				{0, 0, 0, 1},
+				{1, 0, 1, 2},
+				{1, 0, 0, 0}
+		};
 
 		//Initialize the map so we can set it to whichever array we pass in
-		map = new Map(arr3);
+		map = new Map(arr4);
 
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);

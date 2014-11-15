@@ -28,6 +28,7 @@ public class SearchAndRescueController {
 			MapPath path = map.getPathFromNodeToNode(current, dest);
 			MapNode next;
 			
+			Display.update("Status", "Moving");
 			while(path!=null){
 				next = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
@@ -44,11 +45,21 @@ public class SearchAndRescueController {
 				}
 			}
 			
+			Display.update("Status", "Searching");
 			//COLOR SENSING --needs so much work
-			while(color.getColorData()==0){
+			int c = color.getColorData();
+			int b = c & 255;
+			int g = (c >> 8) & 255;
+			int r = (c >> 16) & 255;
+			while(r<100 && g<100 && b<100){
 				nav.forward(1);
 				while(nav.isNavigating()){}
+				c = color.getColorData();
+				b = c & 255;
+				g = (c >> 8) & 255;
+				r = (c >> 16) & 255;
 			}
+			Display.update("Status", "Collecting");
 			nav.forward(10);
 			while(nav.isNavigating()){}
 			
@@ -60,6 +71,7 @@ public class SearchAndRescueController {
 			dest = map.getDeliveryNode();
 			path = map.getPathFromNodeToNode(current, dest);
 			
+			Display.update("Status", "Returning");
 			while(path!=null){
 				next = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
@@ -78,6 +90,8 @@ public class SearchAndRescueController {
 			
 			//CLAW AGAIN
 			claw.open();
+			
+			Display.update("Status", "Final");
 		}
 		
     }

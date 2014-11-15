@@ -36,17 +36,23 @@ public class Map {
 			//For each square in the array, we need to do a bunch of math to add right children to the node
 			for(int i=0; i<map.length; i++){
 				for(int j=0; j<map[0].length; j++){
-					if(i<map.length-1&&map[j][i+1]==0){ //If the square isn't at the edge of the array, and it has an empty space to the east, we set the child to the next node over.
+					if(i<map.length-1&&map[j][i+1]!=1){ //If the square isn't at the edge of the array, and it has an empty space to the east, we set the child to the next node over.
 						//Otherwise the child is already null, so we don't set anything
 						getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i+1, j, 0));
 					}
-					if(j>0&&map[j-1][i]==0){//Check for the square to the north of this one
+					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
 						getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, 90));
+						if(map[j-1][i]==2){
+							finish = getNodeAtPosition(i, j, 90).getNum();
+						}
+						if(map[j-1][i]==2){
+							start = getNodeAtPosition(i, j, 90).getNum();
+						}
 					}
-					if(i>0&&map[j][i-1]==0){//Check the square to the west
+					if(i>0&&map[j][i-1]!=1){//Check the square to the west
 						getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, 180));
 					}
-					if(j<map[0].length-1&&map[j+1][i]==0){//Check the square to the south
+					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
 						getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 270));
 					}
 
