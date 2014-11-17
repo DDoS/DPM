@@ -230,6 +230,25 @@ public class Odometer extends Thread {
                         }
                     }
                     crossFlags = 0;
+                } else {
+                    // only one sensor has crossed
+                    final Position crossedPosition;
+                    if ((crossFlags & 0x3) == 0x1) {
+                        // left has crossed
+                        crossedPosition = leftOdo;
+                    } else {
+                        // right has crossed
+                        crossedPosition = rightOdo;
+                    }
+                    // get the distance since the line was crossed by one of the sensors
+                    float diffX = crossedPosition.x - x;
+                    float diffY = crossedPosition.y - y;
+                    float distance = diffX * diffX + diffY * diffY;
+                    // cancel correction if we're pass the tile center, to prevent errors when encounteing the next line
+                    if (distance >= HALF_TILE_SPACING * HALF_TILE_SPACING) {
+                        // reset sensors as uncrossed
+                        crossFlags = 0;
+                    }
                 }
             }
 
