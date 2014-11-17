@@ -78,12 +78,14 @@ public class Group7Robot {
 		navigation.start();
 
 		/*
+		// MAIN RUN
 		Button.waitForAnyPress();
 		odometer.enableCorrection(false);
 		localization.run();
 		*/
 
 		/*
+		// CALIBRATION RUNS
 		odometer.enableCorrection(false);
 		Button.waitForAnyPress();
 		navigation.travelTo(0, Odometer.TILE_SPACING * 2);
@@ -96,20 +98,20 @@ public class Group7Robot {
 		*/
 
 		/**/
+		// INFINITE RANDOM WALK
 		odometer.enableDebugOutput(true);
 		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
-
-		for (int i = 0; i < 2; i++) {
-			navigation.travelTo(0, 60);
+		java.util.Random random = new java.util.Random();
+		while (!Button.ESCAPE.isDown()) {
+			float next = random.nextInt(3) * Odometer.TILE_SPACING;
+			if (random.nextBoolean()) {
+				navigation.travelBy(next - odometer.getX(), 0);
+			} else {
+				navigation.travelBy(0, next - odometer.getY());
+			}
 			navigation.waitUntilDone();
-			navigation.travelTo(0, 0);
-			navigation.waitUntilDone();
-			navigation.travelTo(60, 0);
-			navigation.waitUntilDone();
-			navigation.travelTo(0, 0);
-			navigation.waitUntilDone();
-		}	
+		}
 		/**/
 
 		// EXIT
