@@ -21,12 +21,14 @@ public class Odometer extends Thread {
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT_LEFT = 480;
-    private static final int LINE_LIGHT_RIGHT = 410;
+    private static final int LINE_LIGHT_LEFT = 460;
+    private static final int LINE_LIGHT_RIGHT = 390;
     // Spacing of the tiles in centimeters
     public static final float TILE_SPACING = 30.48f;
     // Half the said spacing
     private static final float HALF_TILE_SPACING = TILE_SPACING / 2;
+    // Dampening for heading correction to reduce error from bad correction
+    private static final float HEADING_CORRECTION_DAMPEN = 0.5f;
     // Whether or not the odometer is running
     private volatile boolean running = false;
     // robot position
@@ -194,7 +196,7 @@ public class Odometer extends Thread {
                         float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS_LEFT, WHEEL_DISTANCE);
                         // apply correction
                         synchronized (lock) {
-                            theta = theta + correction;
+                            theta = theta + correction * HEADING_CORRECTION_DAMPEN;
                         }
                     }
                     // do coordinate correction: check which line direction we just crossed using the heading
@@ -230,7 +232,7 @@ public class Odometer extends Thread {
                         }
                     }
                     crossFlags = 0;
-                } else {
+                } else if ((crossFlags & 0x3) != 0) {
                     // only one sensor has crossed
                     final Position crossedPosition;
                     if ((crossFlags & 0x3) == 0x1) {

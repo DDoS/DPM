@@ -95,22 +95,22 @@ public class Group7Robot {
 		}
 		*/
 
-		/*
+		/**/
 		odometer.enableDebugOutput(true);
+		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
 
-		navigation.travelTo(0, 0);
-		navigation.waitUntilDone();
-		Button.waitForAnyPress();
-
-		navigation.travelTo(60, 0);
-		navigation.waitUntilDone();
-		Button.waitForAnyPress();
-
-		navigation.travelTo(0, 0);
-		navigation.waitUntilDone();
-		Button.waitForAnyPress();
-		*/
+		for (int i = 0; i < 2; i++) {
+			navigation.travelTo(0, 60);
+			navigation.waitUntilDone();
+			navigation.travelTo(0, 0);
+			navigation.waitUntilDone();
+			navigation.travelTo(60, 0);
+			navigation.waitUntilDone();
+			navigation.travelTo(0, 0);
+			navigation.waitUntilDone();
+		}	
+		/**/
 
 		// EXIT
 		Button.waitForAnyPress();
