@@ -22,7 +22,7 @@ public class Group7Robot {
 
 		// MAP
 		Map map;
-		//The pattern given to us in the project specifications
+		/*//The pattern given to us in the project specifications
 		int[][] arr = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -57,12 +57,12 @@ public class Group7Robot {
 				{1, 0, 0, 0, 0, 0, 0, 0}
 
 		};
-
+	*/
 		//Test for small scale
 		int[][] arr4 = {
 				{3, 1, 2, 0},
-				{0, 0, 0, 1},
-				{1, 0, 0, 0},
+				{0, 1, 0, 1},
+				{0, 0, 0, 0},
 				{1, 0, 1, 0}
 		};
 
@@ -77,12 +77,12 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
-		/*
+		
 		// MAIN RUN
 		Button.waitForAnyPress();
-		odometer.enableCorrection(false);
+		odometer.enableCorrection(true);
 		localization.run();
-		*/
+
 
 		/*
 		// CALIBRATION RUNS
@@ -97,7 +97,7 @@ public class Group7Robot {
 		}
 		*/
 
-		/**/
+		/*
 		// INFINITE RANDOM WALK
 		odometer.enableDebugOutput(true);
 		Button.waitForAnyPress();
@@ -111,9 +111,9 @@ public class Group7Robot {
 				navigation.travelBy(0, next - odometer.getY());
 			}
 			navigation.waitUntilDone();
-		}
+		}*/
 		/**/
-
+		
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);

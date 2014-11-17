@@ -58,51 +58,6 @@ public class LocalizationController {
 		Display.reserve("Status", "X", "Y", "Th", "Moves");
 		Display.update("Status", "Init");
 
-//		//The pattern given to us in the project specifications
-//		int[][] arr = {
-//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-//				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-//				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-//
-//		};
-//
-//		//A smaller test pattern
-//		int[][] arr2 = {
-//				{0, 0, 1},
-//				{1, 0, 1},
-//				{0, 0, 0}
-//		};
-//		//Test for midterm
-//		int[][] arr3 = {
-//				{0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 0, 0, 0, 0, 0},
-//				{1, 0, 0, 1, 0, 0, 0, 0},
-//				{0, 1, 0, 0, 0, 0, 0, 0},
-//				{0, 0, 0, 1, 0, 0, 0, 0},
-//				{1, 0, 0, 0, 0, 0, 0, 0}
-//
-//		};
-
-		int[][] arr = {
-				{0, 1, 0, 1},
-				{0, 0, 0, 1},
-				{1, 0, 0, 0},
-				{0, 0, 1, 0}
-		};
-
-		//Initialize the map so we can set it to whichever array we pass in
-		Map map = new Map(arr);
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
@@ -198,6 +153,7 @@ public class LocalizationController {
 
 				MapNode n = m.getNodeFromPath(path);
 				n = n.getNodeFromPath(new MapPath(MapPath.Direction.LEFT));
+				n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
 
 				//We loop and move the node forward until we hit a wall, then we increment the corresponding value in tileCount
 				int i=0;
@@ -215,6 +171,7 @@ public class LocalizationController {
 				//reset and repeat for facing right
 				n = m.getNodeFromPath(path);
 				n = n.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
+				n = n.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
 				i=0;
 				while(n!=null){
 					i++;
@@ -245,7 +202,31 @@ public class LocalizationController {
 			float stdR = stdDev(tileCount[1]);
 			float stdF = stdDev(tileCount[2]);
 
+			//If the std devs are all the same, we want to go to the move that has the obstacle which is farthest away.
+			if(stdL==stdR&&stdL==stdF){
+				//search through the lists backwards until we find a spot that isn't 0, then break. (can hit multiple spots at once, then the comparisons below take care of the rest)
+				for(int i=MAX_TILES; i>=0; i--){
+					boolean br = false;
+					if(tileCount[0][i]!=0){
+						stdL = -1;
+						br = true;
+					}
+					if(tileCount[1][i]!=0){
+						stdR = -1;
+						br = true;
+					}
+					if(tileCount[2][i]!=0){
+						stdF = -1;
+						br = true;
+					}
+					if(br){
+						break;
+					}
+				}
+			}
+			
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
+				//The <= comparisons here make the forward move a little more common
 				//Add a forward node to the path
 				try{
 					path.addMapPath(new MapPath(MapPath.Direction.FRONT));
@@ -286,15 +267,15 @@ public class LocalizationController {
 
 		nodes = map.getRemaningNodes();
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*arr.length*4));
+			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
 		}else{
-			current = nodes.get(0);//Else use what the algorithm found
+			current = nodes.get(0).getNodeFromPath(path);//Else use what the algorithm found
 		}
 
 		int num = current.getNum();//Do math to find out the position
 		float theta = (float) ((num%4)*(Math.PI/2));
-		float x = 15 + 30*(int)((num/4)%(arr.length));
-		float y = 15 + 30*(int)((num/4)/(arr.length));
+		float x = 15 + 30*(int)((num/4)%(map.getLength()));
+		float y = 105 - 30*(int)((num/4)/(map.getLength()));
 
 		//Update the display and the odometer
 		Display.update("X", ""+x);

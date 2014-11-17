@@ -41,40 +41,40 @@ public class Map {
 						getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i+1, j, 0));
 					}
 					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
-						getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, 90));
+						getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, Math.PI/2));
 						if(map[j-1][i]==2){
-							finish = getNodeAtPosition(i, j, 90).getNum();
+							finish = getNodeAtPosition(i, j, Math.PI/2).getNum();
 						}
-						if(map[j-1][i]==2){
-							start = getNodeAtPosition(i, j, 90).getNum();
+						if(map[j-1][i]==3){
+							start = getNodeAtPosition(i, j, Math.PI/2).getNum();
 						}
 					}
 					if(i>0&&map[j][i-1]!=1){//Check the square to the west
-						getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, 180));
+						getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, Math.PI));
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
-						getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 270));
+						getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 3*Math.PI/2));
 					}
 
 					//Now we set all the left/right nodes properly
-					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 90));
-					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 270));
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI/2));
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 3*Math.PI/2));
 
-					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 180));
-					getNodeAtPosition(i, j, 90).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
+					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI));
+					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
 
-					getNodeAtPosition(i, j,180).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 270));
-					getNodeAtPosition(i, j, 180).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 90));
+					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 3*Math.PI/2));
+					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI/2));
 
-					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
-					getNodeAtPosition(i, j, 270).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 180));
+					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
+					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI));
 
 					//If we're currently on a tile with a block on it, make sure it's not considered a valid starting spot
 					if(map[j][i]==1){
 						getNodeAtPosition(i, j, 0).setIsValidStart(false);
-						getNodeAtPosition(i, j, 90).setIsValidStart(false);
-						getNodeAtPosition(i, j, 180).setIsValidStart(false);
-						getNodeAtPosition(i, j, 270).setIsValidStart(false);
+						getNodeAtPosition(i, j, Math.PI/2).setIsValidStart(false);
+						getNodeAtPosition(i, j, Math.PI).setIsValidStart(false);
+						getNodeAtPosition(i, j, 3*Math.PI/2).setIsValidStart(false);
 					}
 				}
 			}
@@ -133,8 +133,8 @@ public class Map {
 	 * @param t Theta value of the node in degrees
 	 * @return The MapNode matching the parameters
 	 */
-	public MapNode getNodeAtPosition(int x, int y, int t){
-		return nodes[(x + y*(int)Math.sqrt((float)nodes.length/4))*4 + t/90];
+	public MapNode getNodeAtPosition(int x, int y, double t){
+		return nodes[(int) ((x + y*(int)Math.sqrt((float)nodes.length/4))*4 + (int)(t/(Math.PI/2)))];
 	}
 
 	/**

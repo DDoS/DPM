@@ -26,17 +26,16 @@ public class SearchAndRescueController {
 			//MOVE TO PICKUP
 			dest = map.getCollectionNode();
 			MapPath path = map.getPathFromNodeToNode(current, dest);
-			MapNode next;
 
 			Display.update("Status", "Moving");
 			while(path!=null){
-				next = current.getNodeFromPath(new MapPath(path.getDirection()));
+				current = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
 
-				int num = next.getNum();
+				int num = current.getNum();
 				float x = 15 + 30*(int)((num/4)%(map.getLength()));
-				float y = 15 + 30*(int)((num/4)/(map.getLength()));
-				float theta = (num%4)*90;
+				float y = 105 - 30*(int)((num/4)/(map.getLength()));
+				float theta = (float) ((num%4)*Math.PI/2);
 				nav.travelTo(x, y);
 				nav.waitUntilDone();
 				if(path==null){
@@ -63,7 +62,7 @@ public class SearchAndRescueController {
 			}
 			Display.update("Status", "Collecting");
 
-			nav.forward(15);
+			nav.forward(13);
 			nav.waitUntilDone();
 
 			//CLAW
@@ -76,13 +75,13 @@ public class SearchAndRescueController {
 
 			Display.update("Status", "Returning");
 			while(path!=null){
-				next = current.getNodeFromPath(new MapPath(path.getDirection()));
+				current = current.getNodeFromPath(new MapPath(path.getDirection()));
 				path = path.getNextMapPath();
 
-				int num = next.getNum();
+				int num = current.getNum();
 				float x = 15 + 30*(int)((num/4)%(map.getLength()));
-				float y = 15 + 30*(int)((num/4)/(map.getLength()));
-				float theta = (num%4)*90;
+				float y = 105 - 30*(int)((num/4)/(map.getLength()));
+				float theta = (float) ((num%4)*Math.PI/2);
 				nav.travelTo(x, y);
 				nav.waitUntilDone();
 				if(path==null){
@@ -92,6 +91,9 @@ public class SearchAndRescueController {
 			}
 
 			//CLAW AGAIN
+			nav.forward(13);
+			nav.waitUntilDone();
+			
 			claw.open();
 
 			Display.update("Status", "Final");
