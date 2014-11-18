@@ -26,13 +26,13 @@ public class Odometer extends Thread {
     // Spacing of the tiles in centimeters
     public static final float TILE_SPACING = 30.48f;
     // Half the said spacing
-    private static final float HALF_TILE_SPACING = TILE_SPACING / 2;
+    public static final float HALF_TILE_SPACING = TILE_SPACING / 2;
     // Dampening for heading correction to reduce error from bad correction
     private static final float HEADING_CORRECTION_DAMPEN = 0.5f;
     // Whether or not the odometer is running
     private volatile boolean running = false;
     // robot position
-    private float x = 0, y = 0, theta = (float) Math.PI / 2;
+    private float x = HALF_TILE_SPACING, y = HALF_TILE_SPACING, theta = (float) Math.PI / 2;
     // Tachometer last readings in radians, for right and left
     private float lastRho = 0, lastLambda = 0;
     // lock object for mutual exclusion
@@ -206,7 +206,7 @@ public class Odometer extends Thread {
                         // offset y to account for sensor distance, using the odo average as the position of the sensor
                         float yy = (leftOdo.y + rightOdo.y) / 2 + sensorYOffset;
                         // snap y to closest line
-                        yy = Math.round((yy + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
+                        yy = Math.round((yy + 0) / TILE_SPACING) * TILE_SPACING - 0;
                         // correct y, removing the offset
                         synchronized (lock) {
                             y = yy - sensorYOffset;
@@ -221,7 +221,7 @@ public class Odometer extends Thread {
                         // offset x to account for sensor distance, using the odo average as the position of the sensor
                         float xx = (leftOdo.x + rightOdo.x) / 2 + sensorXOffset;
                         // snap x to closest line
-                        xx = Math.round((xx + HALF_TILE_SPACING) / TILE_SPACING) * TILE_SPACING - HALF_TILE_SPACING;
+                        xx = Math.round((xx + 0) / TILE_SPACING) * TILE_SPACING - 0;
                         // correct x, removing the offset
                         synchronized (lock) {
                             x = xx - sensorXOffset;

@@ -57,17 +57,66 @@ public class Group7Robot {
 				{1, 0, 0, 0, 0, 0, 0, 0}
 
 		};
-	*/
+	
 		//Test for small scale
 		int[][] arr4 = {
-				{3, 1, 2, 0},
-				{0, 1, 0, 1},
-				{0, 0, 0, 0},
-				{1, 0, 1, 0}
+				{1, 0, 0, 0},
+				{3, 0, 1, 1},
+				{0, 0, 0, 2},
+				{0, 1, 0, 0}
 		};
+*/
+		int[][] arr3 = {
+				{3, 1, 1, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 1},
+				{1, 0, 0, 1, 0, 0, 1, 2},
+				{0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1},
+				{0, 0, 0, 0, 1, 0, 1, 1},
+				{0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1}
 
+		};
+		int[][] arr4 = {
+				{0, 0, 3, 1, 1, 0, 2, 1},
+				{0, 1, 0, 0, 1, 0, 0, 1},
+				{1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 1, 0, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 1},
+				{0, 0, 1, 0, 0, 1, 0, 1}
+
+		};
+		int[][] arr5 = {
+				{1, 0, 0, 0, 1, 0, 2, 0},
+				{0, 0, 1, 1, 0, 0, 0, 1},
+				{0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 1, 0, 0, 1, 1},
+				{0, 0, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0},
+				{3, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 0, 1}
+
+		};
+		
+		map = new Map(64);
 		//Initialize the map so we can set it to whichever array we pass in
-		map = new Map(arr4);
+		int option = Button.waitForAnyPress();
+		switch(option){
+		case Button.ID_LEFT:
+			map = new Map(arr3);
+			break;
+		case Button.ID_ENTER:
+			map = new Map(arr4);
+			break;
+		case Button.ID_RIGHT:
+			map = new Map(arr5);
+			break;
+		default:
+			System.exit(0);
+		}
+
 
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
@@ -80,9 +129,11 @@ public class Group7Robot {
 
 		// MAIN RUN
 		/**/
-		Button.waitForAnyPress();
+		odometer.enableDebugOutput(true);
 		odometer.enableCorrection(true);
 		localization.run();
+		odometer.enableCorrection(true);
+		searchAndRescue.run();
 		/**/
 
 		/*
@@ -106,7 +157,7 @@ public class Group7Robot {
 		java.util.Random random = new java.util.Random();
 		int i = 0;
 		while (!Button.ESCAPE.isDown()) {
-			float next = random.nextInt(4) * Odometer.TILE_SPACING;
+			float next = random.nextInt(4) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING;
 			if (random.nextBoolean()) {
 				navigation.travelBy(next - odometer.getX(), 0);
 			} else {

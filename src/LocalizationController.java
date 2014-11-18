@@ -9,7 +9,7 @@ public class LocalizationController {
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
-	private static final int MAX_TILES = 3;
+	private static final int MAX_TILES = 2;
 	private static final boolean DUEL_SENSOR = false;
 	private SearchAndRescueController searchAndRescue;
 
@@ -54,9 +54,9 @@ public class LocalizationController {
 	 */
 	public void run(){
 		//Setting up the display
-		Display.clear();
-		Display.reserve("Status", "X", "Y", "Th", "Moves");
-		Display.update("Status", "Init");
+//		Display.clear();
+//		Display.reserve("Status", "X", "Y", "Th", "Moves");
+//		Display.update("Status", "Init");
 
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
@@ -64,10 +64,11 @@ public class LocalizationController {
 		ArrayList<MapNode> nodes = map.getRemaningNodes();
 
 		//We continue to run this algorithm until there is one (or zero) nodes left
-		Display.update("Status", "Run");
+		//Display.update("Status", "Run");
 		int moves = 0;
+		float currTheta = (float) (Math.PI/2);
 		while(nodes.size()>1){
-			Display.update("Moves", ""+moves);
+			//Display.update("Moves", ""+moves);
 			moves++;
 			int rearTiles;
 			//Get the distance data and use it to find out how many empty tiles surround the robot
@@ -230,38 +231,40 @@ public class LocalizationController {
 				//Add a forward node to the path
 				try{
 					path.addMapPath(new MapPath(MapPath.Direction.FRONT));
-				}catch(Exception e){
+				}catch(NullPointerException e){
 					path = new MapPath(MapPath.Direction.FRONT);
 				}
 				//Move forward
-				nav.forward(30);
+				nav.forward(Odometer.TILE_SPACING);
 				nav.waitUntilDone();//Wait for the navigation to finish
 			}else if(stdL<stdR){ //If we want to move left, left has to have a lower standard deviation
 				//Add a left node to the path
 				try{
 					path.addMapPath(new MapPath(MapPath.Direction.LEFT));
-				}catch(Exception e){
+				}catch(NullPointerException e){
 					path = new MapPath(MapPath.Direction.LEFT);
 				}
 				//Move left
-				nav.turnBy((float) (Math.PI/2));
+				currTheta += (float) (Math.PI/2);
+				nav.turnTo(currTheta);
 				nav.waitUntilDone();//Wait for the navigation to finish
 
 			}else{//else we want to move right
 				//add a right node to the path
 				try{
 				 	path.addMapPath(new MapPath(MapPath.Direction.RIGHT));
-				}catch(Exception e){
+				}catch(NullPointerException e){
 					path = new MapPath(MapPath.Direction.RIGHT);
 				}
 				//Move right
-				nav.turnBy((float) (-Math.PI/2));
+				currTheta -= (float) (Math.PI/2);
+				nav.turnTo(currTheta);
 				nav.waitUntilDone();//Wait for the navigation to finish
 			}
 		}
 
 		//End of algorithm, update position
-		Display.update("Status", "Final");
+		//Display.update("Status", "Final");
 
 		MapNode current;//Current spot that the robot is in
 
@@ -274,19 +277,18 @@ public class LocalizationController {
 
 		int num = current.getNum();//Do math to find out the position
 		float theta = (float) ((num%4)*(Math.PI/2));
-		float x = 15 + 30*(int)((num/4)%(map.getLength()));
-		float y = 105 - 30*(int)((num/4)/(map.getLength()));
+		float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING*(int)((num/4)%(map.getLength()));
+		float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
 
 		//Update the display and the odometer
-		Display.update("X", ""+x);
-		Display.update("Y", ""+y);
-		Display.update("Th", ""+theta);
+//		Display.update("X", ""+x);
+//		Display.update("Y", ""+y);
+//		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
 		
 		lejos.nxt.Button.waitForAnyPress();
 
 		searchAndRescue.setCurrent(current);
-		searchAndRescue.run();
 
 	}
 }
