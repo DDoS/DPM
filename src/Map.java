@@ -42,9 +42,7 @@ public class Map {
 					}
 					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
 						getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, Math.PI/2));
-						if(map[j-1][i]==2){
-							finish = getNodeAtPosition(i, j, Math.PI/2).getNum();
-						}
+
 						if(map[j-1][i]==3){
 							start = getNodeAtPosition(i, j, Math.PI/2).getNum();
 						}
@@ -54,6 +52,9 @@ public class Map {
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
 						getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 3*Math.PI/2));
+						if(map[j+1][i]==2){
+							finish = getNodeAtPosition(i, j, 3*Math.PI/2).getNum();
+						}
 					}
 
 					//Now we set all the left/right nodes properly

@@ -9,7 +9,7 @@ public class LocalizationController {
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
-	private static final int MAX_TILES = 2;
+	private static final int MAX_TILES = 1;
 	private static final boolean DUEL_SENSOR = false;
 	private static final boolean ULTRA_CORRECT = true;
 	private SearchAndRescueController searchAndRescue;
@@ -221,11 +221,11 @@ public class LocalizationController {
 				for(int i=MAX_TILES; i>=0; i--){
 					boolean br = false;
 					if(tileCount[0][i]!=0){
-						stdL = -1;
+						stdL = -0.5f;
 						br = true;
 					}
 					if(tileCount[1][i]!=0){
-						stdR = -1;
+						stdR = -0.25f;
 						br = true;
 					}
 					if(tileCount[2][i]!=0){
@@ -237,7 +237,7 @@ public class LocalizationController {
 					}
 				}
 			}
-			
+
 			if(stdF<=stdL&&stdF<=stdR&&frontTiles!=0){ //Make sure there isn't a tile in front of us already if we want to move fowrard
 				//The <= comparisons here make the forward move a little more common
 				//Add a forward node to the path
@@ -297,12 +297,12 @@ public class LocalizationController {
 		Display.update("Y", ""+y);
 		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
-		
+
 		Sound.beep();
 		//lejos.nxt.Button.waitForAnyPress();
 
 		searchAndRescue.setCurrent(current);
-		
+
 
 
 	}
