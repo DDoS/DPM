@@ -11,6 +11,7 @@ public class LocalizationController {
 	private FilteredUltrasonicSensor front_us, rear_us;
 	private static final int MAX_TILES = 2;
 	private static final boolean DUEL_SENSOR = false;
+	private static final boolean ULTRA_CORRECT = true;
 	private SearchAndRescueController searchAndRescue;
 
 	/**
@@ -54,9 +55,9 @@ public class LocalizationController {
 	 */
 	public void run(){
 		//Setting up the display
-//		Display.clear();
-//		Display.reserve("Status", "X", "Y", "Th", "Moves");
-//		Display.update("Status", "Init");
+		Display.clear();
+		Display.reserve("Status", "X", "Y", "Th", "Moves");
+		Display.update("Status", "Init");
 
 		//path represents the current path that the robot has actually traveled
 		MapPath path = null;
@@ -64,11 +65,11 @@ public class LocalizationController {
 		ArrayList<MapNode> nodes = map.getRemaningNodes();
 
 		//We continue to run this algorithm until there is one (or zero) nodes left
-		//Display.update("Status", "Run");
+		Display.update("Status", "Run");
 		int moves = 0;
 		float currTheta = (float) (Math.PI/2);
 		while(nodes.size()>1){
-			//Display.update("Moves", ""+moves);
+			Display.update("Moves", ""+moves);
 			moves++;
 			int rearTiles;
 			//Get the distance data and use it to find out how many empty tiles surround the robot
@@ -77,7 +78,18 @@ public class LocalizationController {
 				int rDist = rear_us.getDistanceData();
 				rearTiles = rDist/30;
 			}
-			int frontTiles = fDist/30;
+			int frontTiles;
+			if(ULTRA_CORRECT){
+				if(fDist<=30){
+					frontTiles = 0;
+				}else if(fDist>30&&fDist<50){
+					frontTiles = 1;
+				}else{
+					frontTiles = 2;
+				}
+			}else{
+				frontTiles = fDist/30;
+			}
 			//cutoff at max number of tiles (due to sensor accuracy)
 			if(frontTiles>MAX_TILES){
 				frontTiles = MAX_TILES;
@@ -204,7 +216,7 @@ public class LocalizationController {
 			float stdF = stdDev(tileCount[2]);
 
 			//If the std devs are all the same, we want to go to the move that has the obstacle which is farthest away.
-			if(stdL==stdR&&stdL==stdF){
+			if(stdL-stdR<0.01&&stdL-stdF<0.01){
 				//search through the lists backwards until we find a spot that isn't 0, then break. (can hit multiple spots at once, then the comparisons below take care of the rest)
 				for(int i=MAX_TILES; i>=0; i--){
 					boolean br = false;
@@ -264,7 +276,7 @@ public class LocalizationController {
 		}
 
 		//End of algorithm, update position
-		//Display.update("Status", "Final");
+		Display.update("Status", "Final");
 
 		MapNode current;//Current spot that the robot is in
 
@@ -281,14 +293,17 @@ public class LocalizationController {
 		float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
 
 		//Update the display and the odometer
-//		Display.update("X", ""+x);
-//		Display.update("Y", ""+y);
-//		Display.update("Th", ""+theta);
+		Display.update("X", ""+x);
+		Display.update("Y", ""+y);
+		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
 		
-		lejos.nxt.Button.waitForAnyPress();
+		Sound.beep();
+		//lejos.nxt.Button.waitForAnyPress();
 
 		searchAndRescue.setCurrent(current);
+		
+
 
 	}
 }

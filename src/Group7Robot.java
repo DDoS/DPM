@@ -126,10 +126,9 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
-
 		// MAIN RUN
 		/**/
-		odometer.enableDebugOutput(true);
+		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
 		localization.run();
 		odometer.enableCorrection(true);
