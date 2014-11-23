@@ -37,7 +37,7 @@ public class SearchAndRescueController {
 				float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
 				float theta = (float) ((num%4)*Math.PI/2);
 
-				if(path.getDirection()!=MapPath.Direction.FRONT){
+				if(path.getDirection()==MapPath.Direction.FRONT){
 					nav.travelTo(x, y);
 					nav.waitUntilDone();
 				}
