@@ -19,7 +19,7 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
-		
+
 
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
@@ -63,7 +63,7 @@ public class Group7Robot {
 				{1, 0, 0, 0, 0, 0, 0, 0}
 
 		};
-
+		*/
 		//Test for small scale
 		int[][] arr4 = {
 				{3, 1, 0, 0},
@@ -71,7 +71,7 @@ public class Group7Robot {
 				{0, 0, 0, 1},
 				{1, 2, 0, 0}
 		};
-		*/
+
 		int[][] arr3 = {
 				{0, 1, 1, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 1},
@@ -83,7 +83,7 @@ public class Group7Robot {
 				{0, 0, 0, 0, 0, 0, 0, 1}
 
 		};
-		int[][] arr4 = {
+	/*	int[][] arr4 = {
 				{0, 0, 0, 1, 1, 0, 0, 1},
 				{0, 1, 0, 0, 1, 0, 0, 1},
 				{1, 0, 0, 0, 0, 0, 0, 0},
@@ -93,7 +93,7 @@ public class Group7Robot {
 				{3, 2, 0, 1, 0, 0, 0, 1},
 				{0, 0, 1, 0, 0, 1, 0, 1}
 
-		};
+		};*/
 		int[][] arr5 = {
 				{1, 0, 0, 0, 1, 0, 0, 0},
 				{0, 0, 1, 1, 0, 0, 0, 1},
@@ -140,12 +140,12 @@ public class Group7Robot {
 		odometer.enableCorrection(true);
 		searchAndRescue.run();
 		/**/
-		
+
 		// ULTRASONIC RUN
 		/*
-			while(true){
-				Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
-			}
+		while(!Button.ESCAPE.isDown()){
+			Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
+		}
 		/*
 
 		/*
@@ -182,23 +182,7 @@ public class Group7Robot {
 		*/
 
 		// EXIT
-		/*
 		Button.waitForAnyPress();
 		System.exit(0);
-		*/
-
 	}
 }
-
-/*
-
-1) We noticed that the robot was seeing a wall whenever it crossed the gap between two of the 4x4 tiles.
-We fixed this issue by tying some string around the ultrasonic sensor, raising the height.
-
-2) Our odometry correction was not working in the demo room, yet it was working fine in the lab. We fixed
-this issue by changing the threshold values of the light sensors to match the different light level of
-the room.
-
-3)
-
-*/

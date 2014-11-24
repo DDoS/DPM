@@ -7,6 +7,8 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Navigation extends Thread {
+    // Pi ratios
+    private static final float HALF_PI = (float) Math.PI / 2;
     // Motor speed constants
     private static final int MOTOR_SPEED = 200;
     private static final int MOTOR_ACCELERATION = 1000;
@@ -81,7 +83,7 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Travel to absolute coordinates in centimeters.
+    * Travel to absolute coordinates in centimeters at the default speed.
     *
     * @param x The x coordinate
     * @param y The y coordinate
@@ -91,10 +93,11 @@ public class Navigation extends Thread {
     }
 
     /**
-     * Travel to absolute coordinates in centimeters.
+     * Travel to absolute coordinates in centimeters at the desired speed.
      *
      * @param x The x coordinate
      * @param y The y coordinate
+     * @param speed The speed
      */
     public void travelTo(float x, float y, int speed) {
         command = new Travel(x, y, speed);
@@ -102,7 +105,7 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Turns by a relative angle in radians.
+    * Turns by a relative angle in radians at the default speed.
     *
     * @param theta The angle
     */
@@ -111,16 +114,17 @@ public class Navigation extends Thread {
     }
 
     /**
-     * Turns by a relative angle in radians.
+     * Turns by a relative angle in radians at the desired speed.
      *
      * @param theta The angle
+     * @param speed The speed
      */
     public void turnBy(float theta, int speed) {
         turnTo(odometer.getTheta() + theta, speed);
     }
 
     /**
-    * Turns to an absolute angle in radians.
+    * Turns to an absolute angle in radians at the default speed.
     *
     * @param theta The angle
     */
@@ -129,9 +133,10 @@ public class Navigation extends Thread {
     }
 
     /**
-     * Turns to an absolute angle in radians.
+     * Turns to an absolute angle in radians at the desired speed.
      *
      * @param theta The angle
+     * @param speed The speed
      */
     public void turnTo(float theta, int speed) {
         command = new Turn(theta, speed);
@@ -139,7 +144,7 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Moves forward by the specified distance.
+    * Moves forward by the specified distance at the default speed.
     *
     * @param distance The distance to travel forward
     */
@@ -148,9 +153,10 @@ public class Navigation extends Thread {
     }
 
     /**
-     * Moves forward by the specified distance.
+     * Moves forward by the specified distance at the desired speed.
      *
      * @param distance The distance to travel forward
+     * @param speed The speed
      */
     public void forward(float distance, int speed) {
         float theta = odometer.getTheta();
@@ -160,7 +166,7 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Moves forward by the specified distance.
+    * Moves forward by the specified distance at the default speed.
     *
     * @param distance The distance to travel forward
     */
@@ -169,9 +175,10 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Moves forward by the specified distance.
+    * Moves forward by the specified distance at the desired speed.
     *
     * @param distance The distance to travel forward
+    * @param speed The speed
     */
     public void backward(float distance, int speed) {
         distance = -distance;
@@ -236,13 +243,20 @@ public class Navigation extends Thread {
         leftMotor.setAcceleration(MOTOR_ACCELERATION);
         rightMotor.setSpeed(speed);
         rightMotor.setAcceleration(MOTOR_ACCELERATION);
-        // Find turn angle
+        // Find delta of movement
         float differenceX = x - odometer.getX();
         float differenceY = y - odometer.getY();
-        // Do turn
-        doTurn((float) Math.atan2(differenceY, differenceX), speed);
-        // Calculate the rotation to apply to the wheels
+        // Compute movement: find turn angle and travel distance
+        float theta = (float) Math.atan2(differenceY, differenceX);
         float distance = (float) Math.sqrt(differenceX * differenceX + differenceY * differenceY);
+        // Negate values if going backwards will be faster
+        if (Odometer.wrapAngle(theta - odometer.getTheta()) > HALF_PI) {
+            theta -= (float) Math.PI;
+            distance = -distance;
+        }
+        // Do turn
+        doTurn(theta, speed);
+        // Calculate the rotation to apply to the wheels
         int rotationDegreesLeft = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_LEFT));
         int rotationDegreesRight = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_RIGHT));
         // Move the robot
