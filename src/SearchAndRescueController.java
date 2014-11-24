@@ -7,6 +7,7 @@ public class SearchAndRescueController {
     private MapNode current;
     private FilteredColorSensor color;
     private Claw claw;
+    private boolean seenBlock = false;
 
     public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
         nav = n;
@@ -53,26 +54,89 @@ public class SearchAndRescueController {
 			//COLOR SENSING --needs so much work
 
             claw.sense();
-			int c = color.getColorData();
-			int b = c & 255;
-			int g = (c >> 8) & 255;
-			int r = (c >> 16) & 255;
-			while(r<100 && g<100 && b<100){
+            
+            final int num = dest.getNum();
+			float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING*(int)((num/4)%(map.getLength()));
+			float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
+			float theta = (float) ((num%4)*Math.PI/2);
+			
+			
+			nav.travelTo(x, y-5);
+			
+			Thread blockCheck = new Thread(){
+				public void run(){
+					int c, r, b, g;
+					while(true){
+		                c = color.getColorData();
+						b = c & 255;
+						g = (c >> 8) & 255;
+						r = (c >> 16) & 255;
+						if(r<100 && b<100 && g<100){
+							seenBlock = false;
+						}else{
+							seenBlock = true;
+						}
+					}
+				}
+			};
+			
+			float ang1 = -1;
+			float ang2 = -1;
+			
+			blockCheck.start();
+			
+			nav.turnTo(theta - 30);
+			
+			while(nav.isNavigating() && seenBlock == false){}
+			nav.abort();
+			
+			if(seenBlock){
+				ang1 = nav.getOdometer().getTheta();
+			}
+			
+			nav.turnTo(theta + 30);
+			
+			while(nav.isNavigating() && seenBlock == false){}
+			nav.abort();
+			
+			if(seenBlock){
+				ang2 = nav.getOdometer().getTheta();
+			}
+			
+			nav.turnTo(theta);
+			
+			if(ang1==-1){
+				while(nav.isNavigating() && seenBlock == false){}
+				nav.abort();
+				
+				if(seenBlock){
+					ang1 = nav.getOdometer().getTheta();
+				}
+			}else{
+				nav.waitUntilDone();
+			}
+			
+			if(ang1!=-1 && ang2 != -1){
+				float blockAng = (ang1+ang2)/2;
+				nav.turnTo(blockAng);
+				nav.waitUntilDone();
+				
+				nav.forward(10);
+				
+				while(nav.isNavigating() && seenBlock == false){}
+				nav.abort();
+				
 				nav.forward(1);
 				nav.waitUntilDone();
-                c = color.getColorData();
-				b = c & 255;
-				g = (c >> 8) & 255;
-				r = (c >> 16) & 255;
+				
+				claw.close();
 			}
+			
+			
 	//		Display.update("Status", "Collecting");
 
-			nav.forward(15);
-			nav.waitUntilDone();
 
 			//CLAW
-			claw.close();
-
 	//		Display.update("Status", "Final");
 
 			/*
@@ -108,7 +172,7 @@ public class SearchAndRescueController {
 		}*/
 
     }
-
+    
     public void setCurrent(MapNode c){
     	current = c;
     }
