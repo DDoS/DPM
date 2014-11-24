@@ -19,8 +19,14 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
+		
 
 		// MAP
+		//Written out as displayed in specifications (the Map class handles rotating it)
+		//0 - no block
+		//1 - block
+		//2 - no block, this is the pickup zone
+		//3 - no block, this is the dropoff zone
 		Map map;
 		/*//The pattern given to us in the project specifications
 		int[][] arr = {
@@ -67,35 +73,35 @@ public class Group7Robot {
 		};
 		*/
 		int[][] arr3 = {
-				{3, 1, 1, 0, 0, 0, 0, 0},
+				{0, 1, 1, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 1},
-				{1, 0, 0, 1, 0, 0, 1, 2},
+				{1, 0, 0, 1, 0, 0, 1, 0},
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 0, 0, 1},
 				{0, 0, 0, 0, 1, 0, 1, 1},
-				{0, 0, 0, 0, 1, 0, 0, 0},
+				{3, 2, 0, 0, 1, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 1}
 
 		};
 		int[][] arr4 = {
-				{0, 0, 3, 1, 1, 0, 0, 1},
+				{0, 0, 0, 1, 1, 0, 0, 1},
 				{0, 1, 0, 0, 1, 0, 0, 1},
 				{1, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 1, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 2, 0, 1, 0, 0, 0, 1},
+				{3, 2, 0, 1, 0, 0, 0, 1},
 				{0, 0, 1, 0, 0, 1, 0, 1}
 
 		};
 		int[][] arr5 = {
-				{1, 0, 0, 0, 1, 0, 2, 0},
+				{1, 0, 0, 0, 1, 0, 0, 0},
 				{0, 0, 1, 1, 0, 0, 0, 1},
 				{0, 0, 0, 0, 0, 1, 0, 0},
 				{0, 0, 0, 1, 0, 0, 1, 1},
 				{0, 0, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 1, 0, 0, 0, 0},
-				{3, 0, 0, 0, 0, 0, 0, 0},
+				{3, 2, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 0, 1}
 
 		};
@@ -134,6 +140,13 @@ public class Group7Robot {
 		odometer.enableCorrection(true);
 		searchAndRescue.run();
 		/**/
+		
+		// ULTRASONIC RUN
+		/*
+			while(true){
+				Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
+			}
+		/*
 
 		/*
 		// CALIBRATION RUNS
@@ -169,8 +182,23 @@ public class Group7Robot {
 		*/
 
 		// EXIT
+		/*
 		Button.waitForAnyPress();
 		System.exit(0);
+		*/
 
 	}
 }
+
+/*
+
+1) We noticed that the robot was seeing a wall whenever it crossed the gap between two of the 4x4 tiles.
+We fixed this issue by tying some string around the ultrasonic sensor, raising the height.
+
+2) Our odometry correction was not working in the demo room, yet it was working fine in the lab. We fixed
+this issue by changing the threshold values of the light sensors to match the different light level of
+the room.
+
+3)
+
+*/

@@ -21,8 +21,8 @@ public class Odometer extends Thread {
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
-    private static final int LINE_LIGHT_LEFT = 460;
-    private static final int LINE_LIGHT_RIGHT = 390;
+    private static final int LINE_LIGHT_LEFT = 460 + 5;
+    private static final int LINE_LIGHT_RIGHT = 390 + 5;
     // Spacing of the tiles in centimeters
     public static final float TILE_SPACING = 30.48f;
     // Half the said spacing
@@ -213,7 +213,7 @@ public class Odometer extends Thread {
                         }
                         // signal a horizontal correction with a low note
                         if (outputDebug) {
-                            Sound.playNote(Sound.FLUTE, 440, 250);
+                            Sound.playNote(Sound.FLUTE, 880 * 4, 250);
                         }
                     } else {
                         // crossed a vertical line
@@ -228,7 +228,7 @@ public class Odometer extends Thread {
                         }
                         // signal a vertical correction with a high note
                         if (outputDebug) {
-                            Sound.playNote(Sound.FLUTE, 880, 250);
+                            Sound.playNote(Sound.FLUTE, 880 * 2, 250);
                         }
                     }
                     crossFlags = 0;

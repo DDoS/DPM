@@ -43,30 +43,40 @@ public class Map {
 					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
 						getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, Math.PI/2));
 
+						//TODO remove this code and replace with a better way of finding the start/finish
 						if(map[j-1][i]==3){
 							start = getNodeAtPosition(i, j, Math.PI/2).getNum();
 						}
+						//------
 					}
 					if(i>0&&map[j][i-1]!=1){//Check the square to the west
 						getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, Math.PI));
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
 						getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 3*Math.PI/2));
+						
+						//TODO remove this code and replace with a better way of finding the start/finish
 						if(map[j+1][i]==2){
 							finish = getNodeAtPosition(i, j, 3*Math.PI/2).getNum();
 						}
+						//-----------
 					}
 
 					//Now we set all the left/right nodes properly
+					
+					//Set node facing 0 to have left facing 90, and right facing 270
 					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI/2));
 					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 3*Math.PI/2));
 
+					//set node facing 90 to have left facing 180, and right facing 0
 					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI));
 					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
 
+					//set node facing 180 to have left facing 90, and right facing 270
 					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 3*Math.PI/2));
 					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI/2));
 
+					//set node facing 270 to have left facing 0 and right facing 180
 					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
 					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI));
 
