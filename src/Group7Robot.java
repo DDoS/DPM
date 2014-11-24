@@ -136,7 +136,7 @@ public class Group7Robot {
 		/**/
 		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
-		localization.run();
+		//localization.run();
 		odometer.enableCorrection(true);
 		searchAndRescue.run();
 		/**/

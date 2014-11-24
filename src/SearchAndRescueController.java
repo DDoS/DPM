@@ -28,7 +28,7 @@ public class SearchAndRescueController {
 		//while(true){ //change to timer things
 			//MOVE TO PICKUP
 			dest = map.getCollectionNode();
-			MapPath path = map.getPathFromNodeToNode(current, dest);
+/*			MapPath path = map.getPathFromNodeToNode(current, dest);
 
 	//		Display.update("Status", "Moving");
 			while(path!=null){
@@ -52,7 +52,7 @@ public class SearchAndRescueController {
 
 	//		Display.update("Status", "Searching");
 			//COLOR SENSING --needs so much work
-
+*/
             claw.sense();
             
             final int num = dest.getNum();
