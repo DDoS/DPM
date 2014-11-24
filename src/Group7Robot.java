@@ -132,18 +132,19 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
-		// MAIN RUN
 		/**/
+		// MAIN RUN
 		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
-		//localization.run();
+		localization.run();
 		odometer.enableCorrection(true);
 		searchAndRescue.run();
 		/**/
 
-		// ULTRASONIC RUN
 		/*
-		while(!Button.ESCAPE.isDown()){
+		// ULTRASONIC RUN
+
+		while (!Button.ESCAPE.isDown()) {
 			Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
 		}
 		/*
@@ -166,11 +167,11 @@ public class Group7Robot {
 		odometer.enableDebugOutput(true);
 		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
-		java.util.Random random = new java.util.Random();
+		Random random = new Random();
 		int i = 0;
 		while (!Button.ESCAPE.isDown()) {
-			float next = random.nextInt(4) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING;
-			if (random.nextBoolean()) {
+			float next = random.nextBits(2) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING;
+			if (random.nextBits(1) == 1) {
 				navigation.travelBy(next - odometer.getX(), 0);
 			} else {
 				navigation.travelBy(0, next - odometer.getY());
