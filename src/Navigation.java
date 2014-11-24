@@ -250,8 +250,8 @@ public class Navigation extends Thread {
         float theta = (float) Math.atan2(differenceY, differenceX);
         float distance = (float) Math.sqrt(differenceX * differenceX + differenceY * differenceY);
         // Negate values if going backwards will be faster
-        if (Odometer.wrapAngle(theta - odometer.getTheta()) > HALF_PI) {
-            theta -= (float) Math.PI;
+        if (getAngleDiff(theta, odometer.getTheta()) > HALF_PI) {
+            theta = Odometer.wrapAngle(theta - (float) Math.PI);
             distance = -distance;
         }
         // Do turn
@@ -312,6 +312,13 @@ public class Navigation extends Thread {
         leftMotor.stop(true);
         rightMotor.stop(false);
     }
+
+    // Get the absolute difference between two angles
+    private static double getAngleDiff(float a, float b) {
+        // Convert to vectors and use dot product to compute angle in between
+        return Math.abs((float) Math.acos(Math.cos(a) * Math.cos(b) + Math.sin(a) * Math.sin(b)));
+    }
+
 
     // A command to travel to absolute coordinates
     private class Travel implements Runnable {
