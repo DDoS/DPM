@@ -144,6 +144,25 @@ public class Navigation extends Thread {
     }
 
     /**
+    * Moves backward by the specified distance at the default speed.
+    *
+    * @param distance The distance to travel backward
+    */
+    public void backward(float distance) {
+        backward(distance, MOTOR_SPEED);
+    }
+
+    /**
+    * Moves backward by the specified distance at the desired speed.
+    *
+    * @param distance The distance to travel backward
+    * @param speed The speed
+    */
+    public void backward(float distance, int speed) {
+        forward(-distance, speed);
+    }
+
+    /**
     * Moves forward by the specified distance at the default speed.
     *
     * @param distance The distance to travel forward
@@ -159,29 +178,6 @@ public class Navigation extends Thread {
      * @param speed The speed
      */
     public void forward(float distance, int speed) {
-        float theta = odometer.getTheta();
-        float x = (float) Math.cos(theta) * distance;
-        float y = (float) Math.sin(theta) * distance;
-        travelBy(x, y, speed);
-    }
-
-    /**
-    * Moves forward by the specified distance at the default speed.
-    *
-    * @param distance The distance to travel forward
-    */
-    public void backward(float distance) {
-        backward(distance, MOTOR_SPEED);
-    }
-
-    /**
-    * Moves forward by the specified distance at the desired speed.
-    *
-    * @param distance The distance to travel forward
-    * @param speed The speed
-    */
-    public void backward(float distance, int speed) {
-        distance = -distance;
         float theta = odometer.getTheta();
         float x = (float) Math.cos(theta) * distance;
         float y = (float) Math.sin(theta) * distance;
