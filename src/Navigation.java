@@ -10,6 +10,8 @@ public class Navigation extends Thread {
     // Motor speed constants
     private static final int MOTOR_SPEED = 200;
     private static final int MOTOR_ACCELERATION = 1000;
+    // Robot design contants
+    private static final float CLAW_DOWN_EXTENSION = 4;
     // Motors (left and right)
     private final NXTRegulatedMotor leftMotor;
     private final NXTRegulatedMotor rightMotor;
@@ -20,6 +22,8 @@ public class Navigation extends Thread {
     private volatile boolean navigating = false;
     private volatile Runnable command = null;
     private volatile Thread runner = null;
+    // Whether or not to use special forward navigation when carrying blocks
+    private volatile boolean clawDownMode = false;
 
     /**
      * Created a new navigation class from the odometer to use to obtain position information for the robot.
@@ -56,6 +60,15 @@ public class Navigation extends Thread {
             // Execute it
             c.run();
         }
+    }
+
+    /**
+     * A special mode which reduces forward motion a bit to account for a longer robot caused by the claw being down.
+     *
+     * @param enable Whether or not to enable the claw down mode
+     */
+    public void enableClawDownMode(boolean enable) {
+        clawDownMode = enable;
     }
 
     /**
@@ -244,9 +257,11 @@ public class Navigation extends Thread {
         float theta = (float) Math.atan2(differenceY, differenceX);
         float distance = (float) Math.sqrt(differenceX * differenceX + differenceY * differenceY);
         // Negate values if going backwards will be faster
-        if (getAngleDiff(theta, odometer.getTheta()) > HALF_PI) {
-            theta = Odometer.wrapAngle(theta - (float) Math.PI);
+        if (getAngleDiff(theta, odometer.getTheta()) > (clawDownMode ? Pi.THREE_QUARTER : Pi.ONE_HALF)) {
+            theta = Pi.wrapAngle(theta - Pi.ONE);
             distance = -distance;
+        } else if (clawDownMode) {
+            distance -= CLAW_DOWN_EXTENSION;
         }
         // Do turn
         doTurn(theta, speed);
