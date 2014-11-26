@@ -34,8 +34,8 @@ public class SearchAndRescueController {
 			while(path!=null){
 				current = current.getNodeFromPath(new MapPath(path.getDirection()));
 				int num = current.getNum();
-				float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING*(int)((num/4)%(map.getLength()));
-				float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
+				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+				float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 				float theta = (num%4)*Pi.ONE_HALF;
 
 				if(path.getDirection()==MapPath.Direction.FRONT){
@@ -56,8 +56,8 @@ public class SearchAndRescueController {
             claw.sense();
 
             final int num = dest.getNum();
-			float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING*(int)((num/4)%(map.getLength()));
-			float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
+			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 			float theta = (num%4)*Pi.ONE_HALF;
 
 
@@ -150,8 +150,8 @@ public class SearchAndRescueController {
 				path = path.getNextMapPath();
 
 				int num = current.getNum();
-				float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING*(int)((num/4)%(map.getLength()));
-				float y = (map.getLength()-1)*Odometer.TILE_SPACING+Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING*(int)((num/4)/(map.getLength()));
+				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+				float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 				float theta = (num%4)*Pi.ONE_HALF;
 				nav.travelTo(x, y);
 				nav.waitUntilDone();

@@ -82,7 +82,7 @@ public class LocalizationController {
 				nav.turnTo(currTheta + (float)i/30);
 				nav.waitUntilDone();
 				int fDist = front_us.getDistanceData();
-				frontTiles = Math.max(fDist/30, frontTiles);
+				frontTiles = Math.max((int) (fDist/Tile.ONE), frontTiles);
 			}
 			nav.turnTo(currTheta); //make sure to rotate back to the normal angle
 			nav.waitUntilDone();
@@ -167,7 +167,7 @@ public class LocalizationController {
 					}
 
 					//Move forward
-					nav.forward(Odometer.TILE_SPACING);
+					nav.forward(Tile.ONE);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				//If the left is less than the right, go left
@@ -218,8 +218,8 @@ public class LocalizationController {
 
 		int num = current.getNum();//Do math to find out the position
 		float theta = (num%4) * Pi.ONE_HALF;
-		float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING * (int)((num/4) % (map.getLength()));
-		float y = (map.getLength()-1) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING * (int)((num/4) / (map.getLength()));
+		float x = Tile.HALF + Tile.ONE * (int)((num/4) % (map.getLength()));
+		float y = (map.getLength()-1) * Tile.ONE + Tile.HALF - Tile.ONE * (int)((num/4) / (map.getLength()));
 
 		//Update the display and the odometer
 		Display.update("X", ""+x);

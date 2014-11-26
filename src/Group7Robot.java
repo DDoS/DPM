@@ -151,7 +151,7 @@ public class Group7Robot {
 		// CALIBRATION RUNS
 		odometer.enableCorrection(false);
 		Button.waitForAnyPress();
-		navigation.travelTo(0, Odometer.TILE_SPACING * 2);
+		navigation.travelTo(0, Tile.ONE * 2);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 		for (int i = 0; i < 8; i++) {
@@ -168,7 +168,7 @@ public class Group7Robot {
 		Random random = new Random();
 		int i = 0;
 		while (!Button.ESCAPE.isDown()) {
-			float next = random.nextBits(2) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING;
+			float next = random.nextBits(2) * Tile.ONE + Tile.HALF;
 			if (random.nextBits(1) == 1) {
 				navigation.travelBy(next - odometer.getX(), 0);
 			} else {
@@ -184,12 +184,12 @@ public class Group7Robot {
 		odometer.enableCorrection(true);
 		odometer.enableDebugOutput(true);
 		navigation.enableClawDownMode(true);
-		odometer.setPosition(15 + 4, 15, Pi.ONE);
-		navigation.travelTo(75, 15);
+		odometer.setPosition(Tile.HALF + 4, Tile.HALF, Pi.ONE);
+		navigation.travelTo(75, Tile.HALF);
 		navigation.waitUntilDone();
 		navigation.travelTo(75, 105);
 		navigation.waitUntilDone();
-		navigation.travelTo(15, 105);
+		navigation.travelTo(Tile.HALF, 105);
 		navigation.waitUntilDone();
 
 		// EXIT
