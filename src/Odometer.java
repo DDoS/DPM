@@ -8,10 +8,6 @@ import lejos.nxt.*;
 public class Odometer extends Thread {
     // odometer update period, in ms
     private static final long PERIOD = 10;
-    // Robot design parameters
-    public static final float WHEEL_RADIUS_LEFT = 2.1f;
-    public static final float WHEEL_RADIUS_RIGHT = 2.1f;
-    public static final float WHEEL_DISTANCE = 14.55f;
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Max light value reading for a grid line
@@ -127,12 +123,12 @@ public class Odometer extends Thread {
             lastRho = rho;
             lastLambda = lambda;
             // multiply rho and lambda by the wheel radius
-            float deltaRhoRadius = deltaRho * WHEEL_RADIUS_RIGHT;
-            float deltaLambdaRadius = deltaLambda * WHEEL_RADIUS_LEFT;
+            float deltaRhoRadius = deltaRho * Wheel.RIGHT_RADIUS;
+            float deltaLambdaRadius = deltaLambda * Wheel.LEFT_RADIUS;
             // compute delta C
             float deltaC = (deltaRhoRadius + deltaLambdaRadius) / 2;
             // compute delta theta and it's half
-            float deltaTheta = (deltaRhoRadius - deltaLambdaRadius) / WHEEL_DISTANCE;
+            float deltaTheta = (deltaRhoRadius - deltaLambdaRadius) / Wheel.DISTANCE;
             float halfDeltaTheta = deltaTheta / 2;
             // compute delta x and y, using y forward and a right handed system (x right)
             float deltaX = deltaC * (float) Math.cos(theta + halfDeltaTheta);
@@ -183,7 +179,7 @@ public class Odometer extends Thread {
                     // make sure the lines have been crossed on different odometer ticks for theta correction
                     if (leftTacho != rightTacho) {
                         // compute correction from tachometer delta
-                        float correction = (float) Math.atan2((leftTacho - rightTacho) * WHEEL_RADIUS_LEFT, WHEEL_DISTANCE);
+                        float correction = (float) Math.atan2((leftTacho - rightTacho) * Wheel.LEFT_RADIUS, Wheel.DISTANCE);
                         // apply correction
                         synchronized (lock) {
                             theta = theta + correction * HEADING_CORRECTION_DAMPEN;

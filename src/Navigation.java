@@ -266,8 +266,8 @@ public class Navigation extends Thread {
         // Do turn
         doTurn(theta, speed);
         // Calculate the rotation to apply to the wheels
-        int rotationDegreesLeft = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_LEFT));
-        int rotationDegreesRight = (int) Math.round(Math.toDegrees(distance / Odometer.WHEEL_RADIUS_RIGHT));
+        int rotationDegreesLeft = (int) Math.round(Math.toDegrees(distance / Wheel.LEFT_RADIUS));
+        int rotationDegreesRight = (int) Math.round(Math.toDegrees(distance / Wheel.RIGHT_RADIUS));
         // Move the robot
         leftMotor.rotate(rotationDegreesLeft, true);
         rightMotor.rotate(rotationDegreesRight, true);
@@ -297,8 +297,8 @@ public class Navigation extends Thread {
             difference = Pi.TWO + difference;
         }
         // Compute wheel rotation in angle
-        float wheelRotationLeft = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS_LEFT) / 2;
-        float wheelRotationRight = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS_RIGHT) / 2;
+        float wheelRotationLeft = (difference * Wheel.DISTANCE / Wheel.LEFT_RADIUS) / 2;
+        float wheelRotationRight = (difference * Wheel.DISTANCE / Wheel.RIGHT_RADIUS) / 2;
         int rotationDegreesLeft = (int) Math.round(Math.toDegrees(wheelRotationLeft));
         int rotationDegreesRight = (int) Math.round(Math.toDegrees(wheelRotationRight));
         // Rotate
