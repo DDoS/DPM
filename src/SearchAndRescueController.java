@@ -95,10 +95,9 @@ public class SearchAndRescueController {
 					if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
 						nav.travelTo(x, y, 400);
 						nav.waitUntilDone();
-					}else if(tOffset[iteration]!=0){
-						nav.turnTo(theta, 400);
-						nav.waitUntilDone();
 					}
+					nav.turnTo(theta, 400);
+					nav.waitUntilDone();
 				}else{
 					claw.open();
 					finished = true;
@@ -118,7 +117,7 @@ public class SearchAndRescueController {
 				y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 				theta = (num%4)*Pi.ONE_HALF;
 				
-				nav.travelTo(x, y);
+				nav.travelTo(x, y, 400);
 				nav.waitUntilDone();
 				
 				//MOVE TO DROP OFF
