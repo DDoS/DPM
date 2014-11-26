@@ -7,7 +7,6 @@ public class SearchAndRescueController {
     private MapNode current;
     private FilteredColorSensor color;
     private Claw claw;
-    private boolean seenBlock = false;
 
     public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
         nav = n;
@@ -63,31 +62,16 @@ public class SearchAndRescueController {
 
 			nav.travelTo(x, y-5);
 
-			Thread blockCheck = new Thread(){
-				public void run(){
-					int c, r, b, g;
-					while(true){
-		                c = color.getColorData();
-						b = c & 255;
-						g = (c >> 8) & 255;
-						r = (c >> 16) & 255;
-						if(r<100 && b<100 && g<100){
-							seenBlock = false;
-						}else{
-							seenBlock = true;
-						}
-					}
-				}
-			};
-
 			float ang1 = -1;
 			float ang2 = -1;
 
-			blockCheck.start();
-
 			nav.turnTo(theta - 30);
 
-			while(nav.isNavigating() && seenBlock == false){}
+            boolean seenBlock = false;
+
+			while(nav.isNavigating() && !(seenBlock = checkForBlock())){
+                Thread.yield();
+            }
 			nav.abort();
 
 			if(seenBlock){
@@ -96,7 +80,9 @@ public class SearchAndRescueController {
 
 			nav.turnTo(theta + 30);
 
-			while(nav.isNavigating() && seenBlock == false){}
+			while(nav.isNavigating() && !(seenBlock = checkForBlock())){
+                Thread.yield();
+            }
 			nav.abort();
 
 			if(seenBlock){
@@ -106,7 +92,9 @@ public class SearchAndRescueController {
 			nav.turnTo(theta);
 
 			if(ang1==-1){
-				while(nav.isNavigating() && seenBlock == false){}
+				while(nav.isNavigating() && !(seenBlock = checkForBlock())){
+                    Thread.yield();
+                }
 				nav.abort();
 
 				if(seenBlock){
@@ -123,7 +111,9 @@ public class SearchAndRescueController {
 
 				nav.forward(10);
 
-				while(nav.isNavigating() && seenBlock == false){}
+				while(nav.isNavigating() && !(seenBlock = checkForBlock())){
+                    Thread.yield();
+                }
 				nav.abort();
 
 				nav.forward(1);
@@ -171,6 +161,14 @@ public class SearchAndRescueController {
 
 		}*/
 
+    }
+
+    private boolean checkForBlock() {
+        int c = color.getColorData();
+        int b = c & 255;
+        int g = (c >> 8) & 255;
+        int r = (c >> 16) & 255;
+        return r>=100 || b>=100 || g>=100;
     }
 
     public void setCurrent(MapNode c){
