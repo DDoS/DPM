@@ -13,4 +13,13 @@ public class Random {
         seed = (seed * MUL + ADD) & MASK;
         return (int) (seed >>> BITS - bits);
     }
+
+    public boolean nextBoolean() {
+        return nextBits(1) == 1;
+    }
+
+    public int nextInt(int n) {
+        // good enough...
+        return nextBits(32) % n;
+    }
 }

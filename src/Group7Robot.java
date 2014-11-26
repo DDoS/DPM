@@ -20,7 +20,6 @@ public class Group7Robot {
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
 
-
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
 		//0 - no block
@@ -123,7 +122,6 @@ public class Group7Robot {
 			System.exit(0);
 		}
 
-
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
 		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);
@@ -169,7 +167,7 @@ public class Group7Robot {
 		int i = 0;
 		while (!Button.ESCAPE.isDown()) {
 			float next = random.nextBits(2) * Tile.ONE + Tile.HALF;
-			if (random.nextBits(1) == 1) {
+			if (random.nextBoolean()) {
 				navigation.travelBy(next - odometer.getX(), 0);
 			} else {
 				navigation.travelBy(0, next - odometer.getY());
@@ -180,17 +178,27 @@ public class Group7Robot {
 		}
 		*/
 
+		// INFINITE RANDOM WALK IN MAP WITH BLOCK
 		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
 		odometer.enableDebugOutput(true);
 		navigation.enableClawDownMode(true);
-		odometer.setPosition(Tile.HALF + 4, Tile.HALF, Pi.ONE);
-		navigation.travelTo(2 * Tile.ONE + Tile.HALF, Tile.HALF);
-		navigation.waitUntilDone();
-		navigation.travelTo(2 * Tile.ONE + Tile.HALF, 3 * Tile.ONE + Tile.HALF);
-		navigation.waitUntilDone();
-		navigation.travelTo(Tile.HALF, 3 * Tile.ONE + Tile.HALF);
-		navigation.waitUntilDone();
+		Random random = new Random();
+		int[][] array = arr5;
+		int size = array.length, sx = 0, sy = 0;
+		while (!Button.ESCAPE.isDown()) {
+			int nx = random.nextInt(size);
+			int ny = random.nextInt(size);
+			final int[] path = Map.findPath(array, sx, sy, nx, ny);
+			int i = 0;
+			while (path[i] != Integer.MAX_VALUE) {
+				sx = path[i];
+				sy = path[i + 1];
+				i += 2;
+				navigation.travelTo(sx * Tile.ONE + Tile.HALF, sy * Tile.ONE + Tile.HALF);
+				navigation.waitUntilDone();
+			}
+		}
 
 		// EXIT
 		Button.waitForAnyPress();

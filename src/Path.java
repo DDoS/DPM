@@ -64,8 +64,15 @@ public class Path {
     * @author Jonah
     */
     public static enum Direction {
-        LEFT,
-        RIGHT,
-        FRONT
+        LEFT(-1, 0),
+        RIGHT(1, 0),
+        FRONT(0, 1),
+        BACK(0, -1);
+        public final int xOffset, yOffset;
+
+        private Direction(int xOffset, int yOffset) {
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
     }
 }
