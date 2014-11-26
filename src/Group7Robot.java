@@ -185,11 +185,11 @@ public class Group7Robot {
 		odometer.enableDebugOutput(true);
 		navigation.enableClawDownMode(true);
 		odometer.setPosition(Tile.HALF + 4, Tile.HALF, Pi.ONE);
-		navigation.travelTo(75, Tile.HALF);
+		navigation.travelTo(2 * Tile.ONE + Tile.HALF, Tile.HALF);
 		navigation.waitUntilDone();
-		navigation.travelTo(75, 105);
+		navigation.travelTo(2 * Tile.ONE + Tile.HALF, 3 * Tile.ONE + Tile.HALF);
 		navigation.waitUntilDone();
-		navigation.travelTo(Tile.HALF, 105);
+		navigation.travelTo(Tile.HALF, 3 * Tile.ONE + Tile.HALF);
 		navigation.waitUntilDone();
 
 		// EXIT

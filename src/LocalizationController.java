@@ -58,9 +58,9 @@ public class LocalizationController {
 		Display.update("Status", "Init");
 
 		//path represents the current path that the robot has actually traveled
-		MapPath path = null;
+		Path path = null;
 		//nodes represents all of the nodes that are considered to be valid starting options
-		ArrayList<MapNode> nodes = map.getRemaningNodes();
+		ArrayList<Node> nodes = map.getRemaningNodes();
 
 		Display.update("Status", "Run");
 
@@ -161,9 +161,9 @@ public class LocalizationController {
 
 					//Add a forward node to the path
 					if(path!=null){
-						path.addMapPath(new MapPath(MapPath.Direction.FRONT));
+						path.addPath(new Path(Path.Direction.FRONT));
 					}else{
-						path = new MapPath(MapPath.Direction.FRONT);
+						path = new Path(Path.Direction.FRONT);
 					}
 
 					//Move forward
@@ -175,9 +175,9 @@ public class LocalizationController {
 
 					//Add a left node to the path
 					if(path!=null){
-						path.addMapPath(new MapPath(MapPath.Direction.LEFT));
+						path.addPath(new Path(Path.Direction.LEFT));
 					}else{
-						path = new MapPath(MapPath.Direction.LEFT);
+						path = new Path(Path.Direction.LEFT);
 					}
 
 					//Move left
@@ -189,9 +189,9 @@ public class LocalizationController {
 
 					//add a right node to the path
 					if(path!=null){
-					 	path.addMapPath(new MapPath(MapPath.Direction.RIGHT));
+					 	path.addPath(new Path(Path.Direction.RIGHT));
 					}else{
-						path = new MapPath(MapPath.Direction.RIGHT);
+						path = new Path(Path.Direction.RIGHT);
 					}
 
 					//Move right
@@ -207,7 +207,7 @@ public class LocalizationController {
 		//End of algorithm, update position
 		Display.update("Status", "Final");
 
-		MapNode current;//Current spot that the robot is in
+		Node current;//Current spot that the robot is in
 
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
 			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
@@ -241,15 +241,15 @@ public class LocalizationController {
 	 * Updates the Map so that starting nodes which no longer fir the path with the new sensor data are removed
 	 * The map isn't returned, but updated by reference
 	 * @param frontTiles An int that represents the number of tiles the robot sees in front of it
-	 * @param nodes An ArrayList of MapNodes that contains all the nodes that are still considered valid (so we can update them)
-	 * @param path A MapPath that represents the path that the robot has traveled while sensing
+	 * @param nodes An ArrayList of Nodes that contains all the nodes that are still considered valid (so we can update them)
+	 * @param path A Path that represents the path that the robot has traveled while sensing
 	 */
-	private void updateMapWithSensorData(int frontTiles, ArrayList<MapNode> nodes, MapPath path){
+	private void updateMapWithSensorData(int frontTiles, ArrayList<Node> nodes, Path path){
 
 		//Loop through all of the nodes that are still considered valid, so we can check if they're still valid when compared to this new sensor data
-		for(MapNode m : nodes){
+		for(Node m : nodes){
 			//if m represents the node we started from, n represents the place that the robot would be if it followed path from m
-			MapNode assumedPos = m.getNodeFromPath(path);
+			Node assumedPos = m.getNodeFromPath(path);
 
 			//scan forward one by one and make sure the sensor data matches with the map data, otherwise remove m as a valid option
 			for(int i=0; i<=frontTiles; i++){
@@ -260,7 +260,7 @@ public class LocalizationController {
 
 				}else if(i==frontTiles){//If we are at the end of what the sensor picked up, that means there's supposed to be a tile here
 
-					assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+					assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));
 					if(assumedPos!=null){//If there isn't a tile here, then remove m
 						m.setIsValidStart(false);
 						break;
@@ -268,7 +268,7 @@ public class LocalizationController {
 
 				}else{//Else, there's not supposed to be a tile here
 
-					assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+					assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));
 					if(assumedPos==null){//If there is a tile here, remove m
 						m.setIsValidStart(false);
 						break;
@@ -284,25 +284,25 @@ public class LocalizationController {
 	/**
 	 * Update the tileCount array by reference with the number of nodes at each distance, from each of the 3 directions
 	 * @param tileCount The int 2D 3-by-X array which represents a block at each distance. The number in each spot in the array represents how many blocks there are in total at that distance in that direction
-	 * @param nodes An ArrayList of MapNodes which represents the nodes that are left as starting nodes (we need to check the distances from each of these nodes)
-	 * @param path A MapPath that represents the path the robot has traveled
+	 * @param nodes An ArrayList of Nodes which represents the nodes that are left as starting nodes (we need to check the distances from each of these nodes)
+	 * @param path A Path that represents the path the robot has traveled
 	 */
-	private void getDistancesToTiles(int[][] tileCount, ArrayList<MapNode> nodes, MapPath path){
+	private void getDistancesToTiles(int[][] tileCount, ArrayList<Node> nodes, Path path){
 
 		//for each valid starting node left, we check the distance to the next tile from each direction
-		for(MapNode m : nodes){
+		for(Node m : nodes){
 
 			//----CHECKING LEFT-----
-			MapNode assumedPos = m.getNodeFromPath(path);
-			assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.LEFT)); //Move the assumed pos to the left (to see how many blocks turning left eliminates)
-			assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
+			Node assumedPos = m.getNodeFromPath(path);
+			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.LEFT)); //Move the assumed pos to the left (to see how many blocks turning left eliminates)
+			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
 
 			//We loop and move the node forward until we hit a wall, then we increment the corresponding value in tileCount
 			int i=0; //i will represent how many blocks we see from this location
 
 			while(assumedPos!=null){
 				i++;
-				assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT)); //Move the assumedPos forward until we hit a wall
+				assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT)); //Move the assumedPos forward until we hit a wall
 			}
 
 			//Cutoff at the max
@@ -318,13 +318,13 @@ public class LocalizationController {
 			//-----CHECKING RIGHT----
 			//reset and repeat for facing right
 			assumedPos = m.getNodeFromPath(path);
-			assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.RIGHT));
-			assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
+			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.RIGHT));
+			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
 			i=0;
 
 			while(assumedPos!=null){
 				i++;
-				assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using r, facing right
+				assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));//Using r, facing right
 			}
 
 			if(i>MAX_TILES){
@@ -338,12 +338,12 @@ public class LocalizationController {
 			//-----CHECKING FRONT----
 			//reset and repeat facing front
 			assumedPos = m.getNodeFromPath(path);
-			assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));
+			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));
 			i=0;
 
 			while(assumedPos!=null){
 				i++;
-				assumedPos = assumedPos.getNodeFromPath(new MapPath(MapPath.Direction.FRONT));//Using f, facing front
+				assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));//Using f, facing front
 			}
 
 			if(i>MAX_TILES){

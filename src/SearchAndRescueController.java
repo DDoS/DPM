@@ -4,7 +4,7 @@ import lejos.nxt.Button;
 public class SearchAndRescueController {
     private Navigation nav;
     private Map map;
-    private MapNode current;
+    private Node current;
     private FilteredColorSensor color;
     private Claw claw;
 
@@ -22,26 +22,26 @@ public class SearchAndRescueController {
 		int blocks = 0;
 		int points = 0;
 
-		MapNode dest;
+		Node dest;
 
 		//while(true){ //change to timer things
 			//MOVE TO PICKUP
 			dest = map.getCollectionNode();
-/*			MapPath path = map.getPathFromNodeToNode(current, dest);
+/*			Path path = map.getPathFromNodeToNode(current, dest);
 
 	//		Display.update("Status", "Moving");
 			while(path!=null){
-				current = current.getNodeFromPath(new MapPath(path.getDirection()));
+				current = current.getNodeFromPath(new Path(path.getDirection()));
 				int num = current.getNum();
 				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
 				float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 				float theta = (num%4)*Pi.ONE_HALF;
 
-				if(path.getDirection()==MapPath.Direction.FRONT){
+				if(path.getDirection()==Path.Direction.FRONT){
 					nav.travelTo(x, y);
 					nav.waitUntilDone();
 				}
-				path = path.getNextMapPath();
+				path = path.getNextPath();
 
 				if(path==null){
 					nav.turnTo(theta);
@@ -136,8 +136,8 @@ public class SearchAndRescueController {
 
 			//Display.update("Status", "Returning");
 			while(path!=null){
-				current = current.getNodeFromPath(new MapPath(path.getDirection()));
-				path = path.getNextMapPath();
+				current = current.getNodeFromPath(new Path(path.getDirection()));
+				path = path.getNextPath();
 
 				int num = current.getNum();
 				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
@@ -171,7 +171,7 @@ public class SearchAndRescueController {
         return r>=100 || b>=100 || g>=100;
     }
 
-    public void setCurrent(MapNode c){
+    public void setCurrent(Node c){
     	current = c;
     }
 }
