@@ -4,17 +4,6 @@
  * @author Jonah
  */
 public class Path {
-    /**
-     * An enum used to represent the three valid directions from a node
-     *
-     * @author Jonah
-     */
-    public enum Direction {
-        LEFT,
-        RIGHT,
-        FRONT
-    }
-
     private Direction dir;
     private Path next;
 
@@ -24,8 +13,7 @@ public class Path {
      * @param d Direction to specify for the Path
      */
     public Path(Direction d) {
-        dir = d;
-        next = null;
+        this(d, null);
     }
 
     /**
@@ -68,5 +56,16 @@ public class Path {
      */
     public Path getNextPath() {
         return this.next;
+    }
+
+    /**
+    * An enum used to represent the three valid directions from a node
+    *
+    * @author Jonah
+    */
+    public static enum Direction {
+        LEFT,
+        RIGHT,
+        FRONT
     }
 }

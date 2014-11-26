@@ -10,7 +10,7 @@ public class Node {
     private Node left;
     private Node right;
     private Node front;
-    public int num;
+    private int num;
     private boolean isValidStart;//Whether or not to consider this node as a valid starting node
 
     //These two used when searching for the shortest path

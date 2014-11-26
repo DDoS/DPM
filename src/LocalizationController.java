@@ -4,12 +4,12 @@ import lejos.nxt.comm.RConsole;
 
 
 public class LocalizationController {
+	private static final int MAX_TILES = 4;
+	private static final boolean DEBUG_MODE = true;
 	//Has a copy of the nav, has a map, and has two sensors
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
-	private static final int MAX_TILES = 4;
-	private static final boolean DEBUG_MODE = true;
 	private SearchAndRescueController searchAndRescue;
 
 	/**
