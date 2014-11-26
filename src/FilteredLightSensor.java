@@ -2,8 +2,8 @@ import lejos.nxt.*;
 import lejos.robotics.Color;
 
 /**
- * A sliding average filtered light sensor. This is implemented as thin wrapper around the ColorSensor class. This class is meant for periodic high frequency sampling. Note that the first few readings
- * will be less accurate as the filtering data has yet to be accumulated.
+ * A sliding average filtered differencial light sensor. This is implemented as thin wrapper around the ColorSensor class. This class is meant for periodic high frequency sampling. Note that the
+ * first few readings will be less accurate as the filtering data has yet to be accumulated.
  * <p/>
  * NOT THREAD SAFE
  */
@@ -15,6 +15,8 @@ public class FilteredLightSensor {
     private int currentCount;
     // Current index in the array for the next sample
     private int index;
+    // The last value for differencial filtering
+    private int lastSample;
 
     /**
      * Constructs a new filtered light sensor from the port to which it is connected.
@@ -66,9 +68,9 @@ public class FilteredLightSensor {
     }
 
     /**
-     * Applies the filtering and returns the light data, a value between 0 and 100 (darkest to brightest). Performs one sampling per call.
+     * Applies the filtering and returns the differencial light data value. Performs one sampling per call.
      *
-     * @return The light level data
+     * @return The light level difference data
      */
     public int getLightData() {
         final int sampleCount = samples.length;
@@ -76,12 +78,21 @@ public class FilteredLightSensor {
         forceSample();
         // Get the start of the array, which is different before wrapping
         int start = currentCount < sampleCount ? 0 : index;
-        int average = 0;
+        int currentSample = 0;
         // Compute the average of the samples
         for (int i = 0; i < currentCount; i++) {
             // Get the sample with a wrapping index
-            average += samples[(start + i) % sampleCount];
+            currentSample += samples[(start + i) % sampleCount];
         }
-        return average / currentCount;
+        currentSample /= currentCount;
+        // First sample is ignored
+        if (sampleCount <= 1) {
+            lastSample = currentSample;
+            return 0;
+        }
+        // Compute the difference and update last sample
+        int difference = currentSample - lastSample;
+        lastSample = currentSample;
+        return difference;
     }
 }

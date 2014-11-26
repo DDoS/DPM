@@ -72,7 +72,7 @@ public class Map {
 					getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(Path.Direction.LEFT, getNodeAtPosition(i, j, Pi.ONE));
 					getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(Path.Direction.RIGHT, getNodeAtPosition(i, j, 0));
 
-					//set node facing 180 to have left facing 90, and right facing 270
+					//set node facing 180 to have left facing 270, and right facing 90
 					getNodeAtPosition(i, j, Pi.ONE).setChild(Path.Direction.LEFT, getNodeAtPosition(i, j, Pi.THREE_HALF));
 					getNodeAtPosition(i, j, Pi.ONE).setChild(Path.Direction.RIGHT, getNodeAtPosition(i, j, Pi.ONE_HALF));
 
@@ -145,7 +145,7 @@ public class Map {
 	 * @return The Node matching the parameters
 	 */
 	public Node getNodeAtPosition(int x, int y, double t){
-		return nodes[(int) ((x + y*(int)Math.sqrt((float)nodes.length/4))*4 + (int)(t/(Pi.ONE_HALF)))];
+		return nodes[(int) ((x + y*(int)Math.sqrt((float)nodes.length/4))*4 + (int)((t+0.01)/(Pi.ONE_HALF)))];
 	}
 
 	/**
@@ -175,4 +175,87 @@ public class Map {
 		return (int) Math.sqrt(nodes.length/4);
 	}
 
+	// Find a path in the map from some tile coordinates to other ones
+	// Uses depth first search with a heuristic based on distance to target to find a good path
+	public static int[] findPath(int[][] map, int fromTileX, int fromTileY, int toTileX, int toTileY) {
+		int size = map.length;
+		// Make a copy of the coordinates
+		int cx = fromTileX, cy = fromTileY;
+		// Allocate an array with enough room to store the path to the end (2 ints per node)
+		int[] path = new int[size * size * 2];
+		// Current index into the path stack
+		int index = 0;
+		// A grid of traveled states (!0 = traveled, 0 = unvisited)
+		int[][] traveled = new int[size][size];
+		// Obstacles are marked as traveled
+		for (int i = 0; i < size; i++) {
+			System.arraycopy(map[i], 0, traveled[i], 0, size);
+		}
+		// Check if the end is actually reachable
+		boolean endBlocked = map[size - toTileY][toTileX] != 0;
+		// Repeat until we reach the end node
+		outer:
+		while (cx != toTileX || cy != toTileY) {
+			// Find the closest neighboor to the end by checking them all
+			int nextX = -1, nextY = -1, distance = Integer.MAX_VALUE;
+			for (Path.Direction next : Path.Direction.values()) {
+				// Get the neighboor coordinates and index
+				int nx = cx + next.xOffset;
+				int ny = cy + next.yOffset;
+				// If the end can't be reached, finish when we're right next to it
+				if (endBlocked && nx == toTileX && ny == toTileY) {
+					break outer;
+				}
+				// Check if the neighboor is in the map and hasn't been visited
+				if (inMap(size, nx, ny) && traveled[size - ny][nx] == 0) {
+					// Get the manhattan distance to the end tile
+					int newDistance = manhattanDistance(toTileX, toTileY, nx, ny);
+					// If smaller than the current best, update to it as the new best
+					if (newDistance < distance) {
+						nextX = nx;
+						nextY = ny;
+						distance = newDistance;
+					}
+				}
+			}
+			// Set the current node as traveled
+			traveled[size - cy][cx] = 1;
+			// Update current coordinates to the neighboor
+			cx = nextX;
+			cy = nextY;
+			// Check if we actually found a neighboor to travel to
+			if (distance == Integer.MAX_VALUE) {
+				// If we don't have a previous node, we end here with no path
+				if (index == 0) {
+					break;
+				}
+				// Else, pop the stack, move the path back to last node
+				index -= 2;
+				cx = path[index];
+				cy = path[index + 1];
+				// We will try another direction next iteration
+			} else {
+				// Else push this node to the stack
+				path[index] = cx;
+				path[index + 1] = cy;
+				index += 2;
+			}
+		}
+		// Mark path end and return it
+		path[index] = Integer.MAX_VALUE;
+		return path;
+	}
+
+	// Checks if the coordinates are inside the field
+	private static boolean inMap(int size, int x, int y) {
+		// If we have bits outside the mask, the coordinate is outside the range
+		return x >= 0 && x < size && y >= 0 && y < size;
+	}
+
+
+	// Compute the manhattan distance between two points
+	private static int manhattanDistance(int ax, int ay, int bx, int by) {
+		// Sum of the absolute values of the differences
+		return Math.abs(bx - ax) + Math.abs(by - ay);
+	}
 }

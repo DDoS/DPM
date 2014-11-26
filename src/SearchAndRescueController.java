@@ -21,146 +21,230 @@ public class SearchAndRescueController {
 	//	Display.update("Status", "Init");
 		int blocks = 0;
 		int points = 0;
+		float[] xOffset = {0          ,         0  ,         0  ,           0,         0  ,           0, 0           , -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, 0           ,           0,           0,           0};
+		float[] yOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3,-Tile.ONE/3 , -Tile.ONE/3, 0           ,           0,           0,           0, 0           ,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3};
+		float[] tOffset = {0          ,           0,           0,          0 ,          0 ,          0 , -Pi.ONE_HALF,           0,           0,           0, -Pi.ONE_HALF,           0,           0,           0};
+		int iteration = 0;
 
 		Node dest;
-
-		//while(true){ //change to timer things
+		
+		boolean finished = false;
+		
+		while(finished == false){ //change to timer things
 			//MOVE TO PICKUP
 			dest = map.getCollectionNode();
-/*			Path path = map.getPathFromNodeToNode(current, dest);
+			Path path = map.getPathFromNodeToNode(current, dest);
+			
+			nav.enableClawDownMode(false);
+			
+			moveAlongPath(path);
 
-	//		Display.update("Status", "Moving");
-			while(path!=null){
-				current = current.getNodeFromPath(new Path(path.getDirection()));
-				int num = current.getNum();
-				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-				float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-				float theta = (num%4)*Pi.ONE_HALF;
-
-				if(path.getDirection()==Path.Direction.FRONT){
-					nav.travelTo(x, y);
-					nav.waitUntilDone();
-				}
-				path = path.getNextPath();
-
-				if(path==null){
-					nav.turnTo(theta);
-					nav.waitUntilDone();
-				}
-			}
-
-	//		Display.update("Status", "Searching");
+			Display.update("Status", "Searching");
 			//COLOR SENSING --needs so much work
-*/
-            claw.sense();
+
 
             final int num = dest.getNum();
 			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
 			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 			float theta = (num%4)*Pi.ONE_HALF;
-
-
-			nav.travelTo(x, y-5);
-
-			float ang1 = -1;
-			float ang2 = -1;
-
-			nav.turnTo(theta - 30);
-
-            boolean seenBlock = false;
-
-			while(nav.isNavigating() && !(seenBlock = checkForBlock())){
-                Thread.yield();
-            }
-			nav.abort();
-
-			if(seenBlock){
-				ang1 = nav.getOdometer().getTheta();
+			
+			for(int i= 0; i<iteration; i++){
+				x += xOffset[i];
+				y += yOffset[i];
+				theta += tOffset[i];
 			}
-
-			nav.turnTo(theta + 30);
-
-			while(nav.isNavigating() && !(seenBlock = checkForBlock())){
-                Thread.yield();
-            }
-			nav.abort();
-
-			if(seenBlock){
-				ang2 = nav.getOdometer().getTheta();
-			}
-
+			
+			nav.travelTo(x, y);
+			nav.waitUntilDone();
 			nav.turnTo(theta);
-
-			if(ang1==-1){
-				while(nav.isNavigating() && !(seenBlock = checkForBlock())){
-                    Thread.yield();
-                }
-				nav.abort();
-
-				if(seenBlock){
-					ang1 = nav.getOdometer().getTheta();
+			nav.waitUntilDone();
+				
+			Display.update("Status", "Collecting");
+	    	
+	    	float blockAng = -1;
+			
+	    	while(blockAng == -1 && finished == false){
+		    	claw.sense();
+				blockAng = scanForBlock(theta);
+				
+				if(blockAng != -1){
+					iteration++;
+					
+					nav.turnTo(blockAng);
+					nav.waitUntilDone();
+					nav.forward(15);
+					
+					while(nav.isNavigating()){
+						if(checkForBlock() == false){
+							nav.abort();
+						}
+					}
+					
+					nav.forward(4);
+					nav.waitUntilDone();
+					
+					claw.close();
+				}else if(iteration < xOffset.length-1){
+					claw.open();
+					iteration++;
+					x += xOffset[iteration];
+					y += yOffset[iteration];
+					theta += tOffset[iteration];
+					nav.travelTo(x, y);
+					nav.waitUntilDone();
+					nav.turnTo(theta);
+					nav.waitUntilDone();
+				}else{
+					claw.open();
+					finished = true;
 				}
-			}else{
-				nav.waitUntilDone();
-			}
+	    	}
 
-			if(ang1!=-1 && ang2 != -1){
-				float blockAng = (ang1+ang2)/2;
-				nav.turnTo(blockAng);
-				nav.waitUntilDone();
-
-				nav.forward(10);
-
-				while(nav.isNavigating() && !(seenBlock = checkForBlock())){
-                    Thread.yield();
-                }
-				nav.abort();
-
-				nav.forward(1);
-				nav.waitUntilDone();
-
-				claw.close();
-			}
-
-
-	//		Display.update("Status", "Collecting");
+	//		
 
 
 			//CLAW
-	//		Display.update("Status", "Final");
+	//		
 
-			/*
-			//MOVE TO DROP OFF
-			dest = map.getDeliveryNode();
-			path = map.getPathFromNodeToNode(current, dest);
-
-			//Display.update("Status", "Returning");
-			while(path!=null){
-				current = current.getNodeFromPath(new Path(path.getDirection()));
-				path = path.getNextPath();
-
-				int num = current.getNum();
-				float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-				float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-				float theta = (num%4)*Pi.ONE_HALF;
+	    	
+	    	if(!finished){
+	    	
+				x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+				y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
+				theta = (num%4)*Pi.ONE_HALF;
+				
 				nav.travelTo(x, y);
 				nav.waitUntilDone();
-				if(path==null){
-					nav.turnTo(theta);
-					nav.waitUntilDone();
-				}
+				
+				//MOVE TO DROP OFF
+				Display.update("Status", "Returning");
+				dest = map.getDeliveryNode();
+				path = map.getPathFromNodeToNode(current, dest);
+				
+				nav.enableClawDownMode(true);
+	
+				moveAlongPath(path);
+	
+				nav.forward(30);
+				nav.waitUntilDone();
+				
+				claw.open();
+				
+				nav.backward(30);
+				nav.waitUntilDone();
+				
+	    	}
+
+
+		}
+		
+		Display.update("Status", "Final");
+		//FINISH
+
+    }
+    
+    private void moveAlongPath(Path path){
+    	Display.update("Status", "Moving");
+		while(path!=null){
+			current = current.getNodeFromPath(new Path(path.getDirection()));
+			int num = current.getNum();
+			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
+			float theta = (num%4)*Pi.ONE_HALF;
+
+			if(path.getDirection()==Path.Direction.FRONT){
+				nav.travelTo(x, y);
+				nav.waitUntilDone();
 			}
+			path = path.getNextPath();
 
-			//CLAW AGAIN
-			nav.forward(13);
-			nav.waitUntilDone();
+			if(path==null){
+				nav.turnTo(theta);
+				nav.waitUntilDone();
+			}
+		}
+    }
+    
+    private float scanForBlock(float theta){
+    	
+    	boolean triggered = false;
+    	boolean seesBlock = false;
+    	
+    	float ang1 = -1;
+    	float ang2 = -1;
+    	
+    	float turnAng = theta - Pi.ONE_SIXTH;
+    	System.out.println(turnAng); // Alexi, please leave this println in
+    								/*	For some reason, every time I take it out, the nav just doesn't move.
+    								 * 	I've been debugging this for a while and it has nothing to do with the while loop below, it just doesn't get an angle that it moves to
+    								 * 	So turnAng isn't correct unless I print it????? I don't know, just leave it in for now.
+    								 */
+    	nav.turnTo(turnAng);
+    	
+    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
+    		seesBlock = checkForBlock();
+    		if(seesBlock==true){
+    			if(triggered==false){
+    				triggered=true;
+    			}
+    		}else{
+    			if(triggered==true){
+    				nav.abort();
+    				ang1 = nav.getOdometer().getTheta();
+    			}
+    		}
 
-			claw.open();
-
-			//Display.update("Status", "Final");
-
-		}*/
-
+    	}
+    	
+    	
+    	turnAng = theta + Pi.ONE_SIXTH;
+    	nav.turnTo(turnAng);
+    	
+    	triggered = false;
+    	
+    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
+    		seesBlock = checkForBlock();
+    		if(seesBlock==true){
+    			if(triggered==false){
+    				triggered=true;
+    			}
+    		}else{
+    			if(triggered==true){
+    				nav.abort();
+    				ang2 = nav.getOdometer().getTheta();
+    			}
+    		}
+    	}
+    	
+    	
+    	if(ang1==-1){
+        	nav.turnTo(theta);
+        	
+    		triggered = false;
+    		
+    		while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
+        		seesBlock = checkForBlock();
+        		if(seesBlock==true){
+        			if(triggered==false){
+        				triggered=true;
+        			}
+        		}else{
+        			if(triggered==true){
+        				nav.abort();
+        				ang1 = nav.getOdometer().getTheta();
+        			}
+        		}
+        	}
+    	}
+    	
+    	if(ang1 != -1 && ang2 != -1){
+    		if(ang1 > Pi.THREE_HALF && ang2 < Pi.ONE_HALF){
+    			ang1 -= Pi.TWO;
+    		}
+    		float result = (ang1+ang2)/2;
+    		return result;
+    	}
+    	return -1;
     }
 
     private boolean checkForBlock() {
@@ -168,7 +252,7 @@ public class SearchAndRescueController {
         int b = c & 255;
         int g = (c >> 8) & 255;
         int r = (c >> 16) & 255;
-        return r>=100 || b>=100 || g>=100;
+        return r>=50 || b>=50 || g>=50;
     }
 
     public void setCurrent(Node c){

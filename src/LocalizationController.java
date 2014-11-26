@@ -97,6 +97,7 @@ public class LocalizationController {
 
 			//Remove the nodes that don't fit with our sensor data
 			this.updateMapWithSensorData(frontTiles, nodes, path);
+			
 
 			//Now that we have removed some nodes, we update nodes
 			nodes = map.getRemaningNodes();
@@ -111,13 +112,13 @@ public class LocalizationController {
 					{0, 0, 0, 0, 0, 0, 0, 0, 0},//right
 					{0, 0, 0, 0, 0, 0, 0, 0, 0}//front
 			};
+			
 			this.getDistancesToTiles(tileCount, nodes, path);
 
 			//Now we compute the standard deviation of the arrays and use the lowest one for the move
 			float stdL = stdDev(tileCount[0]);
 			float stdR = stdDev(tileCount[1]);
 			float stdF = stdDev(tileCount[2]);
-
 
 			//FIX STD DEVS
 			//If the std devs are all the same, we want to go to the move that has the obstacle which is farthest away (with bias towards moving front, then left, then right, to avoid getting stuck in a loop)
@@ -227,7 +228,6 @@ public class LocalizationController {
 		Display.update("Th", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
 
-		Note.play();
 		//lejos.nxt.Button.waitForAnyPress();
 
 		//Set the SearchAndRescueController so it knows where the robot is
@@ -292,11 +292,11 @@ public class LocalizationController {
 		//for each valid starting node left, we check the distance to the next tile from each direction
 		for(Node m : nodes){
 
+
 			//----CHECKING LEFT-----
 			Node assumedPos = m.getNodeFromPath(path);
 			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.LEFT)); //Move the assumed pos to the left (to see how many blocks turning left eliminates)
 			assumedPos = assumedPos.getNodeFromPath(new Path(Path.Direction.FRONT));//Must add one node to the front to avoid off-by-one error
-
 			//We loop and move the node forward until we hit a wall, then we increment the corresponding value in tileCount
 			int i=0; //i will represent how many blocks we see from this location
 
