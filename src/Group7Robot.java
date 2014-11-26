@@ -177,7 +177,7 @@ public class Group7Robot {
 			Display.update("i", Integer.toString(i));
 		}
 		*/
-/*
+		/*
 		// INFINITE RANDOM WALK IN MAP WITH BLOCK
 		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
@@ -199,9 +199,7 @@ public class Group7Robot {
 				navigation.waitUntilDone();
 			}
 		}
-
 		*/
-
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);

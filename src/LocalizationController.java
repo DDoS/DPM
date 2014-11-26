@@ -168,7 +168,7 @@ public class LocalizationController {
 					}
 
 					//Move forward
-					nav.forward(Tile.ONE);
+					nav.forward(Tile.ONE, 400);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				//If the left is less than the right, go left
@@ -183,7 +183,7 @@ public class LocalizationController {
 
 					//Move left
 					currTheta += Pi.ONE_HALF;
-					nav.turnTo(currTheta);
+					nav.turnTo(currTheta, 400);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}else{//else we want to move right
@@ -197,7 +197,7 @@ public class LocalizationController {
 
 					//Move right
 					currTheta -= Pi.ONE_HALF;
-					nav.turnTo(currTheta);
+					nav.turnTo(currTheta, 400);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}

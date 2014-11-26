@@ -52,12 +52,14 @@ public class SearchAndRescueController {
 				x += xOffset[i];
 				y += yOffset[i];
 				theta += tOffset[i];
+				if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
+					nav.travelTo(x, y, 400);
+					nav.waitUntilDone();
+				}else if(tOffset[iteration]!=0){
+					nav.turnTo(theta, 400);
+					nav.waitUntilDone();
+				}
 			}
-			
-			nav.travelTo(x, y);
-			nav.waitUntilDone();
-			nav.turnTo(theta);
-			nav.waitUntilDone();
 				
 			Display.update("Status", "Collecting");
 	    	
@@ -90,10 +92,13 @@ public class SearchAndRescueController {
 					x += xOffset[iteration];
 					y += yOffset[iteration];
 					theta += tOffset[iteration];
-					nav.travelTo(x, y);
-					nav.waitUntilDone();
-					nav.turnTo(theta);
-					nav.waitUntilDone();
+					if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
+						nav.travelTo(x, y, 400);
+						nav.waitUntilDone();
+					}else if(tOffset[iteration]!=0){
+						nav.turnTo(theta, 400);
+						nav.waitUntilDone();
+					}
 				}else{
 					claw.open();
 					finished = true;
@@ -153,13 +158,13 @@ public class SearchAndRescueController {
 			float theta = (num%4)*Pi.ONE_HALF;
 
 			if(path.getDirection()==Path.Direction.FRONT){
-				nav.travelTo(x, y);
+				nav.travelTo(x, y, 400);
 				nav.waitUntilDone();
 			}
 			path = path.getNextPath();
 
 			if(path==null){
-				nav.turnTo(theta);
+				nav.turnTo(theta, 400);
 				nav.waitUntilDone();
 			}
 		}
@@ -195,6 +200,9 @@ public class SearchAndRescueController {
     		}
 
     	}
+    	if(triggered==true && ang1 == -1){
+    		ang1 = nav.getOdometer().getTheta();
+    	}
     	
     	
     	turnAng = theta + Pi.ONE_SIXTH;
@@ -216,6 +224,10 @@ public class SearchAndRescueController {
     		}
     	}
     	
+    	if(triggered==true && ang2 == -1){
+    		ang2 = nav.getOdometer().getTheta();
+    	}
+    	
     	
     	if(ang1==-1){
         	nav.turnTo(theta);
@@ -234,6 +246,10 @@ public class SearchAndRescueController {
         				ang1 = nav.getOdometer().getTheta();
         			}
         		}
+        	}
+    		
+    		if(triggered==true && ang1 == -1){
+        		ang1 = nav.getOdometer().getTheta();
         	}
     	}
     	
