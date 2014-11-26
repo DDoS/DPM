@@ -10,9 +10,9 @@ public class Odometer extends Thread {
     private static final long PERIOD = 10;
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
-    // Max light value reading for a grid line
-    private static final int LINE_LIGHT_LEFT = 465;
-    private static final int LINE_LIGHT_RIGHT = 395;
+    // Min light value reading drop for a grid line
+    private static final int LINE_LIGHT_LEFT = -50;
+    private static final int LINE_LIGHT_RIGHT = -50;
     // Dampening for heading correction to reduce error from bad correction
     private static final float HEADING_CORRECTION_DAMPEN = 0.5f;
     // Whether or not the odometer is running

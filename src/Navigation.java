@@ -236,7 +236,7 @@ public class Navigation extends Thread {
             // Interrupt it running
             runner.interrupt();
         } else {
-            // Else set navigation stet and notify runner
+            // Else set navigation state and notify runner
             synchronized (condition) {
                 navigating = true;
                 condition.notify();
