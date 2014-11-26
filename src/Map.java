@@ -41,51 +41,51 @@ public class Map {
 						getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i+1, j, 0));
 					}
 					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
-						getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, Math.PI/2));
+						getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j-1, Pi.ONE_HALF));
 
 						//TODO remove this code and replace with a better way of finding the start/finish
 						if(map[j-1][i]==3){
-							start = getNodeAtPosition(i, j, Math.PI/2).getNum();
+							start = getNodeAtPosition(i, j, Pi.ONE_HALF).getNum();
 						}
 						//------
 					}
 					if(i>0&&map[j][i-1]!=1){//Check the square to the west
-						getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, Math.PI));
+						getNodeAtPosition(i, j, Pi.ONE).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i-1, j, Pi.ONE));
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
-						getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, 3*Math.PI/2));
-						
+						getNodeAtPosition(i, j, Pi.THREE_HALF).setChild(MapPath.Direction.FRONT, getNodeAtPosition(i, j+1, Pi.THREE_HALF));
+
 						//TODO remove this code and replace with a better way of finding the start/finish
 						if(map[j+1][i]==2){
-							finish = getNodeAtPosition(i, j, 3*Math.PI/2).getNum();
+							finish = getNodeAtPosition(i, j, Pi.THREE_HALF).getNum();
 						}
 						//-----------
 					}
 
 					//Now we set all the left/right nodes properly
-					
+
 					//Set node facing 0 to have left facing 90, and right facing 270
-					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI/2));
-					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 3*Math.PI/2));
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Pi.ONE_HALF));
+					getNodeAtPosition(i, j, 0).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Pi.THREE_HALF));
 
 					//set node facing 90 to have left facing 180, and right facing 0
-					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Math.PI));
-					getNodeAtPosition(i, j, Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
+					getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Pi.ONE));
+					getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, 0));
 
 					//set node facing 180 to have left facing 90, and right facing 270
-					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 3*Math.PI/2));
-					getNodeAtPosition(i, j, Math.PI).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI/2));
+					getNodeAtPosition(i, j, Pi.ONE).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, Pi.THREE_HALF));
+					getNodeAtPosition(i, j, Pi.ONE).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Pi.ONE_HALF));
 
 					//set node facing 270 to have left facing 0 and right facing 180
-					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
-					getNodeAtPosition(i, j, 3*Math.PI/2).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Math.PI));
+					getNodeAtPosition(i, j, Pi.THREE_HALF).setChild(MapPath.Direction.LEFT, getNodeAtPosition(i, j, 0));
+					getNodeAtPosition(i, j, Pi.THREE_HALF).setChild(MapPath.Direction.RIGHT, getNodeAtPosition(i, j, Pi.ONE));
 
 					//If we're currently on a tile with a block on it, make sure it's not considered a valid starting spot
 					if(map[j][i]==1){
 						getNodeAtPosition(i, j, 0).setIsValidStart(false);
-						getNodeAtPosition(i, j, Math.PI/2).setIsValidStart(false);
-						getNodeAtPosition(i, j, Math.PI).setIsValidStart(false);
-						getNodeAtPosition(i, j, 3*Math.PI/2).setIsValidStart(false);
+						getNodeAtPosition(i, j, Pi.ONE_HALF).setIsValidStart(false);
+						getNodeAtPosition(i, j, Pi.ONE).setIsValidStart(false);
+						getNodeAtPosition(i, j, Pi.THREE_HALF).setIsValidStart(false);
 					}
 				}
 			}
@@ -145,7 +145,7 @@ public class Map {
 	 * @return The MapNode matching the parameters
 	 */
 	public MapNode getNodeAtPosition(int x, int y, double t){
-		return nodes[(int) ((x + y*(int)Math.sqrt((float)nodes.length/4))*4 + (int)(t/(Math.PI/2)))];
+		return nodes[(int) ((x + y*(int)Math.sqrt((float)nodes.length/4))*4 + (int)(t/(Pi.ONE_HALF)))];
 	}
 
 	/**

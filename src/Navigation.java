@@ -7,8 +7,6 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Navigation extends Thread {
-    // Pi ratios
-    private static final float HALF_PI = (float) Math.PI / 2;
     // Motor speed constants
     private static final int MOTOR_SPEED = 200;
     private static final int MOTOR_ACCELERATION = 1000;
@@ -278,10 +276,10 @@ public class Navigation extends Thread {
         rightMotor.setAcceleration(MOTOR_ACCELERATION);
         // Find min angle difference
         float difference = theta - odometer.getTheta();
-        if (difference >= (float) Math.PI) {
-            difference = -2 * (float) Math.PI + difference;
-        } else if (difference <= (float) -Math.PI) {
-            difference = 2 * (float) Math.PI + difference;
+        if (difference >= Pi.ONE) {
+            difference = -Pi.TWO + difference;
+        } else if (difference <= -Pi.ONE) {
+            difference = Pi.TWO + difference;
         }
         // Compute wheel rotation in angle
         float wheelRotationLeft = (difference * Odometer.WHEEL_DISTANCE / Odometer.WHEEL_RADIUS_LEFT) / 2;
@@ -338,7 +336,7 @@ public class Navigation extends Thread {
         private final int speed;
 
         private Turn(float theta, int speed) {
-            this.theta = Odometer.wrapAngle(theta);
+            this.theta = Pi.wrapAngle(theta);
             this.speed = speed;
         }
 

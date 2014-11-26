@@ -1,7 +1,11 @@
 import lejos.nxt.*;
 
-public class Note {
+public final class Note {
     private static final int A_NOTE = 55;
+
+    // Prevent instances of the singleton
+    private Note() {
+    }
 
     public static void play() {
         play(3);

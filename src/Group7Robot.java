@@ -132,18 +132,16 @@ public class Group7Robot {
 		odometer.start();
 		navigation.start();
 
-		/**/
+		/*
 		// MAIN RUN
 		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
 		localization.run();
-		odometer.enableCorrection(true);
 		searchAndRescue.run();
-		/**/
+		/*
 
 		/*
 		// ULTRASONIC RUN
-
 		while (!Button.ESCAPE.isDown()) {
 			Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
 		}
@@ -157,7 +155,7 @@ public class Group7Robot {
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
 		for (int i = 0; i < 8; i++) {
-			navigation.turnBy((float) Math.PI / 2);
+			navigation.turnBy(Pi.ONE_HALF);
 			navigation.waitUntilDone();
 		}
 		*/
@@ -181,6 +179,18 @@ public class Group7Robot {
 			Display.update("i", Integer.toString(i));
 		}
 		*/
+
+		Button.waitForAnyPress();
+		odometer.enableCorrection(true);
+		odometer.enableDebugOutput(true);
+		navigation.enableClawDownMode(true);
+		odometer.setPosition(15 + 4, 15, Pi.ONE);
+		navigation.travelTo(75, 15);
+		navigation.waitUntilDone();
+		navigation.travelTo(75, 105);
+		navigation.waitUntilDone();
+		navigation.travelTo(15, 105);
+		navigation.waitUntilDone();
 
 		// EXIT
 		Button.waitForAnyPress();

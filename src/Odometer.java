@@ -1,19 +1,13 @@
 import lejos.nxt.*;
 
 /**
- * An odometer class which runs its own thread to monitor the wheel rotation and update the position information every 25 ms.
+ * An odometer class which runs its own thread to monitor the wheel rotation and update the position information every 10 ms.
  * <p/>
  * THREAD SAFE
  */
 public class Odometer extends Thread {
     // odometer update period, in ms
     private static final long PERIOD = 10;
-    // Various PI ratios
-    private static final float TWO_PI = (float) Math.PI * 2;
-    private static final float ONE_QUARTER_PI = (float) Math.PI / 4;
-    private static final float THREE_QUARTER_PI = 3 * ONE_QUARTER_PI;
-    private static final float FIVE_QUARTER_PI = 5 * ONE_QUARTER_PI;
-    private static final float SEVEN_QUARTER_PI = 7 * ONE_QUARTER_PI;
     // Robot design parameters
     public static final float WHEEL_RADIUS_LEFT = 2.1f;
     public static final float WHEEL_RADIUS_RIGHT = 2.1f;
@@ -152,7 +146,7 @@ public class Odometer extends Thread {
                 // update x, y, and theta by their deltas
                 x += deltaX;
                 y += deltaY;
-                theta = wrapAngle(theta + deltaTheta);
+                theta = Pi.wrapAngle(theta + deltaTheta);
             }
 
 			/*
@@ -200,7 +194,7 @@ public class Odometer extends Thread {
                         }
                     }
                     // do coordinate correction: check which line direction we just crossed using the heading
-                    if (theta >= ONE_QUARTER_PI && theta < THREE_QUARTER_PI || theta >= FIVE_QUARTER_PI && theta < SEVEN_QUARTER_PI) {
+                    if (theta >= Pi.ONE_QUARTER && theta < Pi.THREE_QUARTER || theta >= Pi.FIVE_QUARTER && theta < Pi.SEVEN_QUARTER) {
                         // crossed a horizontal line
                         float sensorYOffset = (float) Math.sin(theta) * SENSOR_OFFSET;
                         // offset y to account for sensor distance, using the odo average as the position of the sensor
@@ -346,16 +340,6 @@ public class Odometer extends Thread {
         synchronized (lock) {
             return new Position(x, y, theta);
         }
-    }
-
-    /**
-     * Wraps an angle between 0 (inclusive) and 2pi (exclusive). This is a utility method exposed for usage by other classes. <p/> TODO: move this to another class?
-     *
-     * @param rads The angle to wrap in radians.
-     * @return The wrapped angle in radians
-     */
-    public static float wrapAngle(float rads) {
-        return ((rads % TWO_PI) + TWO_PI) % TWO_PI;
     }
 
     /**

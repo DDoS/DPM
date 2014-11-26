@@ -64,7 +64,7 @@ public class LocalizationController {
 
 		Display.update("Status", "Run");
 
-		float currTheta = (float) (Math.PI/2); //Keep track of the current heading so our turning before localization is accurate
+		float currTheta = Pi.ONE_HALF; //Keep track of the current heading so our turning before localization is accurate
 
 		int moves = 0; //Keep track of the number of moves taken for testing purposes
 
@@ -181,7 +181,7 @@ public class LocalizationController {
 					}
 
 					//Move left
-					currTheta += (float) (Math.PI/2);
+					currTheta += Pi.ONE_HALF;
 					nav.turnTo(currTheta);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
@@ -195,7 +195,7 @@ public class LocalizationController {
 					}
 
 					//Move right
-					currTheta -= (float) (Math.PI/2);
+					currTheta -= Pi.ONE_HALF;
 					nav.turnTo(currTheta);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
@@ -217,7 +217,7 @@ public class LocalizationController {
 		}
 
 		int num = current.getNum();//Do math to find out the position
-		float theta = (float) ((num%4) * (Math.PI/2));
+		float theta = (num%4) * Pi.ONE_HALF;
 		float x = Odometer.HALF_TILE_SPACING + Odometer.TILE_SPACING * (int)((num/4) % (map.getLength()));
 		float y = (map.getLength()-1) * Odometer.TILE_SPACING + Odometer.HALF_TILE_SPACING - Odometer.TILE_SPACING * (int)((num/4) / (map.getLength()));
 
