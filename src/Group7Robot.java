@@ -26,52 +26,21 @@ public class Group7Robot {
 		//1 - block
 		//2 - no block, this is the pickup zone
 		//3 - no block, this is the dropoff zone
-		Map map;
-		/*//The pattern given to us in the project specifications
-		int[][] arr = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-				{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
-		};
-
-		//A smaller test pattern
-		int[][] arr2 = {
+		// A tiny test pattern
+		int[][] tiny1 = {
 				{0, 0, 1},
 				{1, 0, 1},
 				{0, 0, 0}
 		};
-		//Test for midterm
-		int[][] arr3 = {
-				{0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0},
-				{1, 0, 0, 1, 0, 0, 0, 0},
-				{0, 1, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 1, 0, 0, 0, 0},
-				{1, 0, 0, 0, 0, 0, 0, 0}
-
-		};
-		*/
-		//Test for small scale
-		int[][] arr4 = {
+		// Test for small scale
+		int[][] small1 = {
 				{0, 0, 3, 1},
 				{1, 0, 0, 0},
 				{0, 2, 1, 0},
 				{0, 0, 1, 0}
 		};
-
-		int[][] arr3 = {
+		// Regular demo patterns
+		int[][] normal1 = {
 				{0, 1, 1, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 1},
 				{1, 0, 0, 1, 0, 0, 1, 0},
@@ -82,7 +51,7 @@ public class Group7Robot {
 				{0, 0, 0, 0, 0, 0, 0, 1}
 
 		};
-	/*	int[][] arr4 = {
+		int[][] normal2 = {
 				{0, 0, 0, 1, 1, 0, 0, 1},
 				{0, 1, 0, 0, 1, 0, 0, 1},
 				{1, 0, 0, 0, 0, 0, 0, 0},
@@ -92,8 +61,8 @@ public class Group7Robot {
 				{3, 2, 0, 1, 0, 0, 0, 1},
 				{0, 0, 1, 0, 0, 1, 0, 1}
 
-		};*/
-		int[][] arr5 = {
+		};
+		int[][] normal3 = {
 				{1, 0, 0, 0, 1, 0, 0, 0},
 				{0, 0, 1, 1, 0, 0, 0, 1},
 				{0, 0, 0, 0, 0, 1, 0, 0},
@@ -104,23 +73,41 @@ public class Group7Robot {
 				{0, 0, 0, 0, 1, 1, 0, 1}
 
 		};
+		// The pattern given to us in the project specifications
+		int[][] large1 = {
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+			{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+			{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+			{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
-		map = new Map(64);
-		//Initialize the map so we can set it to whichever array we pass in
+		};
+
+		// Initialize the map so we can set it to whichever array we pass in
 		int option = Button.waitForAnyPress();
+		int[][] array;
 		switch(option){
-		case Button.ID_LEFT:
-			map = new Map(arr3);
-			break;
-		case Button.ID_ENTER:
-			map = new Map(arr4);
-			break;
-		case Button.ID_RIGHT:
-			map = new Map(arr5);
-			break;
-		default:
-			System.exit(0);
+			case Button.ID_LEFT:
+				array = normal1;
+				break;
+			case Button.ID_ENTER:
+				array = normal2;
+				break;
+			case Button.ID_RIGHT:
+				array = normal3;
+				break;
+			default:
+				array = null;
+				System.exit(0);
 		}
+		Map map = new Map(array);
 
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
@@ -129,7 +116,7 @@ public class Group7Robot {
 		// LOGIC
 		odometer.start();
 		navigation.start();
-		
+
 		/**/
 		// MAIN RUN
 		odometer.enableDebugOutput(false);
@@ -139,16 +126,27 @@ public class Group7Robot {
 		/**/
 
 		/*
-		// ULTRASONIC RUN
+		// ULTRASONIC TEST
 		while (!Button.ESCAPE.isDown()) {
 			Display.update("u", Integer.toString(ultrasonicSensor.getDistanceData()));
 		}
+		*/
+
 		/*
+		// LIGHT SENSOR TEST
+		while (!Button.ESCAPE.isDown()) {
+			Display.update("l", Integer.toString(leftLightSensor.getLightData()));
+			Display.update("r", Integer.toString(rightLightSensor.getLightData()));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+			}
+		}
+		*/
 
 		/*
 		// CALIBRATION RUNS
 		odometer.enableCorrection(false);
-		Button.waitForAnyPress();
 		navigation.travelTo(0, Tile.ONE * 2);
 		navigation.waitUntilDone();
 		Button.waitForAnyPress();
@@ -161,12 +159,11 @@ public class Group7Robot {
 		/*
 		// INFINITE RANDOM WALK
 		odometer.enableDebugOutput(true);
-		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
 		Random random = new Random();
 		int i = 0;
 		while (!Button.ESCAPE.isDown()) {
-			float next = random.nextBits(2) * Tile.ONE + Tile.HALF;
+			float next = Tile.toOdo(random.nextBits(2));
 			if (random.nextBoolean()) {
 				navigation.travelBy(next - odometer.getX(), 0);
 			} else {
@@ -177,29 +174,30 @@ public class Group7Robot {
 			Display.update("i", Integer.toString(i));
 		}
 		*/
+
 		/*
 		// INFINITE RANDOM WALK IN MAP WITH BLOCK
-		Button.waitForAnyPress();
 		odometer.enableCorrection(true);
 		odometer.enableDebugOutput(true);
 		navigation.enableClawDownMode(true);
 		Random random = new Random();
-		int[][] array = arr5;
-		int size = array.length, sx = 0, sy = 0;
+		int size = array.length, sx = 7, sy = 7;
+		odometer.setPosition(Tile.toOdo(sx), Tile.toOdo(sy), Pi.ONE);
 		while (!Button.ESCAPE.isDown()) {
 			int nx = random.nextInt(size);
 			int ny = random.nextInt(size);
-			final int[] path = Map.findPath(array, sx, sy, nx, ny);
+			int[] path = Map.findPath(array, sx, sy, nx, ny);
 			int i = 0;
 			while (path[i] != Integer.MAX_VALUE) {
 				sx = path[i];
 				sy = path[i + 1];
 				i += 2;
-				navigation.travelTo(sx * Tile.ONE + Tile.HALF, sy * Tile.ONE + Tile.HALF);
+				navigation.travelTo(Tile.toOdo(sx), Tile.toOdo(sy));
 				navigation.waitUntilDone();
 			}
 		}
 		*/
+
 		// EXIT
 		Button.waitForAnyPress();
 		System.exit(0);
