@@ -11,8 +11,8 @@ public class Odometer extends Thread {
     // The distance of the sensor from the wheel axle
     private static final float SENSOR_OFFSET = -5.5f;
     // Min light value reading drop for a grid line
-    private static final int LINE_LIGHT_LEFT = -50;
-    private static final int LINE_LIGHT_RIGHT = -50;
+    private static final int LINE_LIGHT_LEFT = -20;
+    private static final int LINE_LIGHT_RIGHT = -20;
     // Dampening for heading correction to reduce error from bad correction
     private static final float HEADING_CORRECTION_DAMPEN = 0.5f;
     // Whether or not the odometer is running
@@ -232,8 +232,8 @@ public class Odometer extends Thread {
                     float diffX = crossedPosition.x - x;
                     float diffY = crossedPosition.y - y;
                     float distance = diffX * diffX + diffY * diffY;
-                    // cancel correction if we're pass the tile center, to prevent errors when encounteing the next line
-                    if (distance >= Tile.HALF * Tile.HALF) {
+                    // cancel correction if we're too far away, to prevent errors when encountering the next line
+                    if (distance >= Tile.QUARTER * Tile.QUARTER) {
                         // reset sensors as uncrossed
                         crossFlags = 0;
                     }
