@@ -185,14 +185,14 @@ public class Map {
 		int[] path = new int[size * size * 2];
 		// Current index into the path stack
 		int index = 0;
-		// A grid of traveled states (!0 = traveled, 0 = unvisited)
+		// A grid of traveled states (0 = unvisited)
 		int[][] traveled = new int[size][size];
 		// Obstacles are marked as traveled
 		for (int i = 0; i < size; i++) {
 			System.arraycopy(map[i], 0, traveled[i], 0, size);
 		}
 		// Check if the end is actually reachable
-		boolean endBlocked = map[size - toTileY][toTileX] != 0;
+		boolean endBlocked = map[size - 1 - toTileY][toTileX] == 1;
 		// Repeat until we reach the end node
 		outer:
 		while (cx != toTileX || cy != toTileY) {
@@ -207,7 +207,7 @@ public class Map {
 					break outer;
 				}
 				// Check if the neighboor is in the map and hasn't been visited
-				if (inMap(size, nx, ny) && traveled[size - ny][nx] == 0) {
+				if (inMap(size, nx, ny) && traveled[size - 1 - ny][nx] != 1) {
 					// Get the manhattan distance to the end tile
 					int newDistance = manhattanDistance(toTileX, toTileY, nx, ny);
 					// If smaller than the current best, update to it as the new best
@@ -219,7 +219,7 @@ public class Map {
 				}
 			}
 			// Set the current node as traveled
-			traveled[size - cy][cx] = 1;
+			traveled[size - 1 - cy][cx] = 1;
 			// Update current coordinates to the neighboor
 			cx = nextX;
 			cy = nextY;
@@ -243,6 +243,7 @@ public class Map {
 		}
 		// Mark path end and return it
 		path[index] = Integer.MAX_VALUE;
+		path[index + 1] = Integer.MAX_VALUE;
 		return path;
 	}
 
