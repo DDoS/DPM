@@ -20,6 +20,6 @@ public class Random {
 
     public int nextInt(int n) {
         // good enough...
-        return nextBits(32) % n;
+        return (nextBits(32) % n + n) % n;
     }
 }
