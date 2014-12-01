@@ -79,41 +79,179 @@ public class Group7Robot {
 
 		};
 		// The pattern given to us in the project specifications
-		int[][] large1 = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-			{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-			{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		int[][][] larges = {
+			{//MAP 1
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0},
+				{0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+				{0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0}
+	
+			},
+			
+			{//MAP 2
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0}
 
+			},
+			
+			{//MAP 3
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
+				{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0}
+
+			},
+			
+			{//MAP 4
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0},
+				{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+
+			},
+			
+			{//MAP 5
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+				{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+				{0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+			},
+			
+			{//MAP 6
+				{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0},
+				{0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0},
+				{0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+
+			}
+			
 		};
-
-		// Initialize the map so we can set it to whichever array we pass in
-		int option = Button.waitForAnyPress();
-		int[][] array;
-		switch(option){
-			case Button.ID_LEFT:
-				array = normal1;
-				break;
-			case Button.ID_ENTER:
-				array = normal2;
-				break;
-			case Button.ID_RIGHT:
-				array = normal3;
-				break;
-			default:
-				array = null;
-				System.exit(0);
-		}
-		Map map = new Map(array);
-
+		
+		
+		//MENU
+		
+		//Splash screen with version check for safety
+		Display.update("Version", "108.4");
+		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
+		Button.waitForAnyPress();
+		Display.clear();
+		
+		int choice, y, x, m;
+		do{
+		
+			//MAP CHOICE
+			int num = 1;
+	
+			do{
+				Display.update("M", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > 1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num <6){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			m = num-1;
+			Display.update("M", Integer.toString(num));
+			
+			
+			//X POS DROPOFF
+			num = -1;
+			do{
+				Display.update("X", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > -1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num < 11){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			x = num;
+			Display.update("X", Integer.toString(num));
+			
+			
+			//Y POS DROPOFF
+			num = -1;
+			do{
+				Display.update("Y", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > -1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num < 11){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			y = num;
+			Display.update("Y", Integer.toString(num));
+			
+			choice = Button.waitForAnyPress();
+			
+		//Final confirm	
+		}while(choice!=Button.ID_ENTER);
+		
+		//if he gives us 11, I don't get it, so wrap it to 10
+		x = Math.min(x, 10);
+		y = Math.min(y, 10);
+		
+		//set up the dropoff location in the map
+		larges[m][11-(y+1)][x+1] = 3;
+		
+		Map map = new Map(larges[m]);
+		
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
 		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);

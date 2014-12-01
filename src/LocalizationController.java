@@ -63,7 +63,7 @@ public class LocalizationController {
 		//nodes represents all of the nodes that are considered to be valid starting options
 		ArrayList<Node> nodes = map.getRemaningNodes();
 
-		Display.update("Status", "Run");
+		Display.update("Status", "Ping");
 
 		float currTheta = Pi.ONE_HALF; //Keep track of the current heading so our turning before localization is accurate
 
@@ -87,7 +87,9 @@ public class LocalizationController {
 			}
 			nav.turnTo(currTheta); //make sure to rotate back to the normal angle
 			nav.waitUntilDone();
-
+			
+			Display.update("Status", "Calculate");
+			
 			//cutoff at max number of tiles (due to sensor accuracy)
 			frontTiles = Math.min(Math.max(frontTiles, 0), MAX_TILES);
 
@@ -168,6 +170,8 @@ public class LocalizationController {
 						path = new Path(Path.Direction.FRONT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move forward
 					nav.forward(Tile.ONE, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
@@ -182,6 +186,8 @@ public class LocalizationController {
 						path = new Path(Path.Direction.LEFT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move left
 					currTheta += Pi.ONE_HALF;
 					nav.turnTo(currTheta, SPEED);
@@ -196,6 +202,8 @@ public class LocalizationController {
 						path = new Path(Path.Direction.RIGHT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move right
 					currTheta -= Pi.ONE_HALF;
 					nav.turnTo(currTheta, SPEED);
@@ -223,8 +231,8 @@ public class LocalizationController {
 		float theta = nodes.get(0).getTheta();
 
 		//Update the display and the odometer
-		Display.update("SX", ""+x);
-		Display.update("SY", ""+y);
+		Display.update("SX", ""+(x - Tile.ONE));
+		Display.update("SY", ""+(y - Tile.ONE));
 		Display.update("ST", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
 
