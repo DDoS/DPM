@@ -50,4 +50,8 @@ public class Claw {
     public void flt() {
         motor.flt();
     }
+
+    public int getAngle() {
+        return motor.getTachoCount();
+    }
 }
