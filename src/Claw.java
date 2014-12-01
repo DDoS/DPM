@@ -43,4 +43,11 @@ public class Claw {
     public void sense() {
         motor.rotateTo(SENSING_ANGLE);
     }
+
+    /**
+     * Floats the claw motor.
+     */
+    public void flt() {
+        motor.flt();
+    }
 }
