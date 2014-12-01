@@ -52,12 +52,12 @@ public class Map {
 					}
 					if(i>0&&map[j][i-1]!=1){//Check the square to the west
 						getNodeAtPosition(i, j, Pi.ONE).setChild(Path.Direction.FRONT, getNodeAtPosition(i-1, j, Pi.ONE));
-						
+
 						//Look for the collection node (because we always want to collect starting facing west)
 						if(map[j][i-1]==2){
 							finish = getNodeAtPosition(i, j, Pi.ONE).getNum();
 						}
-						
+
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
 						getNodeAtPosition(i, j, Pi.THREE_HALF).setChild(Path.Direction.FRONT, getNodeAtPosition(i, j+1, Pi.THREE_HALF));

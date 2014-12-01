@@ -19,10 +19,10 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
-		
+
 		//TIMER
 		Time.startTime(7*60 + 30);
-			
+
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
 		//0 - no block
@@ -91,10 +91,10 @@ public class Group7Robot {
 				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0},
 				{0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
 				{0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0}
-	
+
 			},*/
-				
-			//TEST MAP FOR MAP 1, REMOVE FOR FINAL	
+
+			//TEST MAP FOR MAP 1, REMOVE FOR FINAL
 				{
 					{0, 1, 1, 0, 0, 0, 0, 0},
 					{0, 0, 1, 0, 0, 0, 0, 1},
@@ -105,7 +105,7 @@ public class Group7Robot {
 					{0, 2, 0, 0, 1, 0, 0, 0},
 					{0, 0, 0, 0, 0, 0, 0, 1}
 				},
-			
+
 			/*
 			{//MAP 2
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
@@ -123,7 +123,7 @@ public class Group7Robot {
 
 			},
 			*/
-				//TEST MAP FOR MAP 2, REMOVE FOR FINAL	
+				//TEST MAP FOR MAP 2, REMOVE FOR FINAL
 				{
 					{0, 0, 0, 1, 1, 0, 0, 1},
 					{0, 1, 0, 0, 1, 0, 0, 1},
@@ -134,8 +134,8 @@ public class Group7Robot {
 					{0, 2, 0, 1, 0, 0, 0, 1},
 					{0, 0, 1, 0, 0, 1, 0, 1}
 				},
-				
-			/*	
+
+			/*
 			{//MAP 3
 				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -163,7 +163,7 @@ public class Group7Robot {
 					{0, 2, 0, 0, 0, 0, 0, 0},
 					{0, 0, 0, 0, 1, 1, 0, 1}
 				},
-				
+
 			{//MAP 4
 				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
@@ -179,7 +179,7 @@ public class Group7Robot {
 				{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0}
 
 			},
-			
+
 			{//MAP 5
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0},
@@ -195,7 +195,7 @@ public class Group7Robot {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 			},
-			
+
 			{//MAP 6
 				{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
 				{1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0},
@@ -211,24 +211,24 @@ public class Group7Robot {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
 
 			}
-			
+
 		};
-		
-		
+
+
 		//MENU
-		
+
 		//Splash screen with version check for safety
 		Display.update("Version", "109.3");
 		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
 		Button.waitForAnyPress();
 		Display.clear();
-		
+
 		int choice, y, x, m;
 		do{
-		
+
 			//MAP CHOICE
 			int num = 1;
-	
+
 			do{
 				Display.update("M", Integer.toString(num));
 				choice = Button.waitForAnyPress();
@@ -238,11 +238,11 @@ public class Group7Robot {
 					num++;
 				}
 			}while(choice!=Button.ID_ENTER);
-			
+
 			m = num-1;
 			Display.update("M", Integer.toString(num));
-			
-			
+
+
 			//X POS DROPOFF
 			num = -1;
 			do{
@@ -254,11 +254,11 @@ public class Group7Robot {
 					num++;
 				}
 			}while(choice!=Button.ID_ENTER);
-			
+
 			x = num;
 			Display.update("X", Integer.toString(num));
-			
-			
+
+
 			//Y POS DROPOFF
 			num = -1;
 			do{
@@ -270,27 +270,27 @@ public class Group7Robot {
 					num++;
 				}
 			}while(choice!=Button.ID_ENTER);
-			
+
 			y = num;
 			Display.update("Y", Integer.toString(num));
-			
+
 			choice = Button.waitForAnyPress();
-			
-		//Final confirm	
+
+		//Final confirm
 		}while(choice!=Button.ID_ENTER);
-		
+
 		//specs use -1, -1 as lowest corner, so offset to the 0, 0  we use
 		x += 1;
 		y += 1;
-		
+
 		//set up the dropoff location in the map
-		
-	//	larges[m][11-(y+1)][x+1] = 3; USE THIS FOR FINAL, 
-		
-		larges[m][8-(y+1)][x+1] = 3;  //DELETE THIS, USE THIS FOR TEST
-		
+
+	//	larges[m][11-y][x] = 3; USE THIS FOR FINAL,
+
+		larges[m][7-y][x] = 3;  //DELETE THIS, USE THIS FOR TEST
+
 		Map map = new Map(larges[m]);
-		
+
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
 		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, searchAndRescue);

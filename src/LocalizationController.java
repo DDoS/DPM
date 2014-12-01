@@ -83,9 +83,9 @@ public class LocalizationController {
 			}
 			nav.turnTo(currTheta); //make sure to rotate back to the normal angle
 			nav.waitUntilDone();
-			
+
 			Display.update("Status", "Calculate");
-			
+
 			//cutoff at max number of tiles (due to sensor accuracy)
 			frontTiles = Math.min(Math.max(frontTiles, 0), MAX_TILES);
 
@@ -96,7 +96,7 @@ public class LocalizationController {
 
 			//Remove the nodes that don't fit with our sensor data
 			this.updateMapWithSensorData(frontTiles, nodes, path);
-			
+
 
 			//Now that we have removed some nodes, we update nodes
 			nodes = map.getRemaningNodes();
@@ -111,7 +111,7 @@ public class LocalizationController {
 					{0, 0, 0, 0, 0, 0, 0, 0, 0},//right
 					{0, 0, 0, 0, 0, 0, 0, 0, 0}//front
 			};
-			
+
 			this.getDistancesToTiles(tileCount, nodes, path);
 
 			//Now we compute the standard deviation of the arrays and use the lowest one for the move
@@ -167,7 +167,7 @@ public class LocalizationController {
 					}
 
 					Display.update("Status", "Move");
-					
+
 					//Move forward
 					nav.forward(Tile.ONE, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
@@ -183,7 +183,7 @@ public class LocalizationController {
 					}
 
 					Display.update("Status", "Move");
-					
+
 					//Move left
 					currTheta += Pi.ONE_HALF;
 					nav.turnTo(currTheta, SPEED);
@@ -199,7 +199,7 @@ public class LocalizationController {
 					}
 
 					Display.update("Status", "Move");
-					
+
 					//Move right
 					currTheta -= Pi.ONE_HALF;
 					nav.turnTo(currTheta, SPEED);
@@ -230,11 +230,11 @@ public class LocalizationController {
 		Display.update("SX", ""+x);
 		Display.update("SY", ""+y);
 		Display.update("ST", ""+theta);
-		
+
 		x = current.getX();
 		y = current.getY();
 		theta = current.getTheta();
-		
+
 		nav.getOdometer().setPosition(x, y, theta);
 
 		Note.play(4); //Play a sound to signal that we've localized
