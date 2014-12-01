@@ -19,6 +19,9 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
+		
+		//TIMER
+		Time.startTime(7*60 + 30);
 
 		
 			
@@ -112,7 +115,7 @@ public class Group7Robot {
 		Map map = new Map(array);
 
 		// CONTROLLERS
-		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, ultrasonicSensor, claw);
+		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
 		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);
 
 		// LOGIC

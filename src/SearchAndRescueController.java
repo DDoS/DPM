@@ -6,30 +6,27 @@ public class SearchAndRescueController {
     private Map map;
     private Node current;
     private FilteredColorSensor color;
-    private FilteredUltrasonicSensor distanceSensor;
     private Claw claw;
     private static final int SPEED = 400;
 
-    public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, FilteredUltrasonicSensor us, Claw c) {
+    public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
         nav = n;
         map = m;
         color = cs;
-        distanceSensor = us;
         claw = c;
     }
 
+    /**
+     * Method called to start the SAR controller
+     * Handles all of the logic of the controller
+     */
     public void run() {
-    //	Display.clear();
-	//	Display.reserve("Status", "Blocks", "Points");
-	//	Display.update("Status", "Init");
-	//	int blocks = 0;
-	//	int points = 0;
     	
     	//Three arrays of offsets used to keep track of the path for the robot to follow while searching for blocks
     	//It will step through the arrays and move the offset amount of distance, then search again  
-		float[] xOffset = {0          ,         0  ,         0  ,           0,         0  ,           0, 0           , -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 ,           0,           0,           0};
-		float[] yOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3,-Tile.ONE/3 , -Tile.ONE/3, -Tile.ONE/3 ,           0,           0,           0, 0           ,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3};
-		float[] tOffset = {0          ,           0,           0,          0 ,          0 ,          0 , -Pi.ONE_HALF,           0,           0,           0, -Pi.ONE_HALF,           0,           0,           0};
+		float[] xOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 ,           0,           0,           0,            0,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3};
+		float[] yOffset = {          0,           0,           0,           0,           0,           0,            0, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3,  -Tile.ONE/3,           0,           0,           0};
+		float[] tOffset = {          0,           0,           0,          0 ,          0 ,          0 ,  Pi.ONE_HALF,           0,           0,           0,  Pi.ONE_HALF,           0,           0,           0};
 		//An int to keep track of which iteration of the offset array the robot is in
 		int iteration = 0;
 
@@ -37,141 +34,198 @@ public class SearchAndRescueController {
 		Node dest;
 		
 		//Keep track of the state of the robots collection
-		boolean finished = false;
+		boolean statusFinal = false;
 		
-		while(finished == false){ //change to timer things
-			//MOVE TO PICKUP
+		while(statusFinal == false && Time.timeLeft()>60){ //Only loop if we have 60 seconds left to try to find a block
+			
+			//Find the path between the pickup location and the current location
 			dest = map.getCollectionNode();
 			Path path = map.getPathFromNodeToNode(current, dest);
 			
+			//Since we enable this later in the loop, make sure to re-disable it before we begin
 			nav.enableClawDownMode(false);
 			
+			//Move to the pickup location
 			moveAlongPath(path);
 
-			Display.update("Status", "Searching");
-			//COLOR SENSING --needs so much work
+			Display.update("Status", "SettingUp");
 			
+			//Disable correction because our path is very odd but also precise. correction messes it up.
 			nav.getOdometer().enableCorrection(false);
 
-            int num = dest.getNum();
-			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-			float theta = (num%4)*Pi.ONE_HALF;
+			//Get the x, y, and theta of the pickup location
+            float x = dest.getX();
+            float y = dest.getY();
+            float theta = dest.getTheta();
 			
+            //Since we might have already visited some of the search locations, we need to iterate to the current position in the list and add it to our position.
+            //Only travel to the locations which contain turns (to minimize time waiting between travels)
 			for(int i= 0; i<iteration; i++){
 				x += xOffset[i];
 				y += yOffset[i];
 				theta += tOffset[i];
-				if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
+				if(tOffset[i]!=0){
 					nav.travelTo(x, y, SPEED);
 					nav.waitUntilDone();
 				}
-				nav.turnTo(theta, SPEED);
-				nav.waitUntilDone();
 			}
+			//Travel to the last location (in case we aren't here already)
+			nav.travelTo(x, y, SPEED);
+			nav.waitUntilDone();
+			nav.turnTo(theta, SPEED);
+			nav.waitUntilDone();
 				
-			Display.update("Status", "Collecting");
 	    	
-	    	float blockAng = -1;
+			//Two variables to keep track of where- if found- the next block is
+			boolean foundBlock = false;
+	    	float blockAng;
 			
-	    	while(blockAng == -1 && finished == false){
+	    	//Keep looking until we either find a block (so we need to go return it), or we reach the end of the algorithm
+	    	while(foundBlock == false && statusFinal == false){
+				Display.update("Status", "Searching");
+	    		//Put the claw into sensing mode
 		    	claw.sense();
+		    	//Scan for a block
 				blockAng = scanForBlock(theta);
-				
+				//If we found a block with the scan, set foundBlock accordingly
 				if(blockAng != -1){
+					foundBlock = true;
+				}
+				
+				//If we do, we have to do more work
+				if(foundBlock == true){
 					
+					Display.update("Status", "Collecting");
+					
+					//Add to iteration because we now have checked this location successfully
 					iteration++;
 	
+					//Turn to the block angle, which is hopefully dead-on
 					nav.turnTo(blockAng);
 					nav.waitUntilDone();
+					
+					//move forward, but don't call waitUntilDone, because we want to keep doing stuff while moving
 					nav.forward(15);
 					
+					//This variable is triggered once we have seen the block, so we know we are seeing the far edge of the block when we no longer see it
 					boolean triggered = false;
+					//Keep looping while we're moving (we will abort movement when we stop seeing the block)
 					while(nav.isNavigating()){
+						//If we see a block and triggered hasn't been set true yet, set it to true
 						if(checkForBlock() == true && triggered == false){
 							triggered = true;
 						}
+						
+						//If we no longer see a block, and we have seen one in the past (triggered is true), then stop navigating
 						if(checkForBlock() == false && triggered == true){
 							nav.abort();
 						}
 					}
 					
-					if(triggered == true){
-						nav.forward(5);
+					//Now, triggered will tell us if there's a block there or not, and we will also be placed right at the far edge of the block
+					
+					if(triggered == true){//If there is a block
+						
+						//Move forward and close the claw a couple times to secure the block in place
+						nav.forward(2);
 						nav.waitUntilDone();
 						claw.close();
+						
+						claw.open();
+						nav.forward(1);
+						nav.waitUntilDone();
+						claw.close();
+						
+						claw.open();
+						nav.forward(1);
+						nav.waitUntilDone();
+						claw.close();
+						//Keep the claw closed so we can begin to carry it back
 				
-					}else{
+					}else{//If there isn't a block
+						//Backup, turn back to the right angle, and restart the loop by setting foundBlock to false again
 						nav.backward(15, SPEED);
 						nav.waitUntilDone();
 						nav.turnTo(theta, SPEED);
 						nav.waitUntilDone();
-						blockAng = -1;
+						foundBlock = false;
+						//Now we're ready to restart the loop and scan again
 					}
 
-				}else if(iteration < xOffset.length-1){
+				}else if(iteration < xOffset.length-1){ //If we don't find a block with our scan and we have more places to check
+					
+					//Open the claw (to allow easier movement)
 					claw.open();
+					
+					//Add one to iteration, so we check the next location
 					iteration++;
+					
+					//Add to our position based on the offset tables
 					x += xOffset[iteration];
 					y += yOffset[iteration];
 					theta += tOffset[iteration];
+					
+					//If we have an x/y change in position, move there
 					if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
 						nav.travelTo(x, y, SPEED);
 						nav.waitUntilDone();
 					}
+					
+					//Turn to face the right angle
 					nav.turnTo(theta, SPEED);
 					nav.waitUntilDone();
-				}else{
+					//Now we're ready to restart the loop and scan again
+					
+				}else{ //If we don't find a block with our scan but we've checked everywhere, then we can be done!
+					
 					claw.open();
-					finished = true;
+					statusFinal = true;
+					//End the SAR algorithm
+					
 				}
 	    	}
-
-	//		
-
-
-			//CLAW
-	//		
+				
 
 	    	
-	    	if(!finished){
+	    	if(!statusFinal){ //If we're not done, since we finished searching, that means it's time to rescue!
 	    	
+	    		//We have a block, so enable the nav's adjusted movements
 				nav.enableClawDownMode(true);
+				
+				Display.update("Status", "Retrieving");
 	    		
-	    		for(int i= iteration; i>=0; i--){
+				//Backup along our path by looping through the offset table in reverse
+	    		for(int i= iteration; i>0; i--){
 					x -= xOffset[i];
 					y -= yOffset[i];
 					theta -= tOffset[i];
-					if(tOffset[i]!=0){
+					if(tOffset[i-1]!=0){
+						//Only travel to the major turns in the path. This helps avoid collisions, as space is tight
 						nav.travelTo(x, y, SPEED);
 						nav.waitUntilDone();
 					}
 				}
+	    		
+	    		//Get the collection node (where we started)
+	            x = dest.getX();
+	            y = dest.getY();
+	            theta = dest.getTheta();
+				//And travel to it
+				nav.travelTo(x, y, SPEED);
+				nav.waitUntilDone();
 				
+				//Enable corrections again while we travel to the dropoff
 				nav.getOdometer().enableCorrection(true);
 				
-				//MOVE TO DROP OFF
-				Display.update("Status", "Returning");
+				//Now the destination is set to the delivery node, and a new path is calculated
 				dest = map.getDeliveryNode();
 				path = map.getPathFromNodeToNode(current, dest);
 				
-	
+				//Move along the new path
 				moveAlongPath(path);
-	
-				nav.forward(30);
-				nav.waitUntilDone();
 				
+				//Drop off the block!
 				claw.open();
-				
-				num = dest.getNum();
-				x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-				y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-				theta = (num%4)*Pi.ONE_HALF;
-				
-				nav.travelTo(x, y, SPEED);
-				nav.waitUntilDone();
-				nav.turnTo(theta);
-				nav.waitUntilDone();
 				
 	    	}
 
@@ -183,21 +237,34 @@ public class SearchAndRescueController {
 
     }
     
+    
+    /**
+     * This method causes the robot to follow a given path that's passed in
+     * @param path Path object to folow
+     */
     private void moveAlongPath(Path path){
     	Display.update("Status", "Moving");
+    	
+    	//Keep looping until we've visited every node on the path
 		while(path!=null){
+			//Move us to the next node along the path
 			current = current.getNodeFromPath(new Path(path.getDirection()));
-			int num = current.getNum();
-			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-			float theta = (num%4)*Pi.ONE_HALF;
+			
+			//Get the position of the next node
+			float x = current.getX();
+			float y = current.getY();
+			float theta = current.getTheta();
 
+			//If it's not a turning node (so we are not currently in the tile), then move to it
 			if(path.getDirection()==Path.Direction.FRONT){
 				nav.travelTo(x, y, SPEED);
 				nav.waitUntilDone();
 			}
+			
+			//Get the next node along the path
 			path = path.getNextPath();
 
+			//If path is done, turn to face the right direction
 			if(path==null){
 				nav.turnTo(theta, SPEED);
 				nav.waitUntilDone();
@@ -205,98 +272,138 @@ public class SearchAndRescueController {
 		}
     }
     
+    
+    /**
+     * This method returns a float representing the direction of the found block
+     * It causes the robot to scan for a block in order to find one
+     * @param theta Current theta orientation of the robot.
+     * @return float returned in direction of block (if none found, returns -1)
+     */
     private float scanForBlock(float theta){
     	
+    	//Keep track of the state of seeing the block, and whether an edge has been triggered. Also the two angles representing each edge of the block
     	boolean triggered = false;
     	boolean seesBlock = false;
     	
-    	float ang1 = -1;
-    	float ang2 = -1;
+    	float angRight = -1;
+    	float angLeft = -1;
     	
+    	//This angle is to the right of the current angle
     	float turnAng = theta - Pi.ONE_FIFTH;
-    	System.out.println(turnAng); // Alexi, please leave this println in
+    	
+    //	System.out.println(turnAng); // Alexi, please leave this println in
     								/*	For some reason, every time I take it out, the nav just doesn't move.
     								 * 	I've been debugging this for a while and it has nothing to do with the while loop below, it just doesn't get an angle that it moves to
     								 * 	So turnAng isn't correct unless I print it????? I don't know, just leave it in for now.
     								 */
+    	
+    	//Turn to scan to the right, but dont waitUntilDone, so we can do other things while turning
     	nav.turnTo(turnAng);
     	
+    	//While we are still turning and either haven't seen a block yet at all, or we've seen a block and are still seeing a block, keep checking for a block
     	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
-    		seesBlock = checkForBlock();
-    		if(seesBlock==true){
-    			if(triggered==false){
-    				triggered=true;
-    			}
-    		}else{
-    			if(triggered==true){
-    				nav.abort();
-    				ang1 = nav.getOdometer().getTheta();
-    			}
+    		
+    		seesBlock = checkForBlock(); //Check if there's a block (true if there is, false if not)
+    		
+    		//If we see a block and haven't seen one yet (triggered is false) then set triggered to true
+    		if(seesBlock==true && triggered==false){
+    			triggered=true;
+    		}
+    		
+    		//If we don't see a block and have already seen one (triggered is true), then we've reached the far edge of the block and we can stop
+    		if(seesBlock==false && triggered==true){
+    			//Stop moving, set the right angle to the current angle we rotated to
+    			nav.abort();
+    			angRight = nav.getOdometer().getTheta();
     		}
 
     	}
     	
-    	
+    	//Now turn to the left past theta
     	turnAng = theta + Pi.ONE_FIFTH;
     	nav.turnTo(turnAng);
     	
+    	//reset triggered and follow the same logic for going left
     	triggered = false;
     	
     	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
     		seesBlock = checkForBlock();
-    		if(seesBlock==true){
-    			if(triggered==false){
-    				triggered=true;
-    			}
-    		}else{
-    			if(triggered==true){
-    				nav.abort();
-    				ang2 = nav.getOdometer().getTheta();
-    			}
+    		
+    		if(seesBlock==true && triggered==false){
+    			triggered=true;
+    		}
+    		if(seesBlock==false && triggered==true){
+    			//Stop moving, set the left angle to the current angle we rotated to
+    			nav.abort();
+    			angLeft = nav.getOdometer().getTheta();
     		}
     	}
     	
     	
+    	//Now, if we haven't seen the right edge of a block at all, then we scan on the way back to theta
     	
-    	if(ang1==-1){
+    	if(angRight==-1){
+    		//Turn back to theta
         	nav.turnTo(theta);
         	
+        	//Reset triggered, follow the same logic
     		triggered = false;
     		
     		while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
         		seesBlock = checkForBlock();
-        		if(seesBlock==true){
-        			if(triggered==false){
-        				triggered=true;
-        			}
-        		}else{
-        			if(triggered==true){
-        				nav.abort();
-        				ang1 = nav.getOdometer().getTheta();
-        			}
+        		
+
+        		if(seesBlock==true && triggered==false){
+        			triggered=true;
         		}
+        		
+        		if(seesBlock==false && triggered==true){
+        			//Stop moving, set the right angle to the current angle we rotated to
+        			nav.abort();
+        			angRight = nav.getOdometer().getTheta();
+        		}
+
         	}
     		
     	}
     	
-    	if(ang1 != -1 && ang2 != -1){
-    		if(ang1 > Pi.THREE_HALF && ang2 < Pi.ONE_HALF){
-    			ang1 -= Pi.TWO;
+    	//NOTICE: This will not save an angle if we start to see a block, but quit navigating before we see the far edge of the block.
+    	//That ends up saving our asses, because trying to pickup blocks that we haven't completely seen is really hard!
+    	
+    	//If we have both a right and left angle then find the angle that the block is at
+    	if(angRight != -1 && angLeft != -1){
+    		//Correct if the angles are on opposite sides of 0
+    		if(angRight > Pi.THREE_HALF && angLeft < Pi.ONE_HALF){
+    			angRight -= Pi.TWO;
     		}
-    		float result = (ang1+ang2)/2;
+    		//Average the two angles and return
+    		float result = (angRight+angLeft)/2;
     		return result;
     	}
+    	//If we don't have both angles, return -1
     	return -1;
     }
 
+    
+    /**
+     * This method checks the color sensor to see if there's a block
+     * @return true or false if there's some block or not (regardless of block color)
+     */
     private boolean checkForBlock() {
+    	//Get the color data and split into parts
         int c = color.getColorData();
         int b = c & 255;
         int g = (c >> 8) & 255;
         int r = (c >> 16) & 255;
+        //return true if it's not close to black
         return r>=50 || b>=50 || g>=50;
     }
 
+    
+    /**
+     * Sets the current node for the SAR algorithm. Called at the end of localization
+     * @param c a Node that specifies the robots current location.
+     */
     public void setCurrent(Node c){
     	current = c;
     }

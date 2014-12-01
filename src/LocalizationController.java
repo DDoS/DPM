@@ -55,7 +55,7 @@ public class LocalizationController {
 	public void run(){
 		//Setting up the display
 		Display.clear();
-		Display.reserve("Status", "X", "Y", "Th", "Moves");
+		Display.reserve("Status", "SX", "SY", "ST", "Moves");
 		Display.update("Status", "Init");
 
 		//path represents the current path that the robot has actually traveled
@@ -212,24 +212,23 @@ public class LocalizationController {
 		Node current;//Current spot that the robot is in
 
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
+			current = map.getNodeAtIndex((int)(Math.random()*Map.getLength()*4));
 		}else{
 			current = nodes.get(0).getNodeFromPath(path);//Else use what the algorithm found
 			//nodes.get(0) returns the only node left in the map (which is the starting node of the robot). getNodeFromPath(path) moves from the start node to the current node
 		}
 
-		int num = current.getNum();//Do math to find out the position
-		float theta = (num%4) * Pi.ONE_HALF;
-		float x = Tile.HALF + Tile.ONE * (int)((num/4) % (map.getLength()));
-		float y = (map.getLength()-1) * Tile.ONE + Tile.HALF - Tile.ONE * (int)((num/4) / (map.getLength()));
+		float x = nodes.get(0).getX();
+		float y = nodes.get(0).getY();
+		float theta = nodes.get(0).getTheta();
 
 		//Update the display and the odometer
-		Display.update("X", ""+x);
-		Display.update("Y", ""+y);
-		Display.update("Th", ""+theta);
+		Display.update("SX", ""+x);
+		Display.update("SY", ""+y);
+		Display.update("ST", ""+theta);
 		nav.getOdometer().setPosition(x, y, theta);
 
-		//lejos.nxt.Button.waitForAnyPress();
+		Note.play(4); //Play a sound to signal that we've localized
 
 		//Set the SearchAndRescueController so it knows where the robot is
 		searchAndRescue.setCurrent(current);
