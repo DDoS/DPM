@@ -8,8 +8,8 @@ import lejos.nxt.*;
  */
 public class Claw {
     private static final int OPENED_ANGLE = 0;
-    private static final int CLOSED_ANGLE = 125;
-    private static final int SENSING_ANGLE = 80;
+    private static final int CLOSED_ANGLE = 130;
+    private static final int SENSING_ANGLE = 75;
     private final NXTRegulatedMotor motor;
 
     /**

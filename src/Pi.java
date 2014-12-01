@@ -9,6 +9,7 @@ public final class Pi {
     public static final float FIVE_QUARTER = 5 * ONE_QUARTER;
     public static final float SEVEN_QUARTER = 7 * ONE_QUARTER;
     public static final float ONE_SIXTH = ONE / 6;
+    public static final float ONE_FIFTH = ONE / 5;
 
     // Prevent instances of the singleton
     private Pi() {

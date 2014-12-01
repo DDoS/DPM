@@ -20,6 +20,8 @@ public class Group7Robot {
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
 
+		
+			
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
 		//0 - no block
@@ -42,34 +44,34 @@ public class Group7Robot {
 		// Regular demo patterns
 		int[][] normal1 = {
 				{0, 1, 1, 0, 0, 0, 0, 0},
-				{0, 0, 1, 0, 0, 0, 0, 1},
+				{0, 0, 1, 0, 3, 0, 0, 1},
 				{1, 0, 0, 1, 0, 0, 1, 0},
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 0, 0, 1},
 				{0, 0, 0, 0, 1, 0, 1, 1},
-				{3, 2, 0, 0, 1, 0, 0, 0},
+				{0, 2, 0, 0, 1, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 1}
 
 		};
 		int[][] normal2 = {
 				{0, 0, 0, 1, 1, 0, 0, 1},
-				{0, 1, 0, 0, 1, 0, 0, 1},
+				{0, 1, 0, 0, 1, 3, 0, 1},
 				{1, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 1, 0, 1, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0},
-				{3, 2, 0, 1, 0, 0, 0, 1},
+				{0, 2, 0, 1, 0, 0, 0, 1},
 				{0, 0, 1, 0, 0, 1, 0, 1}
 
 		};
 		int[][] normal3 = {
 				{1, 0, 0, 0, 1, 0, 0, 0},
 				{0, 0, 1, 1, 0, 0, 0, 1},
-				{0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 3, 1, 0, 0},
 				{0, 0, 0, 1, 0, 0, 1, 1},
 				{0, 0, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 1, 0, 0, 0, 0},
-				{3, 2, 0, 0, 0, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 0, 1}
 
 		};
@@ -110,7 +112,7 @@ public class Group7Robot {
 		Map map = new Map(array);
 
 		// CONTROLLERS
-		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
+		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, ultrasonicSensor, claw);
 		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);
 
 		// LOGIC

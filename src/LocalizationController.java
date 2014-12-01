@@ -4,13 +4,14 @@ import lejos.nxt.comm.RConsole;
 
 
 public class LocalizationController {
-	private static final int MAX_TILES = 4;
+	private static final int MAX_TILES = 3;
 	private static final boolean DEBUG_MODE = true;
 	//Has a copy of the nav, has a map, and has two sensors
 	private Navigation nav;
 	private Map map;
 	private FilteredUltrasonicSensor front_us, rear_us;
 	private SearchAndRescueController searchAndRescue;
+	private static final int SPEED = 500;
 
 	/**
 	 * Constructs a new localization controller with every property
@@ -79,7 +80,7 @@ public class LocalizationController {
 
 			//Look at 5 slightly different angles, and find the max distance (to avoid the weird problems with the ultrasonic)
 			for(int i=-2; i<=2; i++){
-				nav.turnTo(currTheta + (float)i/30);
+				nav.turnTo(currTheta + (float)i/60);
 				nav.waitUntilDone();
 				int fDist = front_us.getDistanceData();
 				frontTiles = Math.max((int) (fDist/Tile.ONE), frontTiles);
@@ -168,7 +169,7 @@ public class LocalizationController {
 					}
 
 					//Move forward
-					nav.forward(Tile.ONE, 400);
+					nav.forward(Tile.ONE, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				//If the left is less than the right, go left
@@ -183,7 +184,7 @@ public class LocalizationController {
 
 					//Move left
 					currTheta += Pi.ONE_HALF;
-					nav.turnTo(currTheta, 400);
+					nav.turnTo(currTheta, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}else{//else we want to move right
@@ -197,7 +198,7 @@ public class LocalizationController {
 
 					//Move right
 					currTheta -= Pi.ONE_HALF;
-					nav.turnTo(currTheta, 400);
+					nav.turnTo(currTheta, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}

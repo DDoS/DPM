@@ -6,12 +6,15 @@ public class SearchAndRescueController {
     private Map map;
     private Node current;
     private FilteredColorSensor color;
+    private FilteredUltrasonicSensor distanceSensor;
     private Claw claw;
+    private static final int SPEED = 400;
 
-    public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
+    public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, FilteredUltrasonicSensor us, Claw c) {
         nav = n;
         map = m;
         color = cs;
+        distanceSensor = us;
         claw = c;
     }
 
@@ -19,15 +22,21 @@ public class SearchAndRescueController {
     //	Display.clear();
 	//	Display.reserve("Status", "Blocks", "Points");
 	//	Display.update("Status", "Init");
-		int blocks = 0;
-		int points = 0;
-		float[] xOffset = {0          ,         0  ,         0  ,           0,         0  ,           0, 0           , -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, 0           ,           0,           0,           0};
-		float[] yOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3,-Tile.ONE/3 , -Tile.ONE/3, 0           ,           0,           0,           0, 0           ,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3};
+	//	int blocks = 0;
+	//	int points = 0;
+    	
+    	//Three arrays of offsets used to keep track of the path for the robot to follow while searching for blocks
+    	//It will step through the arrays and move the offset amount of distance, then search again  
+		float[] xOffset = {0          ,         0  ,         0  ,           0,         0  ,           0, 0           , -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 ,           0,           0,           0};
+		float[] yOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3,-Tile.ONE/3 , -Tile.ONE/3, -Tile.ONE/3 ,           0,           0,           0, 0           ,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3};
 		float[] tOffset = {0          ,           0,           0,          0 ,          0 ,          0 , -Pi.ONE_HALF,           0,           0,           0, -Pi.ONE_HALF,           0,           0,           0};
+		//An int to keep track of which iteration of the offset array the robot is in
 		int iteration = 0;
 
+		//Node to keep track of where the robot wants to go
 		Node dest;
 		
+		//Keep track of the state of the robots collection
 		boolean finished = false;
 		
 		while(finished == false){ //change to timer things
@@ -41,9 +50,10 @@ public class SearchAndRescueController {
 
 			Display.update("Status", "Searching");
 			//COLOR SENSING --needs so much work
+			
+			nav.getOdometer().enableCorrection(false);
 
-
-            final int num = dest.getNum();
+            int num = dest.getNum();
 			float x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
 			float y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
 			float theta = (num%4)*Pi.ONE_HALF;
@@ -53,12 +63,11 @@ public class SearchAndRescueController {
 				y += yOffset[i];
 				theta += tOffset[i];
 				if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
-					nav.travelTo(x, y, 400);
-					nav.waitUntilDone();
-				}else if(tOffset[iteration]!=0){
-					nav.turnTo(theta, 400);
+					nav.travelTo(x, y, SPEED);
 					nav.waitUntilDone();
 				}
+				nav.turnTo(theta, SPEED);
+				nav.waitUntilDone();
 			}
 				
 			Display.update("Status", "Collecting");
@@ -70,22 +79,36 @@ public class SearchAndRescueController {
 				blockAng = scanForBlock(theta);
 				
 				if(blockAng != -1){
-					iteration++;
 					
+					iteration++;
+	
 					nav.turnTo(blockAng);
 					nav.waitUntilDone();
 					nav.forward(15);
 					
+					boolean triggered = false;
 					while(nav.isNavigating()){
-						if(checkForBlock() == false){
+						if(checkForBlock() == true && triggered == false){
+							triggered = true;
+						}
+						if(checkForBlock() == false && triggered == true){
 							nav.abort();
 						}
 					}
 					
-					nav.forward(4);
-					nav.waitUntilDone();
-					
-					claw.close();
+					if(triggered == true){
+						nav.forward(5);
+						nav.waitUntilDone();
+						claw.close();
+				
+					}else{
+						nav.backward(15, SPEED);
+						nav.waitUntilDone();
+						nav.turnTo(theta, SPEED);
+						nav.waitUntilDone();
+						blockAng = -1;
+					}
+
 				}else if(iteration < xOffset.length-1){
 					claw.open();
 					iteration++;
@@ -93,10 +116,10 @@ public class SearchAndRescueController {
 					y += yOffset[iteration];
 					theta += tOffset[iteration];
 					if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
-						nav.travelTo(x, y, 400);
+						nav.travelTo(x, y, SPEED);
 						nav.waitUntilDone();
 					}
-					nav.turnTo(theta, 400);
+					nav.turnTo(theta, SPEED);
 					nav.waitUntilDone();
 				}else{
 					claw.open();
@@ -113,19 +136,25 @@ public class SearchAndRescueController {
 	    	
 	    	if(!finished){
 	    	
-				x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
-				y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
-				theta = (num%4)*Pi.ONE_HALF;
+				nav.enableClawDownMode(true);
+	    		
+	    		for(int i= iteration; i>=0; i--){
+					x -= xOffset[i];
+					y -= yOffset[i];
+					theta -= tOffset[i];
+					if(tOffset[i]!=0){
+						nav.travelTo(x, y, SPEED);
+						nav.waitUntilDone();
+					}
+				}
 				
-				nav.travelTo(x, y, 400);
-				nav.waitUntilDone();
+				nav.getOdometer().enableCorrection(true);
 				
 				//MOVE TO DROP OFF
 				Display.update("Status", "Returning");
 				dest = map.getDeliveryNode();
 				path = map.getPathFromNodeToNode(current, dest);
 				
-				nav.enableClawDownMode(true);
 	
 				moveAlongPath(path);
 	
@@ -134,7 +163,14 @@ public class SearchAndRescueController {
 				
 				claw.open();
 				
-				nav.backward(30);
+				num = dest.getNum();
+				x = Tile.HALF + Tile.ONE*(int)((num/4)%(map.getLength()));
+				y = (map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(map.getLength()));
+				theta = (num%4)*Pi.ONE_HALF;
+				
+				nav.travelTo(x, y, SPEED);
+				nav.waitUntilDone();
+				nav.turnTo(theta);
 				nav.waitUntilDone();
 				
 	    	}
@@ -157,13 +193,13 @@ public class SearchAndRescueController {
 			float theta = (num%4)*Pi.ONE_HALF;
 
 			if(path.getDirection()==Path.Direction.FRONT){
-				nav.travelTo(x, y, 400);
+				nav.travelTo(x, y, SPEED);
 				nav.waitUntilDone();
 			}
 			path = path.getNextPath();
 
 			if(path==null){
-				nav.turnTo(theta, 400);
+				nav.turnTo(theta, SPEED);
 				nav.waitUntilDone();
 			}
 		}
@@ -177,7 +213,7 @@ public class SearchAndRescueController {
     	float ang1 = -1;
     	float ang2 = -1;
     	
-    	float turnAng = theta - Pi.ONE_SIXTH;
+    	float turnAng = theta - Pi.ONE_FIFTH;
     	System.out.println(turnAng); // Alexi, please leave this println in
     								/*	For some reason, every time I take it out, the nav just doesn't move.
     								 * 	I've been debugging this for a while and it has nothing to do with the while loop below, it just doesn't get an angle that it moves to
@@ -199,12 +235,9 @@ public class SearchAndRescueController {
     		}
 
     	}
-    	if(triggered==true && ang1 == -1){
-    		ang1 = nav.getOdometer().getTheta();
-    	}
     	
     	
-    	turnAng = theta + Pi.ONE_SIXTH;
+    	turnAng = theta + Pi.ONE_FIFTH;
     	nav.turnTo(turnAng);
     	
     	triggered = false;
@@ -223,9 +256,6 @@ public class SearchAndRescueController {
     		}
     	}
     	
-    	if(triggered==true && ang2 == -1){
-    		ang2 = nav.getOdometer().getTheta();
-    	}
     	
     	
     	if(ang1==-1){
@@ -247,9 +277,6 @@ public class SearchAndRescueController {
         		}
         	}
     		
-    		if(triggered==true && ang1 == -1){
-        		ang1 = nav.getOdometer().getTheta();
-        	}
     	}
     	
     	if(ang1 != -1 && ang2 != -1){
