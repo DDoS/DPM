@@ -19,7 +19,10 @@ public class Group7Robot {
 		// HELPER THREADS
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
-
+		
+		//TIMER
+		Time.startTime(7*60 + 30);
+			
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
 		//0 - no block
@@ -47,7 +50,7 @@ public class Group7Robot {
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 0, 0, 1},
 				{0, 0, 0, 0, 1, 0, 1, 1},
-				{3, 2, 0, 0, 1, 0, 0, 0},
+				{0, 2, 0, 0, 1, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 1}
 
 		};
@@ -58,7 +61,7 @@ public class Group7Robot {
 				{0, 0, 1, 0, 1, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0},
-				{3, 2, 0, 1, 0, 0, 0, 1},
+				{0, 2, 0, 1, 0, 0, 0, 1},
 				{0, 0, 1, 0, 0, 1, 0, 1}
 
 		};
@@ -69,49 +72,228 @@ public class Group7Robot {
 				{0, 0, 0, 1, 0, 0, 1, 1},
 				{0, 0, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 1, 0, 0, 0, 0},
-				{3, 2, 0, 0, 0, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 0, 1}
 
 		};
 		// The pattern given to us in the project specifications
-		int[][] large1 = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
-			{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-			{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		int[][][] larges = {
+		/*	{//MAP 1
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0},
+				{0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+				{0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0}
+	
+			},*/
+				
+			//TEST MAP FOR MAP 1, REMOVE FOR FINAL	
+				{
+					{0, 1, 1, 0, 0, 0, 0, 0},
+					{0, 0, 1, 0, 0, 0, 0, 1},
+					{1, 0, 0, 1, 0, 0, 1, 0},
+					{0, 0, 1, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 1, 0, 0, 1},
+					{0, 0, 0, 0, 1, 0, 1, 1},
+					{0, 2, 0, 0, 1, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 1}
+				},
+			
+			/*
+			{//MAP 2
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0}
 
+			},
+			*/
+				//TEST MAP FOR MAP 2, REMOVE FOR FINAL	
+				{
+					{0, 0, 0, 1, 1, 0, 0, 1},
+					{0, 1, 0, 0, 1, 0, 0, 1},
+					{1, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 1, 0, 1, 0, 0, 0},
+					{0, 0, 1, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 2, 0, 1, 0, 0, 0, 1},
+					{0, 0, 1, 0, 0, 1, 0, 1}
+				},
+				
+			/*	
+			{//MAP 3
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
+				{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0}
+
+			},
+			*/
+				//TEST MAP FOR MAP 3, REMOVE FOR FINAL
+				{
+					{1, 0, 0, 0, 1, 0, 0, 0},
+					{0, 0, 1, 1, 0, 0, 0, 1},
+					{0, 0, 0, 0, 0, 1, 0, 0},
+					{0, 0, 0, 1, 0, 0, 1, 1},
+					{0, 0, 1, 1, 0, 0, 0, 0},
+					{0, 0, 0, 1, 0, 0, 0, 0},
+					{0, 2, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 1, 1, 0, 1}
+				},
+				
+			{//MAP 4
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+				{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0},
+				{1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+
+			},
+			
+			{//MAP 5
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+				{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+				{0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+			},
+			
+			{//MAP 6
+				{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+				{1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0},
+				{0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0},
+				{0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0},
+				{0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0},
+				{0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+
+			}
+			
 		};
-
-		// Initialize the map so we can set it to whichever array we pass in
-		int option = Button.waitForAnyPress();
-		int[][] array;
-		switch(option){
-			case Button.ID_LEFT:
-				array = normal1;
-				break;
-			case Button.ID_ENTER:
-				array = normal2;
-				break;
-			case Button.ID_RIGHT:
-				array = normal3;
-				break;
-			default:
-				array = null;
-				System.exit(0);
-		}
-		Map map = new Map(array);
-
+		
+		
+		//MENU
+		
+		//Splash screen with version check for safety
+		Display.update("Version", "109.3");
+		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
+		Button.waitForAnyPress();
+		Display.clear();
+		
+		int choice, y, x, m;
+		do{
+		
+			//MAP CHOICE
+			int num = 1;
+	
+			do{
+				Display.update("M", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > 1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num <6){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			m = num-1;
+			Display.update("M", Integer.toString(num));
+			
+			
+			//X POS DROPOFF
+			num = -1;
+			do{
+				Display.update("X", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > -1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num < 11){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			x = num;
+			Display.update("X", Integer.toString(num));
+			
+			
+			//Y POS DROPOFF
+			num = -1;
+			do{
+				Display.update("Y", Integer.toString(num));
+				choice = Button.waitForAnyPress();
+				if(choice==Button.ID_LEFT && num > -1){
+					num--;
+				}else if(choice == Button.ID_RIGHT && num < 11){
+					num++;
+				}
+			}while(choice!=Button.ID_ENTER);
+			
+			y = num;
+			Display.update("Y", Integer.toString(num));
+			
+			choice = Button.waitForAnyPress();
+			
+		//Final confirm	
+		}while(choice!=Button.ID_ENTER);
+		
+		//specs use -1, -1 as lowest corner, so offset to the 0, 0  we use
+		x += 1;
+		y += 1;
+		
+		//set up the dropoff location in the map
+		
+	//	larges[m][11-(y+1)][x+1] = 3; USE THIS FOR FINAL, 
+		
+		larges[m][8-(y+1)][x+1] = 3;  //DELETE THIS, USE THIS FOR TEST
+		
+		Map map = new Map(larges[m]);
+		
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
-		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, null, searchAndRescue);
+		LocalizationController localization = new LocalizationController(navigation, map, ultrasonicSensor, searchAndRescue);
 
 		// LOGIC
 		odometer.start();

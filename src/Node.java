@@ -207,4 +207,28 @@ public class Node {
     public void setNum(int n){
     	num = n;
     }
+    
+    /**
+     * Get the X position of the center of this tile
+     * @return float value of X pos
+     */
+    public float getX(){
+    	return Tile.HALF + Tile.ONE*(int)((num/4)%(Map.getLength()));
+    }
+    
+    /**
+     * Get the Y position of the center of this tile
+     * @return float value of Y pos
+     */
+    public float getY(){
+    	return (Map.getLength()-1)*Tile.ONE+Tile.HALF - Tile.ONE*(int)((num/4)/(Map.getLength()));
+    }
+    
+    /**
+     * Get the theta value for the orientation of this node
+     * @return float value of theta
+     */
+    public float getTheta(){
+    	return (num%4)*Pi.ONE_HALF;
+    }
 }

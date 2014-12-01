@@ -9,6 +9,7 @@ public class Map {
 	private Node[] nodes;
 	private int start;
 	private int finish;
+	private static int length;
 
 	/**
 	 * Initialize a new Map object with a set size.
@@ -26,6 +27,7 @@ public class Map {
 	 */
 	public Map(int[][] map){
 		//As long as there's a map, we want to create the graph that represents the array
+		length = map.length;
 		if(map.length>0){
 			//create a new Node array of the right size to hold all the values (4x the size of the array, one for each direction per square)
 			nodes = new Node[map.length * map[0].length * 4];
@@ -43,23 +45,22 @@ public class Map {
 					if(j>0&&map[j-1][i]!=1){//Check for the square to the north of this one
 						getNodeAtPosition(i, j, Pi.ONE_HALF).setChild(Path.Direction.FRONT, getNodeAtPosition(i, j-1, Pi.ONE_HALF));
 
-						//TODO remove this code and replace with a better way of finding the start/finish
-						if(map[j-1][i]==3){
+						//Look for the delivery node (We deliver facing north)
+						if(map[j][i]==3){
 							start = getNodeAtPosition(i, j, Pi.ONE_HALF).getNum();
 						}
-						//------
 					}
 					if(i>0&&map[j][i-1]!=1){//Check the square to the west
 						getNodeAtPosition(i, j, Pi.ONE).setChild(Path.Direction.FRONT, getNodeAtPosition(i-1, j, Pi.ONE));
+						
+						//Look for the collection node (because we always want to collect starting facing west)
+						if(map[j][i-1]==2){
+							finish = getNodeAtPosition(i, j, Pi.ONE).getNum();
+						}
+						
 					}
 					if(j<map[0].length-1&&map[j+1][i]!=1){//Check the square to the south
 						getNodeAtPosition(i, j, Pi.THREE_HALF).setChild(Path.Direction.FRONT, getNodeAtPosition(i, j+1, Pi.THREE_HALF));
-
-						//TODO remove this code and replace with a better way of finding the start/finish
-						if(map[j+1][i]==2){
-							finish = getNodeAtPosition(i, j, Pi.THREE_HALF).getNum();
-						}
-						//-----------
 					}
 
 					//Now we set all the left/right nodes properly
@@ -171,12 +172,19 @@ public class Map {
 	 * Get the "length" of the map, as in the length of one side (so 12 for the final project)
 	 * @return int length based on the number of nodes. assumes map is square
 	 */
-	public int getLength(){
-		return (int) Math.sqrt(nodes.length/4);
+	public static int getLength(){
+		return length;
 	}
 
-	// Find a path in the map from some tile coordinates to other ones
-	// Uses depth first search with a heuristic based on distance to target to find a good path
+	/**
+	 * Find a path in the map from some tile coordinates to other ones. Uses depth first search with a heuristic based on distance to target to find a good path
+	 * @param map The map to path find in
+	 * @param fromTileX The starting x coordinate in tile coordinates
+	 * @param fromTileY The starting y coordinate in tile coordinates
+	 * @param toTileX The target x coordinate in tile coordinates
+	 * @param toTileY The target y coordinate in tile coordinates
+	 * @return An {@link Integer.MAX_VALUE} terminated stack or integer coordinates, each pair being successive in the array
+	 */
 	public static int[] findPath(int[][] map, int fromTileX, int fromTileY, int toTileX, int toTileY) {
 		int size = map.length;
 		// Make a copy of the coordinates

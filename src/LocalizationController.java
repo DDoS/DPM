@@ -1,16 +1,14 @@
 import java.util.ArrayList;
 
-import lejos.nxt.comm.RConsole;
-
-
 public class LocalizationController {
-	private static final int MAX_TILES = 4;
+	private static final int MAX_TILES = 3;
 	private static final boolean DEBUG_MODE = true;
 	//Has a copy of the nav, has a map, and has two sensors
 	private Navigation nav;
 	private Map map;
-	private FilteredUltrasonicSensor front_us, rear_us;
+	private FilteredUltrasonicSensor front_us;
 	private SearchAndRescueController searchAndRescue;
+	private static final int SPEED = 500;
 
 	/**
 	 * Constructs a new localization controller with every property
@@ -19,11 +17,10 @@ public class LocalizationController {
 	 * @param s1 The front ultrasonic sensor
 	 * @param s2 The rear ultrasonic sensor
 	 */
-	public LocalizationController(Navigation n, Map m, FilteredUltrasonicSensor s1, FilteredUltrasonicSensor s2, SearchAndRescueController sarC){
+	public LocalizationController(Navigation n, Map m, FilteredUltrasonicSensor s1, SearchAndRescueController sarC){
 		nav = n;
 		map = m;
 		front_us = s1;
-		rear_us = s2;
 		searchAndRescue = sarC;
 	}
 
@@ -32,7 +29,7 @@ public class LocalizationController {
 	 * @param arr The array of integers (any size)
 	 * @return The standard deviation as a float
 	 */
-	public float stdDev(int[] arr){
+	private static float stdDev(int[] arr){
 		//Loop through the array and sum the values divided by the length to find the average
 		float avg = 0;
 		for(int i=0; i<arr.length; i++){
@@ -54,7 +51,7 @@ public class LocalizationController {
 	public void run(){
 		//Setting up the display
 		Display.clear();
-		Display.reserve("Status", "X", "Y", "Th", "Moves");
+		Display.reserve("Status", "SX", "SY", "ST", "Moves");
 		Display.update("Status", "Init");
 
 		//path represents the current path that the robot has actually traveled
@@ -62,7 +59,7 @@ public class LocalizationController {
 		//nodes represents all of the nodes that are considered to be valid starting options
 		ArrayList<Node> nodes = map.getRemaningNodes();
 
-		Display.update("Status", "Run");
+		Display.update("Status", "Ping");
 
 		float currTheta = Pi.ONE_HALF; //Keep track of the current heading so our turning before localization is accurate
 
@@ -79,14 +76,16 @@ public class LocalizationController {
 
 			//Look at 5 slightly different angles, and find the max distance (to avoid the weird problems with the ultrasonic)
 			for(int i=-2; i<=2; i++){
-				nav.turnTo(currTheta + (float)i/30);
+				nav.turnTo(currTheta + (float)i/60);
 				nav.waitUntilDone();
 				int fDist = front_us.getDistanceData();
 				frontTiles = Math.max((int) (fDist/Tile.ONE), frontTiles);
 			}
 			nav.turnTo(currTheta); //make sure to rotate back to the normal angle
 			nav.waitUntilDone();
-
+			
+			Display.update("Status", "Calculate");
+			
 			//cutoff at max number of tiles (due to sensor accuracy)
 			frontTiles = Math.min(Math.max(frontTiles, 0), MAX_TILES);
 
@@ -167,8 +166,10 @@ public class LocalizationController {
 						path = new Path(Path.Direction.FRONT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move forward
-					nav.forward(Tile.ONE, 400);
+					nav.forward(Tile.ONE, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				//If the left is less than the right, go left
@@ -181,9 +182,11 @@ public class LocalizationController {
 						path = new Path(Path.Direction.LEFT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move left
 					currTheta += Pi.ONE_HALF;
-					nav.turnTo(currTheta, 400);
+					nav.turnTo(currTheta, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}else{//else we want to move right
@@ -195,9 +198,11 @@ public class LocalizationController {
 						path = new Path(Path.Direction.RIGHT);
 					}
 
+					Display.update("Status", "Move");
+					
 					//Move right
 					currTheta -= Pi.ONE_HALF;
-					nav.turnTo(currTheta, 400);
+					nav.turnTo(currTheta, SPEED);
 					nav.waitUntilDone();//Wait for the navigation to finish
 
 				}
@@ -211,24 +216,28 @@ public class LocalizationController {
 		Node current;//Current spot that the robot is in
 
 		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*map.getLength()*4));
+			current = map.getNodeAtIndex((int)(Math.random()*Map.getLength()*4));
 		}else{
 			current = nodes.get(0).getNodeFromPath(path);//Else use what the algorithm found
 			//nodes.get(0) returns the only node left in the map (which is the starting node of the robot). getNodeFromPath(path) moves from the start node to the current node
 		}
 
-		int num = current.getNum();//Do math to find out the position
-		float theta = (num%4) * Pi.ONE_HALF;
-		float x = Tile.HALF + Tile.ONE * (int)((num/4) % (map.getLength()));
-		float y = (map.getLength()-1) * Tile.ONE + Tile.HALF - Tile.ONE * (int)((num/4) / (map.getLength()));
+		float x = nodes.get(0).getX() - Tile.ONE;
+		float y = nodes.get(0).getY() - Tile.ONE;
+		float theta = nodes.get(0).getTheta();
 
 		//Update the display and the odometer
-		Display.update("X", ""+x);
-		Display.update("Y", ""+y);
-		Display.update("Th", ""+theta);
+		Display.update("SX", ""+x);
+		Display.update("SY", ""+y);
+		Display.update("ST", ""+theta);
+		
+		x = current.getX();
+		y = current.getY();
+		theta = current.getTheta();
+		
 		nav.getOdometer().setPosition(x, y, theta);
 
-		//lejos.nxt.Button.waitForAnyPress();
+		Note.play(4); //Play a sound to signal that we've localized
 
 		//Set the SearchAndRescueController so it knows where the robot is
 		searchAndRescue.setCurrent(current);
