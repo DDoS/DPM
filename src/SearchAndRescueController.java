@@ -8,6 +8,7 @@ public class SearchAndRescueController {
     private FilteredColorSensor color;
     private Claw claw;
     private static final int SPEED = 400;
+    private static final int BLOCK_DIST = 10;
 
     public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
         nav = n;
@@ -36,7 +37,7 @@ public class SearchAndRescueController {
 		//Keep track of the state of the robots collection
 		boolean statusFinal = false;
 
-		while(statusFinal == false && Time.timeLeft()>60){ //Only loop if we have 60 seconds left to try to find a block
+		while(statusFinal == false && Time.timeLeft()>0){ //Only loop if we have 60 seconds left to try to find a block
 
 			//Find the path between the pickup location and the current location
 			dest = map.getCollectionNode();
@@ -105,46 +106,73 @@ public class SearchAndRescueController {
 					nav.waitUntilDone();
 
 					//move forward, but don't call waitUntilDone, because we want to keep doing stuff while moving
-					nav.forward(15);
+					nav.forward((int)(BLOCK_DIST*1.2));
 
-					//This variable is triggered once we have seen the block, so we know we are seeing the far edge of the block when we no longer see it
-					boolean triggered = false;
-					//Keep looping while we're moving (we will abort movement when we stop seeing the block)
-					while(nav.isNavigating()){
-						//If we see a block and triggered hasn't been set true yet, set it to true
-						if(checkForBlock() == true && triggered == false){
-							triggered = true;
-						}
-
-						//If we no longer see a block, and we have seen one in the past (triggered is true), then stop navigating
-						if(checkForBlock() == false && triggered == true){
-							nav.abort();
-						}
-					}
+					boolean blockInReach = waitForEdge();
 
 					//Now, triggered will tell us if there's a block there or not, and we will also be placed right at the far edge of the block
 
-					if(triggered == true){//If there is a block
+					if(blockInReach == true){//If there is a block
 
 						//Move forward and close the claw a couple times to secure the block in place
 						nav.forward(2);
 						nav.waitUntilDone();
-						claw.close();
+						
+						boolean closed = grabBlock();
+						
+						while(!closed){
+							
+							claw.sense();
+							
+							nav.backward((int)(3.0*BLOCK_DIST/4));
+							nav.waitUntilDone();
+							
+							nav.turnBy(Pi.ONE_QUARTER);
+							nav.waitUntilDone();
+							
+							claw.close();
+							
+							nav.turnBy(-Pi.ONE_HALF);
+							nav.waitUntilDone();
+							
+							claw.sense();
+							
+							nav.forward(2);
+							nav.waitUntilDone();
+							
+							nav.turnBy(Pi.ONE_HALF);
+							
+							waitForEdge();
+							
+							nav.turnBy(-Pi.ONE_SIXTH);
+							nav.waitUntilDone();
+							
+							//move forward, but don't call waitUntilDone, because we want to keep doing stuff while moving
+							nav.forward((int)(BLOCK_DIST*1.2));
+			
 
+							waitForEdge();
+							
+							nav.forward(2);
+							nav.waitUntilDone();
+							
+							closed = grabBlock();
+							
+						}
+						
 						claw.open();
-						nav.forward(1);
+						
+						nav.forward(2);
 						nav.waitUntilDone();
+						
 						claw.close();
-
-						claw.open();
-						nav.forward(1);
-						nav.waitUntilDone();
-						claw.close();
+						
+						claw.flt();
 						//Keep the claw closed so we can begin to carry it back
 
 					}else{//If there isn't a block
 						//Backup, turn back to the right angle, and restart the loop by setting foundBlock to false again
-						nav.backward(15, SPEED);
+						nav.backward((int)(BLOCK_DIST*1.5), SPEED);
 						nav.waitUntilDone();
 						nav.turnTo(theta, SPEED);
 						nav.waitUntilDone();
@@ -238,9 +266,48 @@ public class SearchAndRescueController {
     }
 
 
+    private boolean waitForEdge(){
+    	//This variable is triggered once we have seen the block, so we know we are seeing the far edge of the block when we no longer see it
+		boolean triggered = false;
+		//Keep looping while we're moving (we will abort movement when we stop seeing the block)
+		while(nav.isNavigating()){
+			//If we see a block and triggered hasn't been set true yet, set it to true
+			if(checkForBlock() == true && triggered == false){
+				triggered = true;
+			}
+
+			//If we no longer see a block, and we have seen one in the past (triggered is true), then stop navigating
+			if(checkForBlock() == false && triggered == true){
+				nav.abort();
+			}
+		}
+		
+		return triggered;
+    }
+    
+    
+    private boolean grabBlock(){
+    	claw.close();
+    	claw.flt();
+    	
+    	try {
+			Thread.sleep(750);
+		} catch (InterruptedException e) {
+		}
+    	
+    	int ANG_ERR = 20;
+    	Display.update("SX", Integer.toString(claw.getAngle()));
+    	if(claw.getAngle() >= Claw.CLOSED_ANGLE - ANG_ERR && claw.getAngle() <= Claw.CLOSED_ANGLE + ANG_ERR){
+    		return true;
+    	}
+    	return false;
+    }
+    
+    
+    
     /**
      * This method causes the robot to follow a given path that's passed in
-     * @param path Path object to folow
+     * @param path Path object to follow
      */
     private void moveAlongPath(Path path){
     	Display.update("Status", "Moving");
@@ -297,48 +364,62 @@ public class SearchAndRescueController {
     								 * 	So turnAng isn't correct unless I print it????? I don't know, just leave it in for now.
     								 */
 
+    	
+    	do{
     	//Turn to scan to the right, but dont waitUntilDone, so we can do other things while turning
-    	nav.turnTo(turnAng);
-
-    	//While we are still turning and either haven't seen a block yet at all, or we've seen a block and are still seeing a block, keep checking for a block
-    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
-
-    		seesBlock = checkForBlock(); //Check if there's a block (true if there is, false if not)
-
-    		//If we see a block and haven't seen one yet (triggered is false) then set triggered to true
-    		if(seesBlock==true && triggered==false){
-    			triggered=true;
-    		}
-
-    		//If we don't see a block and have already seen one (triggered is true), then we've reached the far edge of the block and we can stop
-    		if(seesBlock==false && triggered==true){
-    			//Stop moving, set the right angle to the current angle we rotated to
-    			nav.abort();
-    			angRight = nav.getOdometer().getTheta();
-    		}
-
-    	}
+	    	nav.turnTo(turnAng);
+	
+	    	//While we are still turning and either haven't seen a block yet at all, or we've seen a block and are still seeing a block, keep checking for a block
+	    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
+	
+	    		seesBlock = checkForBlock(); //Check if there's a block (true if there is, false if not)
+	
+	    		//If we see a block and haven't seen one yet (triggered is false) then set triggered to true
+	    		if(seesBlock==true && triggered==false){
+	    			triggered=true;
+	    		}
+	
+	    		//If we don't see a block and have already seen one (triggered is true), then we've reached the far edge of the block and we can stop
+	    		if(seesBlock==false && triggered==true){
+	    			//Stop moving, set the right angle to the current angle we rotated to
+	    			nav.abort();
+	    			angRight = nav.getOdometer().getTheta();
+	    		}
+	
+	    	}
+	    	
+	    	//If we have seen a block, but not seen the end of it, then we keep turning even more
+	    	turnAng -= Pi.ONE_SIXTH;
+	    	//This will loop in that case
+    	}while(triggered==true && angRight==-1);
 
     	//Now turn to the left past theta
     	turnAng = theta + Pi.ONE_FIFTH;
-    	nav.turnTo(turnAng);
-
-    	//reset triggered and follow the same logic for going left
-    	triggered = false;
-
-    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
-    		seesBlock = checkForBlock();
-
-    		if(seesBlock==true && triggered==false){
-    			triggered=true;
-    		}
-    		if(seesBlock==false && triggered==true){
-    			//Stop moving, set the left angle to the current angle we rotated to
-    			nav.abort();
-    			angLeft = nav.getOdometer().getTheta();
-    		}
-    	}
-
+    	
+    	do{
+	
+	    	nav.turnTo(turnAng);
+	
+	    	//reset triggered and follow the same logic for going left
+	    	triggered = false;
+	
+	    	while(nav.isNavigating() && (triggered == false || (triggered == true && seesBlock == true))){
+	    		seesBlock = checkForBlock();
+	
+	    		if(seesBlock==true && triggered==false){
+	    			triggered=true;
+	    		}
+	    		if(seesBlock==false && triggered==true){
+	    			//Stop moving, set the left angle to the current angle we rotated to
+	    			nav.abort();
+	    			angLeft = nav.getOdometer().getTheta();
+	    		}
+	    	}
+	    	
+	    	//If we have seen a block, but not seen the end of it, then we keep turning even more
+	    	turnAng += Pi.ONE_SIXTH;
+	    	//This will loop in that case
+    	}while(triggered==true && angRight==-1);
 
     	//Now, if we haven't seen the right edge of a block at all, then we scan on the way back to theta
 

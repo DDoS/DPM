@@ -7,9 +7,9 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Claw {
-    private static final int OPENED_ANGLE = 0;
-    private static final int CLOSED_ANGLE = 125;
-    private static final int SENSING_ANGLE = 75;
+	public static final int OPENED_ANGLE = 0;
+    public static final int CLOSED_ANGLE = 125;
+    public static final int SENSING_ANGLE = 75;
     private final NXTRegulatedMotor motor;
 
     /**
@@ -51,6 +51,9 @@ public class Claw {
         motor.flt();
     }
 
+    /**
+     * Gets the angle in degrees of the claw motor
+     */
     public int getAngle() {
         return motor.getTachoCount();
     }
