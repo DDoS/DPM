@@ -50,7 +50,7 @@ public class SearchAndRescueController {
 			nav.enableClawDownMode(false);
 
 			//Move to the pickup location
-			moveAlongPath(path);
+			moveAlongPath(path, false);
 
 			Display.update("Status", "SettingUp");
 
@@ -273,7 +273,7 @@ public class SearchAndRescueController {
 				path = map.getPathFromNodeToNode(current, dest);
 
 				//Move along the new path
-				moveAlongPath(path); 
+				moveAlongPath(path, true); 
 				
 				blocks++;
 				
@@ -348,7 +348,7 @@ public class SearchAndRescueController {
      * This method causes the robot to follow a given path that's passed in
      * @param path Path object to follow
      */
-    private void moveAlongPath(Path path){
+    private void moveAlongPath(Path path, boolean delivery){
     	Display.update("Status", "Moving");
 
     	//Keep looping until we've visited every node on the path
@@ -372,7 +372,7 @@ public class SearchAndRescueController {
 			path = path.getNextPath();
 
 			//If path is done, turn to face the right direction
-			if(path==null){
+			if(path==null && !delivery){
 				nav.turnTo(theta, SPEED_SLOW);
 				nav.waitUntilDone();
 			}

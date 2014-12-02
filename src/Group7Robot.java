@@ -199,7 +199,7 @@ public class Group7Robot {
 			}while(choice!=Button.ID_ENTER);
 
 			m = num-1;
-			Display.update("M", Integer.toString(num));
+			Display.update("M", Integer.toString(num)); 
 
 
 			//X POS DROPOFF
