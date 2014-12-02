@@ -177,7 +177,7 @@ public class Group7Robot {
 		//MENU
 
 		//Splash screen with version check for safety
-		Display.update("Version", "117.10");
+		Display.update("Version", "119.0");
 		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
 		Button.waitForAnyPress();
 		Display.clear();
