@@ -177,7 +177,7 @@ public class Group7Robot {
 		//MENU
 
 		//Splash screen with version check for safety
-		Display.update("Version", "119.0");
+		Display.update("Version", "119.1");
 		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
 		Button.waitForAnyPress();
 		Display.clear();
@@ -199,7 +199,7 @@ public class Group7Robot {
 			}while(choice!=Button.ID_ENTER);
 
 			m = num-1;
-			Display.update("M", Integer.toString(num)); 
+			Display.update("M", Integer.toString(num));
 
 
 			//X POS DROPOFF
@@ -244,11 +244,11 @@ public class Group7Robot {
 
 		//set up the dropoff location in the map
 
-		larges[m][11-y][x] = 3; 
+		larges[m][11-y][x] = 3;
 
 		//MAP
 		Map map = new Map(larges[m]);
-		
+
 		//TIMER
 		Time.startTime(7*60 + 30);
 
@@ -264,7 +264,7 @@ public class Group7Robot {
 		// MAIN RUN
 		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
-		
+
 		boolean localized = localization.run();
 		while(localized==false){
 			for(int i = 0; i<12*12*4; i++){
