@@ -26,16 +26,13 @@ public class SearchAndRescueController {
 
     	//Three arrays of offsets used to keep track of the path for the robot to follow while searching for blocks
     	//It will step through the arrays and move the offset amount of distance, then search again
-		float[] xOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5,               3,           0,           0,               0,                0,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3 - 5};
-		float[] yOffset = {          0,           0,           0,           0,           0,               0,               0, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5,               -3,           0,           0,               0};
+		float[] xOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3    ,     -Tile.ONE/3,           0,           0,               0,                0,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3 - 5};
+		float[] yOffset = {          0,           0,           0,           0,           0,               0,               0, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3    ,      -Tile.ONE/3,           0,           0,               0};
 		float[] tOffset = {          0,           0,           0,          0 ,          0 ,              0 ,     Pi.ONE_HALF,           0,           0,               0,      Pi.ONE_HALF,           0,           0,               0};
 		//An int to keep track of which iteration of the offset array the robot is in
 		int iteration = 0;
 		
 		int blocks = 0;
-		
-		float[] xDropoff = {-10, 10, 0, -10, 10, 0, -10, 10, 0};
-		float[] yDropoff = {45, 45, 45, 30, 30, 30, 15, 15, 15};
 
 		//Node to keep track of where the robot wants to go
 		Node dest;
@@ -53,7 +50,7 @@ public class SearchAndRescueController {
 			nav.enableClawDownMode(false);
 
 			//Move to the pickup location
-			moveAlongPath(path, false);
+			moveAlongPath(path);
 
 			Display.update("Status", "SettingUp");
 
@@ -124,35 +121,46 @@ public class SearchAndRescueController {
 						nav.forward(4);
 						nav.waitUntilDone();
 						
+						//Close the claw and get whether or not it worked
 						boolean closed = grabBlock();
 						
+						//while it doesn't work, follow a routine
 						while(!closed){
 							
+							//flip the pushing direction based on where the robot is
 							int direction = 1;
 							
 							if(iteration<6){
 								direction = -1;
 							}
 							
+							//lift the claw
 							claw.sense();
 							
+							//move back a bit
 							nav.backward((int)(3.0*BLOCK_DIST/4));
 							nav.waitUntilDone();
 							
+							//turn
 							nav.turnBy(-Pi.ONE_QUARTER);
 							nav.waitUntilDone();
 							
+							//lower the claw
 							claw.close();
 							
+							
+							//turn so you swing by the block and push it to a better angle
 							nav.turnBy(Pi.ONE_HALF);
 							nav.waitUntilDone();
 							
+							//lift the claw
 							claw.sense();
 							
-							
+							//turn back a bit
 							nav.turnBy(-Pi.ONE_SIXTH);
 							nav.waitUntilDone();
 							
+							//keep scanning for the block and looking forward until you find it
 							float angle;
 							do{
 								nav.forward(4);
@@ -162,15 +170,17 @@ public class SearchAndRescueController {
 							
 							}while(angle == -1);
 							
+							//turn to where the block is
 							nav.turnTo(angle);
 							nav.waitUntilDone();
 							
 							//move forward, but don't call waitUntilDone, because we want to keep doing stuff while moving
 							nav.forward((int)(BLOCK_DIST*1.2));
 			
-
+							//stop moving when you see the edge
 							waitForEdge();
 							
+							//move forward and attempt to grab again
 							nav.forward(4);
 							nav.waitUntilDone();
 							
@@ -178,6 +188,7 @@ public class SearchAndRescueController {
 							
 						}
 						
+						//go back to where we just were as part of the search algorithm
 						nav.travelTo(x, y, SPEED_FAST);
 						nav.waitUntilDone();
 						//Keep the claw closed so we can begin to carry it back
@@ -262,13 +273,7 @@ public class SearchAndRescueController {
 				path = map.getPathFromNodeToNode(current, dest);
 
 				//Move along the new path
-				moveAlongPath(path, true);
-				
-				x = nav.getOdometer().getX();
-				y = nav.getOdometer().getY();
-				
-				nav.travelTo(x + xDropoff[blocks], y + yDropoff[blocks]);
-				nav.waitUntilDone();
+				moveAlongPath(path); 
 				
 				blocks++;
 				
@@ -278,9 +283,6 @@ public class SearchAndRescueController {
 				
 				//Drop off the block!
 				claw.open();
-				
-				nav.travelTo(x, y);
-				nav.waitUntilDone();
 
 	    	}
 
@@ -312,21 +314,31 @@ public class SearchAndRescueController {
 		return triggered;
     }
     
-    
+    /**
+     * Function to grab a block, but give an error if the claw accidentally lifts up the robot
+     * @return
+     */
     private boolean grabBlock(){
+    	//close the claw but then float it.
+    	//a good close will stay in pretty much the same position, but one where the robot was lifted up will now fall back down
     	claw.close();
     	claw.flt();
     	
+    	//wait a bit for the fall to happen
     	try {
 			Thread.sleep(750);
 		} catch (InterruptedException e) {
 		}
     	
+    	//if the didnt change too much, we know it was a good pickup
     	int ANG_ERR = 20;
     	Display.update("SX", Integer.toString(claw.getAngle()));
     	if(claw.getAngle() >= Claw.CLOSED_ANGLE - ANG_ERR && claw.getAngle() <= Claw.CLOSED_ANGLE + ANG_ERR){
+    		//re-close the claw, return true
+    		claw.close(); 
     		return true;
     	}
+    	//else, it was a bad pickup
     	return false;
     }
     
@@ -336,15 +348,11 @@ public class SearchAndRescueController {
      * This method causes the robot to follow a given path that's passed in
      * @param path Path object to follow
      */
-    private void moveAlongPath(Path path, boolean delivery){
+    private void moveAlongPath(Path path){
     	Display.update("Status", "Moving");
 
     	//Keep looping until we've visited every node on the path
 		while(path!=null){
-			
-			if(path.getNextPath()==null && delivery== true){
-				break;
-			}
 			
 			//Move us to the next node along the path
 			current = current.getNodeFromPath(new Path(path.getDirection()));

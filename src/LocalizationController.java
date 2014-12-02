@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class LocalizationController {
 	private static final int MAX_TILES = 3;
-	private static final boolean DEBUG_MODE = true;
+	private static final boolean DEBUG_MODE = false;
 	//Has a copy of the nav, has a map, and has two sensors
 	private Navigation nav;
 	private Map map;
