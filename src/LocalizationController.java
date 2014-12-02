@@ -48,7 +48,7 @@ public class LocalizationController {
 	 * Method called to start the Localization Controller
 	 * Handles all the logic of the controller
 	 */
-	public void run(){
+	public boolean run(){
 		//Setting up the display
 		Display.clear();
 		Display.reserve("Status", "SX", "SY", "ST", "Moves");
@@ -59,7 +59,6 @@ public class LocalizationController {
 		//nodes represents all of the nodes that are considered to be valid starting options
 		ArrayList<Node> nodes = map.getRemaningNodes();
 
-		Display.update("Status", "Ping");
 
 		float currTheta = Pi.ONE_HALF; //Keep track of the current heading so our turning before localization is accurate
 
@@ -70,7 +69,9 @@ public class LocalizationController {
 			//Update moves
 			Display.update("Moves", ""+moves);
 			moves++;
-
+			
+			Display.update("Status", "Ping");
+			
 			//Get the distance data and use it to find out how many empty tiles surround the robot
 			int frontTiles = 0;
 
@@ -215,8 +216,8 @@ public class LocalizationController {
 
 		Node current;//Current spot that the robot is in
 
-		if(nodes.size()!=1){//If the algorithm failed, choose a node at random and hope for the best
-			current = map.getNodeAtIndex((int)(Math.random()*Map.getLength()*4));
+		if(nodes.size()<1){//If the algorithm failed, return failure
+			return false;
 		}else{
 			current = nodes.get(0).getNodeFromPath(path);//Else use what the algorithm found
 			//nodes.get(0) returns the only node left in the map (which is the starting node of the robot). getNodeFromPath(path) moves from the start node to the current node
@@ -241,6 +242,8 @@ public class LocalizationController {
 
 		//Set the SearchAndRescueController so it knows where the robot is
 		searchAndRescue.setCurrent(current);
+		
+		return true;
 
 
 

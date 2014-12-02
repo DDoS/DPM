@@ -7,7 +7,8 @@ public class SearchAndRescueController {
     private Node current;
     private FilteredColorSensor color;
     private Claw claw;
-    private static final int SPEED = 400;
+    private static final int SPEED_FAST = 500;
+    private static final int SPEED_SLOW = 400;
     private static final int BLOCK_DIST = 10;
 
     public SearchAndRescueController(Navigation n, Map m, FilteredColorSensor cs, Claw c) {
@@ -25,11 +26,16 @@ public class SearchAndRescueController {
 
     	//Three arrays of offsets used to keep track of the path for the robot to follow while searching for blocks
     	//It will step through the arrays and move the offset amount of distance, then search again
-		float[] xOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5, -Tile.ONE/3 - 5,           0,           0,               0,                0,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3 - 5};
-		float[] yOffset = {          0,           0,           0,           0,           0,               0,               0, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5,  -Tile.ONE/3 - 5,           0,           0,               0};
+		float[] xOffset = {-Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5,               3,           0,           0,               0,                0,  Tile.ONE/3,  Tile.ONE/3,  Tile.ONE/3 - 5};
+		float[] yOffset = {          0,           0,           0,           0,           0,               0,               0, -Tile.ONE/3, -Tile.ONE/3, -Tile.ONE/3 + 5,               -3,           0,           0,               0};
 		float[] tOffset = {          0,           0,           0,          0 ,          0 ,              0 ,     Pi.ONE_HALF,           0,           0,               0,      Pi.ONE_HALF,           0,           0,               0};
 		//An int to keep track of which iteration of the offset array the robot is in
 		int iteration = 0;
+		
+		int blocks = 0;
+		
+		float[] xDropoff = {-10, 10, 0, -10, 10, 0, -10, 10, 0};
+		float[] yDropoff = {45, 45, 45, 30, 30, 30, 15, 15, 15};
 
 		//Node to keep track of where the robot wants to go
 		Node dest;
@@ -47,7 +53,7 @@ public class SearchAndRescueController {
 			nav.enableClawDownMode(false);
 
 			//Move to the pickup location
-			moveAlongPath(path);
+			moveAlongPath(path, false);
 
 			Display.update("Status", "SettingUp");
 
@@ -66,14 +72,14 @@ public class SearchAndRescueController {
 				y += yOffset[i];
 				theta += tOffset[i];
 				if(tOffset[i]!=0){
-					nav.travelTo(x, y, SPEED);
+					nav.travelTo(x, y, SPEED_FAST);
 					nav.waitUntilDone();
 				}
 			}
 			//Travel to the last location (in case we aren't here already)
-			nav.travelTo(x, y, SPEED);
+			nav.travelTo(x, y, SPEED_FAST);
 			nav.waitUntilDone();
-			nav.turnTo(theta, SPEED);
+			nav.turnTo(theta, SPEED_FAST);
 			nav.waitUntilDone();
 
 
@@ -115,36 +121,48 @@ public class SearchAndRescueController {
 					if(blockInReach == true){//If there is a block
 
 						//Move forward and close the claw a couple times to secure the block in place
-						nav.forward(2);
+						nav.forward(4);
 						nav.waitUntilDone();
 						
 						boolean closed = grabBlock();
 						
 						while(!closed){
 							
+							int direction = 1;
+							
+							if(iteration<6){
+								direction = -1;
+							}
+							
 							claw.sense();
 							
 							nav.backward((int)(3.0*BLOCK_DIST/4));
 							nav.waitUntilDone();
 							
-							nav.turnBy(Pi.ONE_QUARTER);
+							nav.turnBy(-Pi.ONE_QUARTER);
 							nav.waitUntilDone();
 							
 							claw.close();
 							
-							nav.turnBy(-Pi.ONE_HALF);
+							nav.turnBy(Pi.ONE_HALF);
 							nav.waitUntilDone();
 							
 							claw.sense();
 							
-							nav.forward(2);
-							nav.waitUntilDone();
-							
-							nav.turnBy(Pi.ONE_HALF);
-							
-							waitForEdge();
 							
 							nav.turnBy(-Pi.ONE_SIXTH);
+							nav.waitUntilDone();
+							
+							float angle;
+							do{
+								nav.forward(4);
+								nav.waitUntilDone();
+								
+								angle = scanForBlock(nav.getOdometer().getTheta());
+							
+							}while(angle == -1);
+							
+							nav.turnTo(angle);
 							nav.waitUntilDone();
 							
 							//move forward, but don't call waitUntilDone, because we want to keep doing stuff while moving
@@ -153,28 +171,22 @@ public class SearchAndRescueController {
 
 							waitForEdge();
 							
-							nav.forward(2);
+							nav.forward(4);
 							nav.waitUntilDone();
 							
 							closed = grabBlock();
 							
 						}
 						
-						claw.open();
-						
-						nav.forward(2);
+						nav.travelTo(x, y, SPEED_FAST);
 						nav.waitUntilDone();
-						
-						claw.close();
-						
-						claw.flt();
 						//Keep the claw closed so we can begin to carry it back
 
 					}else{//If there isn't a block
 						//Backup, turn back to the right angle, and restart the loop by setting foundBlock to false again
-						nav.backward((int)(BLOCK_DIST*1.5), SPEED);
+						nav.backward((int)(BLOCK_DIST*1.5), SPEED_FAST);
 						nav.waitUntilDone();
-						nav.turnTo(theta, SPEED);
+						nav.turnTo(theta, SPEED_FAST);
 						nav.waitUntilDone();
 						foundBlock = false;
 						//Now we're ready to restart the loop and scan again
@@ -195,12 +207,12 @@ public class SearchAndRescueController {
 
 					//If we have an x/y change in position, move there
 					if(xOffset[iteration]!=0 || yOffset[iteration]!=0){
-						nav.travelTo(x, y, SPEED);
+						nav.travelTo(x, y, SPEED_FAST);
 						nav.waitUntilDone();
 					}
 
 					//Turn to face the right angle
-					nav.turnTo(theta, SPEED);
+					nav.turnTo(theta, SPEED_FAST);
 					nav.waitUntilDone();
 					//Now we're ready to restart the loop and scan again
 
@@ -229,7 +241,7 @@ public class SearchAndRescueController {
 					theta -= tOffset[i];
 					if(tOffset[i-1]!=0){
 						//Only travel to the major turns in the path. This helps avoid collisions, as space is tight
-						nav.travelTo(x, y, SPEED);
+						nav.travelTo(x, y, SPEED_SLOW);
 						nav.waitUntilDone();
 					}
 				}
@@ -239,7 +251,7 @@ public class SearchAndRescueController {
 	            y = dest.getY();
 	            theta = dest.getTheta();
 				//And travel to it
-				nav.travelTo(x, y, SPEED);
+				nav.travelTo(x, y, SPEED_SLOW);
 				nav.waitUntilDone();
 
 				//Enable corrections again while we travel to the dropoff
@@ -250,10 +262,25 @@ public class SearchAndRescueController {
 				path = map.getPathFromNodeToNode(current, dest);
 
 				//Move along the new path
-				moveAlongPath(path);
-
+				moveAlongPath(path, true);
+				
+				x = nav.getOdometer().getX();
+				y = nav.getOdometer().getY();
+				
+				nav.travelTo(x + xDropoff[blocks], y + yDropoff[blocks]);
+				nav.waitUntilDone();
+				
+				blocks++;
+				
+				if(blocks==9){
+					statusFinal = true;
+				}
+				
 				//Drop off the block!
 				claw.open();
+				
+				nav.travelTo(x, y);
+				nav.waitUntilDone();
 
 	    	}
 
@@ -309,11 +336,16 @@ public class SearchAndRescueController {
      * This method causes the robot to follow a given path that's passed in
      * @param path Path object to follow
      */
-    private void moveAlongPath(Path path){
+    private void moveAlongPath(Path path, boolean delivery){
     	Display.update("Status", "Moving");
 
     	//Keep looping until we've visited every node on the path
 		while(path!=null){
+			
+			if(path.getNextPath()==null && delivery== true){
+				break;
+			}
+			
 			//Move us to the next node along the path
 			current = current.getNodeFromPath(new Path(path.getDirection()));
 
@@ -324,7 +356,7 @@ public class SearchAndRescueController {
 
 			//If it's not a turning node (so we are not currently in the tile), then move to it
 			if(path.getDirection()==Path.Direction.FRONT){
-				nav.travelTo(x, y, SPEED);
+				nav.travelTo(x, y, SPEED_SLOW);
 				nav.waitUntilDone();
 			}
 
@@ -333,7 +365,7 @@ public class SearchAndRescueController {
 
 			//If path is done, turn to face the right direction
 			if(path==null){
-				nav.turnTo(theta, SPEED);
+				nav.turnTo(theta, SPEED_SLOW);
 				nav.waitUntilDone();
 			}
 		}

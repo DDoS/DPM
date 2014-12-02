@@ -20,9 +20,6 @@ public class Group7Robot {
 		Odometer odometer = new Odometer(leftMotor, rightMotor, leftLightSensor, rightLightSensor);
 		Navigation navigation = new Navigation(leftMotor, rightMotor, odometer);
 
-		//TIMER
-		Time.startTime(7*60 + 30);
-
 		// MAP
 		//Written out as displayed in specifications (the Map class handles rotating it)
 		//0 - no block
@@ -180,7 +177,7 @@ public class Group7Robot {
 		//MENU
 
 		//Splash screen with version check for safety
-		Display.update("Version", "109.3");
+		Display.update("Version", "116.5");
 		//PLEASE UPDATE VERSION: first number changes with every commit. second number changes with every minor edit.
 		Button.waitForAnyPress();
 		Display.clear();
@@ -249,8 +246,11 @@ public class Group7Robot {
 
 		larges[m][11-y][x] = 3; 
 
-
+		//MAP
 		Map map = new Map(larges[m]);
+		
+		//TIMER
+		Time.startTime(7*60 + 30);
 
 		// CONTROLLERS
 		SearchAndRescueController searchAndRescue = new SearchAndRescueController(navigation, map, colorSensor, claw);
@@ -264,7 +264,14 @@ public class Group7Robot {
 		// MAIN RUN
 		odometer.enableDebugOutput(false);
 		odometer.enableCorrection(true);
-		localization.run();
+		
+		boolean localized = localization.run();
+		while(localized==false){
+			for(int i = 0; i<12*12*4; i++){
+				map.getNodeAtIndex(i).setIsValidStart(true);
+			}
+			localized = localization.run();
+		}
 		searchAndRescue.run();
 		/**/
 
