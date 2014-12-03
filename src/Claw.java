@@ -7,7 +7,7 @@ import lejos.nxt.*;
  * THREAD SAFE
  */
 public class Claw {
-	public static final int OPENED_ANGLE = 0;
+    public static final int OPENED_ANGLE = 0;
     public static final int CLOSED_ANGLE = 125;
     public static final int SENSING_ANGLE = 78;
     private final NXTRegulatedMotor motor;

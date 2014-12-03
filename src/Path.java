@@ -59,15 +59,18 @@ public class Path {
     }
 
     /**
-    * An enum used to represent the three valid directions from a node
-    *
-    * @author Jonah
-    */
+     * An enum used to represent the three valid directions from a node
+     *
+     * @author Jonah
+     */
     public static enum Direction {
         LEFT(-1, 0),
         RIGHT(1, 0),
         FRONT(0, 1),
         BACK(0, -1);
+        /**
+         * The unit offset for the direction in tile coords.
+         */
         public final int xOffset, yOffset;
 
         private Direction(int xOffset, int yOffset) {

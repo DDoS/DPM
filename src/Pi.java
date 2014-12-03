@@ -1,3 +1,6 @@
+/**
+ * Contains various ratios of Pi.
+ */
 public final class Pi {
     // Various PI ratios
     public static final float ONE = (float) Math.PI;
@@ -17,11 +20,11 @@ public final class Pi {
     }
 
     /**
-    * Wraps an angle between 0 (inclusive) and 2pi (exclusive). This is a utility method exposed for usage by other classes.
-    *
-    * @param rads The angle to wrap in radians.
-    * @return The wrapped angle in radians
-    */
+     * Wraps an angle between 0 (inclusive) and 2pi (exclusive). This is a utility method exposed for usage by other classes.
+     *
+     * @param rads The angle to wrap in radians.
+     * @return The wrapped angle in radians
+     */
     public static float wrapAngle(float rads) {
         return ((rads % TWO) + TWO) % TWO;
     }

@@ -2,8 +2,8 @@ import lejos.nxt.*;
 import lejos.robotics.Color;
 
 /**
- * A sliding average filtered differencial light sensor. This is implemented as thin wrapper around the ColorSensor class. This class is meant for periodic high frequency sampling. Note that the
- * first few readings will be less accurate as the filtering data has yet to be accumulated.
+ * A sliding average filtered differencial light sensor. This is implemented as thin wrapper around the ColorSensor class. This class is meant for periodic high frequency sampling. Note that the first
+ * few readings will be less accurate as the filtering data has yet to be accumulated.
  * <p/>
  * NOT THREAD SAFE
  */
@@ -54,8 +54,8 @@ public class FilteredLightSensor {
     }
 
     /**
-     * Forces the sensor to take a sample and add it to the sliding average filter, effectively slidding it forward by one sample. This doesn't actually compute the light value,
-     * but can help improve the frequency of sampling even in slow threads when called at a few strategic locations in the code. The disadvantage is the lost of time coherency in the samples.
+     * Forces the sensor to take a sample and add it to the sliding average filter, effectively slidding it forward by one sample. This doesn't actually compute the light value, but can help improve
+     * the frequency of sampling even in slow threads when called at a few strategic locations in the code. The disadvantage is the lost of time coherency in the samples.
      */
     public void forceSample() {
         final int sampleCount = samples.length;

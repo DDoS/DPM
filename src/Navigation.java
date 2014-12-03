@@ -72,11 +72,11 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Travel by a relative distance in centimeters at the default speed.
-    *
-    * @param x The x distance
-    * @param y The y distance
-    */
+     * Travel by a relative distance in centimeters at the default speed.
+     *
+     * @param x The x distance
+     * @param y The y distance
+     */
     public void travelBy(float x, float y) {
         travelBy(x, y, MOTOR_SPEED);
     }
@@ -94,11 +94,11 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Travel to absolute coordinates in centimeters at the default speed.
-    *
-    * @param x The x coordinate
-    * @param y The y coordinate
-    */
+     * Travel to absolute coordinates in centimeters at the default speed.
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     */
     public void travelTo(float x, float y) {
         travelTo(x, y, MOTOR_SPEED);
     }
@@ -116,10 +116,10 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Turns by a relative angle in radians at the default speed.
-    *
-    * @param theta The angle
-    */
+     * Turns by a relative angle in radians at the default speed.
+     *
+     * @param theta The angle
+     */
     public void turnBy(float theta) {
         turnBy(theta, MOTOR_SPEED);
     }
@@ -135,10 +135,10 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Turns to an absolute angle in radians at the default speed.
-    *
-    * @param theta The angle
-    */
+     * Turns to an absolute angle in radians at the default speed.
+     *
+     * @param theta The angle
+     */
     public void turnTo(float theta) {
         turnTo(theta, MOTOR_SPEED);
     }
@@ -155,29 +155,29 @@ public class Navigation extends Thread {
     }
 
     /**
-    * Moves backward by the specified distance at the default speed.
-    *
-    * @param distance The distance to travel backward
-    */
+     * Moves backward by the specified distance at the default speed.
+     *
+     * @param distance The distance to travel backward
+     */
     public void backward(float distance) {
         backward(distance, MOTOR_SPEED);
     }
 
     /**
-    * Moves backward by the specified distance at the desired speed.
-    *
-    * @param distance The distance to travel backward
-    * @param speed The speed
-    */
+     * Moves backward by the specified distance at the desired speed.
+     *
+     * @param distance The distance to travel backward
+     * @param speed The speed
+     */
     public void backward(float distance, int speed) {
         forward(-distance, speed);
     }
 
     /**
-    * Moves forward by the specified distance at the default speed.
-    *
-    * @param distance The distance to travel forward
-    */
+     * Moves forward by the specified distance at the default speed.
+     *
+     * @param distance The distance to travel forward
+     */
     public void forward(float distance) {
         forward(distance, MOTOR_SPEED);
     }
@@ -224,10 +224,11 @@ public class Navigation extends Thread {
 
     /**
      * Getter for the odometer
+     *
      * @return the odometer
      */
-    public Odometer getOdometer(){
-    	return odometer;
+    public Odometer getOdometer() {
+        return odometer;
     }
 
     // Starts a navigation command
@@ -327,7 +328,6 @@ public class Navigation extends Thread {
         // Convert to vectors and use dot product to compute angle in between
         return Math.abs((float) Math.acos(Math.cos(a) * Math.cos(b) + Math.sin(a) * Math.sin(b)));
     }
-
 
     // A command to travel to absolute coordinates
     private class Travel implements Runnable {

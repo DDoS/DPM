@@ -63,9 +63,8 @@ public class Odometer extends Thread {
     }
 
     /**
-     * Whether or not to enable the debug output: the odometer position will be mapped to the Display to "ox", "oy" and "ot".
-     * When crossing a horizontal line, a low pitch sound will be played.
-     * When crossing a vertical line, the sound will be higher pitched.
+     * Whether or not to enable the debug output: the odometer position will be mapped to the Display to "ox", "oy" and "ot". When crossing a horizontal line, a low pitch sound will be played. When
+     * crossing a vertical line, the sound will be higher pitched.
      *
      * @param enabled The enable state
      */
@@ -311,16 +310,17 @@ public class Odometer extends Thread {
 
     /**
      * Sets the position to 3 specified values
+     *
      * @param setX float, the new x position
      * @param setY float, the new y position
      * @param setT float, the new theta position
      */
-    public void setPosition(float setX, float setY, float setT){
-    	synchronized (lock) {
-        	x = setX;
-        	y = setY;
-        	theta = setT;
-    	}
+    public void setPosition(float setX, float setY, float setT) {
+        synchronized (lock) {
+            x = setX;
+            y = setY;
+            theta = setT;
+        }
     }
 
     /**
