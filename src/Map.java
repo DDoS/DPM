@@ -2,8 +2,6 @@ import java.util.ArrayList;
 
 /**
  * Map class holds all of the Nodes
- *
- * @author Jonah
  */
 public class Map {
     private Node[] nodes;

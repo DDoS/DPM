@@ -2,8 +2,6 @@ import java.util.Queue;
 
 /**
  * Node class used to represent a single position of the robot
- *
- * @author Jonah
  */
 public class Node {
     //Each node contains pointers to the nodes to the left, right, and front

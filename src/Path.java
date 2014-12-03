@@ -1,7 +1,5 @@
 /**
  * Path class used to represent paths between nodes
- *
- * @author Jonah
  */
 public class Path {
     private Direction dir;
@@ -60,8 +58,6 @@ public class Path {
 
     /**
      * An enum used to represent the three valid directions from a node
-     *
-     * @author Jonah
      */
     public static enum Direction {
         LEFT(-1, 0),
